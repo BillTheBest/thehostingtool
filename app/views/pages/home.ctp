@@ -5,12 +5,10 @@
           <tr> 
             <td width="40%" align="left">Username:</td> 
             <td><input type="text" name="textfield" id="user" class="textbox" /></td>
-            <td align="center">&nbsp;</td> 
           </tr> 
           <tr> 
             <td>Password:</td> 
-            <td><input name="pass" type="password" class="textbox" id="pass" value="lolololol" /></td>
-            <td align="center"><?php echo $html->image('accept.png', array('alt' => 'Accepted'))?></td> 
+            <td><input name="pass" type="password" class="accepted" id="pass" value="lolololol" /></td>
           </tr> 
           <tr> 
             <td>Confirm Password:</td> 
@@ -19,8 +17,7 @@
           </tr> 
           <tr> 
             <td>Email:</td> 
-            <td><input name="user" type="text" class="textbox" style="" id="email" value="Invalidemail.com" /></td>
-            <td align="center"><?php echo $html->image('delete.png', array('alt' => 'Declined'))?></td> 
+            <td><input name="user" type="text" class="declined" style="" id="email" value="Invalidemail.com" /></td>
           </tr> 
           </table> 
     </div></div> 

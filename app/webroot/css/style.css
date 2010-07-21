@@ -36,22 +36,40 @@ body {
 }
 h1 {
 	font-family:Georgia, Times New Roman, "Times", serif;
-	color:#526adc;
+	color:#db5252;
 	font-size:22px;
 	font-weight:normal;
 	margin-top:0;
 	margin-bottom:5px;
 	/*border-bottom:1px solid #CCC;*/
-	text-shadow: 0px 1px 0px #CCC;
+	text-shadow: 0px 1px 0px rgba(0,0,0,.2);
 }
 .textbox {
 	font-size:14px;
 	color:#666;
 	border:0;
 	padding:3px;
-	-webkit-box-shadow: 1px 1px 5px #999;
-	-moz-box-shadow: 1px 1px 5px #999;
-	box-shadow: 1px 1px 5px #999;
+	-webkit-box-shadow: 1px 1px 4px #999;
+	-moz-box-shadow: 1px 1px 4px #999;
+	box-shadow: 1px 1px 4px #999;
+}
+.declined {
+	font-size:14px;
+	color:#666;
+	border:1px solid #db5252;
+	padding:3px;
+	-webkit-box-shadow: 1px 1px 4px rgba(0,0,0,.2);
+	-moz-box-shadow: 1px 1px 4px rgba(0,0,0,.2);
+	box-shadow: 1px 1px 4px rgba(0,0,0,.2);
+}
+.accepted {
+	font-size:14px;
+	color:#666;
+	border:1px solid #5fdb52;
+	padding:3px;
+	-webkit-box-shadow: 1px 1px 4px rgba(0,0,0,.2);
+	-moz-box-shadow: 1px 1px 4px rgba(0,0,0,.2);
+	box-shadow: 1px 1px 4px rgba(0,0,0,.2);
 }
 #buttonbox {
 	width:350px;

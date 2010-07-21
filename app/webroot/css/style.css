@@ -56,7 +56,7 @@ h1 {
 .declined {
 	font-size:14px;
 	color:#666;
-	border:1px solid #db5252;
+	border:2px solid #db5252;
 	padding:3px;
 	-webkit-box-shadow: 1px 1px 4px rgba(0,0,0,.2);
 	-moz-box-shadow: 1px 1px 4px rgba(0,0,0,.2);
@@ -65,7 +65,7 @@ h1 {
 .accepted {
 	font-size:14px;
 	color:#666;
-	border:1px solid #5fdb52;
+	border:2px solid #5fdb52;
 	padding:3px;
 	-webkit-box-shadow: 1px 1px 4px rgba(0,0,0,.2);
 	-moz-box-shadow: 1px 1px 4px rgba(0,0,0,.2);

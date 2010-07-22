@@ -1,5 +1,5 @@
 How to setup:
-1. Decide what kind of enviroment you're going to be using. Production or Development. If you want a production install COPY (do NOT rename or move) app/config/core.prod.php to app/config/core.private.php. If you want a development install COPY (do NOT rename or move) app/config/core.dev.php to app/config/core.private.php.
+1. Decide what kind of environment you're going to be using. Production or Development. If you want a production install COPY (do NOT rename or move) app/config/core.prod.php to app/config/core.private.php. If you want a development install COPY (do NOT rename or move) app/config/core.dev.php to app/config/core.private.php.
 2. Edit the new file to your likings. This includes a new Security.salt & Security.cipherSeed
 3. COPY app/config/database.php.default to app/config/database.php
 4. Modify your copied file to reflect your database details.

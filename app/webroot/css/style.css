@@ -120,3 +120,11 @@ h1 {
 	background: -moz-linear-gradient(top,  #4c5daf,  #5a75f7);
 	background: #5a75f7;
 }
+
+/* Some CakePHP related errors and stuff for the front page */
+.notice {
+    color: #db5252;
+}
+.success {
+    color: #5fdb52;
+}

@@ -1,7 +1,7 @@
 <div class="container">	
+<h1 align="center">Step 2 - Enter Details</h1>
 	<div id="box" style="margin:auto auto;"> 
-        <div id="step2" class="padding"> 
-          <h1>Step 2 - Enter Details</h1> 
+        <div id="step2" class="padding">  
           <table width="100%" border="0" cellspacing="0" cellpadding="6"> 
           <tr> 
             <td width="40%" align="left">Username:</td> 

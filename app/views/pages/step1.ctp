@@ -1,5 +1,5 @@
 <div class="container">
-	<h1>Step 1 - Choose Package</h1>
+	<h1 align="center">Step 1 - Choose Package</h1>
     <div id="box"> 
 		<div class="boxheader">Package 1</div>
 		<p>This package has unlimited everything. It's so cool.</p>

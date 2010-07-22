@@ -47,11 +47,18 @@ h1 {
 .textbox {
 	font-size:14px;
 	color:#666;
-	border:0;
+	border:2px solid transparent;
 	padding:3px;
 	-webkit-box-shadow: 1px 1px 4px #999;
 	-moz-box-shadow: 1px 1px 4px #999;
 	box-shadow: 1px 1px 4px #999;
+}
+.textbox:focus{
+	outline:none;
+	border:2px solid #2daebf;
+	-moz-box-shadow:inset 0 2px 4px rgba(0,0,0,0.1), inset 0 6px 10px rgba(0,0,0,0.2), 1px 1px 4px #999;
+	-webkit-box-shadow:inset 0 2px 4px rgba(0,0,0,0.2), inset 0 6px 10px rgba(0,0,0,0.2), 1px 1px 4px #999;
+	box-shadow:inset 0 2px 4px rgba(0,0,0,0.1), inset 0 6px 10px rgba(0,0,0,0.2), 1px 1px 4px #999;
 }
 .declined {
 	font-size:14px;
@@ -70,6 +77,12 @@ h1 {
 	-webkit-box-shadow: 1px 1px 4px rgba(0,0,0,.2);
 	-moz-box-shadow: 1px 1px 4px rgba(0,0,0,.2);
 	box-shadow: 1px 1px 4px rgba(0,0,0,.2);
+}
+.declined:focus, .accepted:focus {
+	outline:none;
+	-moz-box-shadow:inset 0 2px 4px rgba(0,0,0,0.1), inset 0 6px 10px rgba(0,0,0,0.2), 1px 1px 4px rgba(0,0,0,.2);
+	-webkit-box-shadow:inset 0 2px 4px rgba(0,0,0,0.2), inset 0 6px 10px rgba(0,0,0,0.2), 1px 1px 4px rgba(0,0,0,.2);
+	box-shadow:inset 0 2px 4px rgba(0,0,0,0.1), inset 0 6px 10px rgba(0,0,0,0.2), 1px 1px 4px rgba(0,0,0,.2);
 }
 #buttonbox {
 	width:350px;

@@ -1,0 +1,36 @@
+<?php
+/* StaffAccount Fixture generated on: 
+Warning: date(): It is not safe to rely on the system's timezone settings. You are *required* to use the date.timezone setting or the date_default_timezone_set() function. In case you used any of those methods and you are still getting this warning, you most likely misspelled the timezone identifier. We selected 'America/New_York' for 'EDT/-4.0/DST' instead in /Applications/MAMP/htdocs/TheHostingTool/branches/2.0/cake/console/templates/default/classes/fixture.ctp on line 24
+2010-07-24 01:07:13 : 1279950013 */
+class StaffAccountFixture extends CakeTestFixture {
+	var $name = 'StaffAccount';
+
+	var $fields = array(
+		'id' => array('type' => 'integer', 'null' => false, 'default' => NULL, 'length' => 10, 'key' => 'primary'),
+		'username' => array('type' => 'string', 'null' => false, 'default' => NULL, 'length' => 50),
+		'display_name' => array('type' => 'string', 'null' => false, 'default' => NULL, 'length' => 50),
+		'password' => array('type' => 'string', 'null' => false, 'default' => NULL),
+		'salt' => array('type' => 'string', 'null' => false, 'default' => NULL),
+		'email' => array('type' => 'string', 'null' => false, 'default' => NULL, 'length' => 50),
+		'added' => array('type' => 'datetime', 'null' => false, 'default' => NULL),
+		'permissions' => array('type' => 'text', 'null' => false, 'default' => NULL),
+		'signature' => array('type' => 'text', 'null' => false, 'default' => NULL),
+		'indexes' => array('PRIMARY' => array('column' => 'id', 'unique' => 1)),
+		'tableParameters' => array()
+	);
+
+	var $records = array(
+		array(
+			'id' => 1,
+			'username' => 'Lorem ipsum dolor sit amet',
+			'display_name' => 'Lorem ipsum dolor sit amet',
+			'password' => 'Lorem ipsum dolor sit amet',
+			'salt' => 'Lorem ipsum dolor sit amet',
+			'email' => 'Lorem ipsum dolor sit amet',
+			'added' => '2010-07-24 01:40:13',
+			'permissions' => 'Lorem ipsum dolor sit amet, aliquet feugiat. Convallis morbi fringilla gravida, phasellus feugiat dapibus velit nunc, pulvinar eget sollicitudin venenatis cum nullam, vivamus ut a sed, mollitia lectus. Nulla vestibulum massa neque ut et, id hendrerit sit, feugiat in taciti enim proin nibh, tempor dignissim, rhoncus duis vestibulum nunc mattis convallis.',
+			'signature' => 'Lorem ipsum dolor sit amet, aliquet feugiat. Convallis morbi fringilla gravida, phasellus feugiat dapibus velit nunc, pulvinar eget sollicitudin venenatis cum nullam, vivamus ut a sed, mollitia lectus. Nulla vestibulum massa neque ut et, id hendrerit sit, feugiat in taciti enim proin nibh, tempor dignissim, rhoncus duis vestibulum nunc mattis convallis.'
+		),
+	);
+}
+?>

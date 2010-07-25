@@ -12,7 +12,7 @@ body {
 	background-image:url(../img/bg.png);
 }
 .container {
-	width:50%;
+	width:75%;
 	margin:auto auto;	
 }
 #logo {
@@ -48,6 +48,17 @@ h1 {
 	margin-bottom:10px;
 	/*border-bottom:1px solid #CCC;*/
 	text-shadow: 0px 1px 0px rgba(0,0,0,.2);
+}
+.pbox {
+	background:#FFF;
+	/*border:2px solid #CCC;*/
+	-webkit-box-shadow: 0px 0px 10px #CCC;
+	-moz-box-shadow: 0px 0px 10px #CCC;
+	box-shadow: 0px 0px 10px #CCC;
+	width:45%;
+	height: 7em;
+	margin:10px;
+	float:left;
 }
 .textbox {
 	font-size:14px;
@@ -93,6 +104,7 @@ h1 {
 	width:100%;
 	margin:auto auto;
 	padding:10px;
+	clear:both;
 }
 .button, .submit input {
 	display: inline-block;

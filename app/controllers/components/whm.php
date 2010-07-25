@@ -10,13 +10,11 @@ class WhmComponent extends Object {
 	
 	var $serverid = false;
 	
-	var $accesshash = false; // Whether to use Access Hash
-	var $password = false; // Whether to use password
-	
 	function __construct() {
 		parent::__construct();
 		// FIXME: Using Undocumented ClassRegistry Function
 		$this->Server = ClassRegistry::init("Server");
+		$this->Plan = ClassRegistry::init("Plan");
 	}
 	
 	/**
@@ -88,5 +86,35 @@ class WhmComponent extends Object {
 			if(!class_exists("SimpleXMLElement")) return $Data;
 			return new SimpleXMLElement($Data);
 		}
+	}
+	
+	
+	/**
+	 * Create a WHM Account / Sign up.
+	 * $server, $reseller, $user = '', $email = '', $pass = ''
+	 * @param  int  Server ID.
+	 * @param  bool Is a reseller?
+	 * @param  string Username.
+	 * @param  string Email. 
+	 * @param  string Password.
+	 * @param  string Domain.
+	 * @param  id Plan.
+	 */
+	function signup($serverid, $reseller, $username, $email, $password, $domain, $plan) {
+		$reseller = ($reseller ? true : false);
+		$plan = intval($plan);
+		
+		$plan = $this->Plan->find("first",
+			array(
+				"condition" => array(
+					"Plan.id" => $plan
+				),
+				"recursive" => false
+			)
+		);
+		
+		if(!$plan or $plan["Plan"]["disabled"]) return false;
+		
+		return true; // FIXME: Stub
 	}
 }

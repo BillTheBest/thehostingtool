@@ -1,9 +1,10 @@
 <?php
-class OrderformController extends AppController {
+class OrdersController extends AppController {
 
-	var $name = 'Orderform';
+	var $name = 'Orders';
 	var $components = array('RequestHandler');
 	var $helpers = array('ajax');
+	var $uses = array('Accounts');
 
 	//One day I will fully understand CakePHP
 	function index() {

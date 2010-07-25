@@ -6,13 +6,15 @@ class OrdersController extends AppController {
 	var $helpers = array('ajax');
 	var $uses = array('Account', 'Plan');
 	
-	var $paginate = array('Plan' => array(
-	'fields' => array('id', 'name', 'description'),
-	'order' => 'id ASC',
-	'limit' => 6
-	));
+	var $paginate = array(
+		'Plan' => array(
+			'fields' => array('id', 'name', 'description'),
+			'order' => 'id ASC',
+			'limit' => 6
+		)
+	);
 
-	//One day I will fully understand CakePHP
+	// One day I will fully understand CakePHP
 	function index() {
 		$this->set('effectTimes', array('drop' => '150', 'slide' => '250'));
 	}
@@ -21,12 +23,13 @@ class OrdersController extends AppController {
 		$this->layout = "ajax";
 		if (!$this->RequestHandler->isAjax()) {
 			Configure::write('debug', 0);
-		 	$this->autoRender = false;
-		 	exit();	
+			$this->autoRender = false;
+			return;
 		}
-		$this->set('data',$this->paginate('Plan'));
+		$this->set('data', $this->paginate('Plan'));
 		$this->helpers['Paginator'] = array('ajax' => 'Ajax');
 	}
+	
 	function step2() {
 			
 	}

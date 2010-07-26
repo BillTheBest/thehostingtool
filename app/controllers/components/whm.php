@@ -56,6 +56,12 @@ class WhmComponent extends Object {
 		
 		if(!function_exists("curl_init")) { // fall back to file_get_contents, ugly way.
 			// TODO:
+			/*
+			* Note From Kevin: Screw file_get_contents(). I'll write up a
+			* connection to it using the core socket functions. file_get_contents()
+			* is way too simple for our purposes. It may turn out that this method is
+			* faster than cURL. Although, I doubt it.
+			*/
 		}
 		else {
 			$CurlConncetion = curl_init();

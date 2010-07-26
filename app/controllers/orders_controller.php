@@ -22,11 +22,11 @@ class OrdersController extends AppController {
 	function step1() {
 		$this->effectTimes();
 		$this->layout = "ajax";
-		/*if (!$this->RequestHandler->isAjax()) {
+		if (!$this->RequestHandler->isAjax()) {
 			Configure::write('debug', 0);
 			$this->autoRender = false;
 			return;
-		}*/
+		}
 		$this->set('data', $this->paginate('Plan'));
 		$this->helpers['Paginator'] = array('ajax' => 'Ajax');
 	}

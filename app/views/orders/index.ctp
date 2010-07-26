@@ -6,5 +6,5 @@
 		TOS HERE
 		</div>
     </div>
-	<div id="buttonbox"><div align="center"><?php echo $ajax->link('I Agree', '/orders/step1', array('update' => 'ajaxbox', 'class' => 'button', 'before'  => '$("#ajaxbox").effect("drop",'.$this->viewVars['effectTimes']['drop'].')', 'after'  => '$("#ajaxbox").effect("slide",{ direction: "right" },'.$this->viewVars['effectTimes']['slide'].')')); ?></div>
+	<div id="buttonbox"><div align="center"><?php echo $ajax->link('I Agree', '/orders/step1', array('update' => 'ajaxbox', 'class' => 'button', 'before'  => '$("#ajaxbox").hide("slide",'.$this->viewVars['effectTime'].');', 'complete'  => '$("#ajaxbox").show("slide",{ direction: "right" },'.$this->viewVars['effectTime'].')')); ?></div>
 </div>

@@ -2,6 +2,8 @@
 class AccountsController extends AppController {
 
 	var $name = 'Accounts';
+	var $validate = array(
+	'email' => 'email');
 
 	function index() {
 		$this->Account->recursive = 0;

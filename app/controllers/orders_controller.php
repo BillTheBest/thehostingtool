@@ -21,21 +21,41 @@ class OrdersController extends AppController {
 
 	function step1() {
 		$this->effectTimes();
+		$this->formLoad();
 		$this->layout = "ajax";
-		if (!$this->RequestHandler->isAjax()) {
+		/*if (!$this->RequestHandler->isAjax()) {
 			Configure::write('debug', 0);
 			$this->autoRender = false;
 			return;
-		}
+		}*/
 		$this->set('data', $this->paginate('Plan'));
-		$this->helpers['Paginator'] = array('ajax' => 'Ajax');
+		$this->set('limit', $this->paginate['Plan']['limit']);
+		$this->set('total', $this->Plan->find('count'));
 	}
-	
+	function ajaxcall() {
+		$this->layout = "ajax";
+		$this->Account->set($this->data['step2']['Email']);
+		if($this->Account->validates()) {
+			echo 1;	
+		}
+		else {
+			echo 0;	
+		}
+	}
 	function step2() {
+		$this->formLoad();
 		$this->effectTimes();
 	}
 	function effectTimes() {
-		$this->set('effectTimes', array('drop' => '150', 'slide' => '250'));	
+		$this->set('effectTime', 500);
+	}
+	function formLoad() {
+		$html = "";
+		$postVar = "";
+		if($this->data) {
+			$postVar = $this->data;
+		}
+		$this->set('postVar', $postVar);
 	}
 }
 ?>

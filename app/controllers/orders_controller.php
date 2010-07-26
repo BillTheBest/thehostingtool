@@ -13,25 +13,29 @@ class OrdersController extends AppController {
 			'limit' => 6
 		)
 	);
-
+	
 	// One day I will fully understand CakePHP
 	function index() {
-		$this->set('effectTimes', array('drop' => '150', 'slide' => '250'));
+		$this->effectTimes();
 	}
 
 	function step1() {
+		$this->effectTimes();
 		$this->layout = "ajax";
-		if (!$this->RequestHandler->isAjax()) {
+		/*if (!$this->RequestHandler->isAjax()) {
 			Configure::write('debug', 0);
 			$this->autoRender = false;
 			return;
-		}
+		}*/
 		$this->set('data', $this->paginate('Plan'));
 		$this->helpers['Paginator'] = array('ajax' => 'Ajax');
 	}
 	
 	function step2() {
-			
+		$this->effectTimes();
+	}
+	function effectTimes() {
+		$this->set('effectTimes', array('drop' => '150', 'slide' => '250'));	
 	}
 }
 ?>

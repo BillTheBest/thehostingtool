@@ -16,12 +16,12 @@ class OrdersController extends AppController {
 	
 	// One day I will fully understand CakePHP
 	function index() {
-		$this->effectTimes();
+		$this->_effectTimes();
 	}
 
 	function step1() {
-		$this->effectTimes();
-		$this->formLoad();
+		$this->_effectTimes();
+		$this->_formLoad();
 		$this->layout = "ajax";
 		/*if (!$this->RequestHandler->isAjax()) {
 			Configure::write('debug', 0);
@@ -34,13 +34,16 @@ class OrdersController extends AppController {
 	}
 	function ajaxcall() {
 		$this->layout = "ajax";
+		
 		foreach($this->data['step2'] as $key => $value) {
-			if(!$n) {
-				$this->Account->set($this->data['step2'][$key]);
-			}
-			$n = 1;
+			$this->Account->set(array(strtolower($key) => $this->data['step2'][$key]));
+			$field = strtolower($key);
+			
+			break;
 		}
-		if($this->Account->validates()) {
+	
+		
+		if($this->Account->validates(array('fieldlist' => array($field)))) {
 			echo 1;	
 		}
 		else {
@@ -48,13 +51,15 @@ class OrdersController extends AppController {
 		}
 	}
 	function step2() {
-		$this->formLoad();
-		$this->effectTimes();
+		$this->_formLoad();
+		$this->_effectTimes();
 	}
-	function effectTimes() {
+	
+	// internal functions
+	function _effectTimes() {
 		$this->set('effectTime', 500);
 	}
-	function formLoad() {
+	function _formLoad() {
 		$html = "";
 		$postVar = "";
 		if($this->data) {

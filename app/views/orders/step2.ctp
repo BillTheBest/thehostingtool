@@ -23,7 +23,7 @@
 				<td><?php echo $form->password('cpass', array("div" => false, "class" => "textbox")) ?></td>
 			  </tr> 
 			  <tr> 
-				<td>Email:</td><?php echo $ajax->observeField('step2Email', array('url' => 'orders/ajaxcall', 'complete' => 'if(request.responseText == "1") { $("#step2Email").removeClass("textbox"); $("#step2Email").addClass("accepted"); } else { $("#step2Email").removeClass("textbox"); $("#step2Email").addClass("declined"); }')); ?>
+				<td>Email:</td><?php echo $ajax->observeField('step2Email', array('url' => Router::url("/", true).'orders/ajaxcall', 'complete' => 'if(request.responseText == "1") { $("#step2Email").removeClass("textbox"); $("#step2Email").addClass("accepted"); } else { $("#step2Email").removeClass("textbox"); $("#step2Email").addClass("declined"); }')); ?>
 				<td><?php print $form->text('Email', array('class' => 'textbox')) ?></td>
 			  </tr> 
 			  </table> 

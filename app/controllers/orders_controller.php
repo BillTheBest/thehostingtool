@@ -34,7 +34,12 @@ class OrdersController extends AppController {
 	}
 	function ajaxcall() {
 		$this->layout = "ajax";
-		$this->Account->set($this->data['step2']['Email']);
+		foreach($this->data['step2'] as $key => $value) {
+			if(!$n) {
+				$this->Account->set($this->data['step2'][$key]);
+			}
+			$n = 1;
+		}
 		if($this->Account->validates()) {
 			echo 1;	
 		}

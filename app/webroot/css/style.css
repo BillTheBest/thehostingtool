@@ -183,7 +183,7 @@ h1 {
 	background: -moz-linear-gradient(top,  #4c5daf,  #5a75f7);
 	background: #5a75f7;
 }
-.boxheaderblue{
+.boxheader{
 	outline: none;
 	text-decoration: none;
 	font: 16px Arial, Helvetica, sans-serif;
@@ -196,7 +196,7 @@ h1 {
 	background: -webkit-gradient(linear, left top, left bottom, from(#5a75f7), to(#4c5daf));
 	background: -moz-linear-gradient(top,  #5a75f7,  #4c5daf);
 }
-.boxheaderred{
+.boxheaderAlt{
 	outline: none;
 	text-decoration: none;
 	font: 16px Arial, Helvetica, sans-serif;
@@ -206,8 +206,8 @@ h1 {
 	border:0;
 	margin:0;
 	background: #dc4242;
-	background: -webkit-gradient(linear, left top, left bottom, from(#dc4242), to(#db5252));
-	background: -moz-linear-gradient(top,  #dc4242,  #db5252);
+	background: -webkit-gradient(linear, left top, left bottom, from(#5fdb52), to(#5faf4c));
+	background: -moz-linear-gradient(top,  #5fdb52,  #5faf4c);
 }
 .requirements {
 	background:#F0F0F0;

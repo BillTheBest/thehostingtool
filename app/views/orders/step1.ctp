@@ -14,11 +14,11 @@
 			}
 				$every = 3;
 				if($r > 0 && $r < $every) {
-					$class = "boxheaderred";
+					$class = "boxheaderAlt";
 					$r++;
 				}
 				elseif($r == $every) {
-					$class = "boxheaderblue";
+					$class = "boxheader";
 					if($every == 1) {
 						$every = 2;	
 					}
@@ -28,7 +28,7 @@
 					$r = 0;
 				}
 				else {
-					$class = "boxheaderblue";	
+					$class = "boxheader";	
 					$r++;
 				}
 			?>

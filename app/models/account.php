@@ -5,10 +5,10 @@ class Account extends AppModel {
 	var $validate = array(
 		'username' => array(
 			'alphanumeric' => array(
-				'rule' => array('alphanumeric'),
+				'rule' => array('alphanumeric', 'maxLength', '8'),
 				//'message' => 'Your custom message here',
 				//'allowEmpty' => false,
-				//'required' => false,
+				'required' => true,
 				//'last' => false, // Stop validation after this rule
 				//'on' => 'create', // Limit validation to 'create' or 'update' operations
 			),

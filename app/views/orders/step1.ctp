@@ -7,9 +7,9 @@
 	}
 	?>
 	<div id="ajaxpbox">
-	<?php $n = 0; $r = 0; foreach($data as $packages):  echo $form->create($packages['Plan']['id']); echo $form->hidden('pID', array('value' => $packages['Plan']['id']));?> 
+	<?php $n = 0; $r = 0; foreach($data as $packages):  echo $form->create('step1'); echo $form->hidden('pID', array('value' => $packages['Plan']['id']));?> 
     <?php
-			foreach($postVar as $key => $value) {
+			foreach($postVar['step2'] as $key => $value) {
 				echo $form->hidden($key, array('value' => $value));
 			}
 				$every = 3;

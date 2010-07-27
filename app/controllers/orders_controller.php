@@ -34,14 +34,13 @@ class OrdersController extends AppController {
 	}
 	function ajaxcall() {
 		$this->layout = "ajax";
-		
-		foreach($this->data['step2'] as $key => $value) {
-			$this->Account->set(array(strtolower($key) => $this->data['step2'][$key]));
-			$field = strtolower($key);
-			
-			break;
+		foreach($this->params['url'] as $key => $value) {
+			if($key != "url") {
+				$this->Account->set(array(strtolower($key) => $this->params['url'][$key]));
+				$field = strtolower($key);
+				break;
+			}
 		}
-	
 		
 		if($this->Account->validates(array('fieldlist' => array($field)))) {
 			echo 1;	

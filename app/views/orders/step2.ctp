@@ -12,15 +12,15 @@
 			  <table width="100%" border="0" cellspacing="0" cellpadding="6"> 
 			  <tr> 
 				<td width="40%" align="left">Username:</td> 
-				<td><?php echo $form->text('user') ?></td>
+				<td><?php echo $form->text('user', array("div" => false, "class" => "textbox")) ?></td>
 			  </tr> 
 			  <tr> 
 				<td>Password:</td> 
-				<td><?php echo $form->password('pass') ?></td>
+				<td><?php echo $form->password('pass', array("div" => false, "class" => "textbox")) ?></td>
 			  </tr> 
 			  <tr> 
 				<td>Confirm Password:</td> 
-				<td><?php echo $form->password('cpass') ?></td>
+				<td><?php echo $form->password('cpass', array("div" => false, "class" => "textbox")) ?></td>
 			  </tr> 
 			  <tr> 
 				<td>Email:</td><?php echo $ajax->observeField('step2Email', array('url' => 'orders/ajaxcall', 'complete' => 'if(request.responseText == "1") { $("#step2Email").removeClass("textbox"); $("#step2Email").addClass("accepted"); } else { $("#step2Email").removeClass("textbox"); $("#step2Email").addClass("declined"); }')); ?>

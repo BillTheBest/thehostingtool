@@ -7,14 +7,33 @@
 	}
 	?>
 	<div id="ajaxpbox">
-	<?php $n = 0; foreach($data as $packages): echo $form->create($packages['Plan']['id']); echo $form->hidden('pID', array('value' => $packages['Plan']['id']));?> 
+	<?php $n = 0; $r = 0; foreach($data as $packages):  echo $form->create($packages['Plan']['id']); echo $form->hidden('pID', array('value' => $packages['Plan']['id']));?> 
     <?php
 			foreach($postVar as $key => $value) {
-				echo $form->hidden($key, array('value' => $value));	
+				echo $form->hidden($key, array('value' => $value));
 			}
+				$every = 3;
+				if($r > 0 && $r < $every) {
+					$class = "boxheaderred";
+					$r++;
+				}
+				elseif($r == $every) {
+					$class = "boxheaderblue";
+					if($every == 1) {
+						$every = 2;	
+					}
+					elseif($every == 2) {
+						$every = 1;	
+					}
+					$r = 0;
+				}
+				else {
+					$class = "boxheaderblue";	
+					$r++;
+				}
 			?>
     <div class="pbox"> 
-		<div class="boxheader"><?php echo $packages['Plan']['name'] ?></div>
+		<div class="<?php echo $class ?>"><?php echo $packages['Plan']['name'] ?></div>
 		<p><?php echo $packages['Plan']['description'] ?></p>
         <table width="100%" border="0">
 		    <tr>

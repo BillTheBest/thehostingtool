@@ -32,7 +32,7 @@
 		<div id="buttonbox"> 
 		  <table width="100%" border="0" cellspacing="0" cellpadding="0"> 
 			<tr>
-			  <td width="50%"><?php echo $ajax->submit('Previous Step', array('id' => 'Previous', 'url'=> '/orders/step1', 'update' => 'ajaxbox' ,'before'  => '$("#ajaxbox").hide("slide",'.$this->viewVars['effectTime'].')', 'complete'  => '$("#ajaxbox").show("slide",{ direction: "right" },'.$this->viewVars['effectTime'].')')); ?></td> 
+			  <td width="50%"><?php echo $ajax->submit('Previous Step', array('id' => 'Previous', 'url'=> '/orders/step1', 'class' => 'button', 'update' => 'ajaxbox' ,'before'  => '$("#ajaxbox").hide("slide",'.$this->viewVars['effectTime'].')', 'complete'  => '$("#ajaxbox").show("slide",{ direction: "right" },'.$this->viewVars['effectTime'].')')); ?></td> 
 			  <td align="right"></td> 
 			</tr> 
 		  </table> 

@@ -7,9 +7,9 @@ body {
 	background-image:url(../img/bg.png);
 	
 	overflow-x:hidden;
-	box-shadow: 0 0 55px #424242;
-	-webkit-box-shadow: 0 0 55px #424242;
-	-moz-box-shadow: 0 0 55px #424242;
+	box-shadow: 0 15px 30px #cecece;
+	-webkit-box-shadow: 0 15px 30px #cecece;
+	-moz-box-shadow: 0 15px 30px #cecece;
 }
 #sidebar {
 	width:110px;
@@ -114,7 +114,10 @@ h1 {
 	color:#333;
 	text-shadow: 0 1px 1px rgba(0,0,0,.3);
 }
-.button, .submit input {
+.submit input {
+	padding:5px;	
+}
+.button {
 	display: inline-block;
 	outline: none;
 	cursor: pointer;
@@ -139,10 +142,10 @@ h1 {
 	color:#fef4e9;;
 	text-decoration:none;
 }
-.button:hover, .submit input:hover {
+.button:hover {
 	text-decoration: none;
 }
-.button:active, .submit input:active {
+.button:active {
 	position: relative;
 	top: 1px;
 	background: -webkit-gradient(linear, left top, left bottom, from(#4c5daf), to(#5a75f7));
@@ -180,7 +183,7 @@ h1 {
 	background: -moz-linear-gradient(top,  #4c5daf,  #5a75f7);
 	background: #5a75f7;
 }
-.boxheader{
+.boxheaderblue{
 	outline: none;
 	text-decoration: none;
 	font: 16px Arial, Helvetica, sans-serif;
@@ -192,6 +195,19 @@ h1 {
 	background: #5a75f7;
 	background: -webkit-gradient(linear, left top, left bottom, from(#5a75f7), to(#4c5daf));
 	background: -moz-linear-gradient(top,  #5a75f7,  #4c5daf);
+}
+.boxheaderred{
+	outline: none;
+	text-decoration: none;
+	font: 16px Arial, Helvetica, sans-serif;
+	padding:6px;
+	text-shadow: 0 1px 1px rgba(0,0,0,.3);
+	color: #fef4e9;
+	border:0;
+	margin:0;
+	background: #dc4242;
+	background: -webkit-gradient(linear, left top, left bottom, from(#dc4242), to(#db5252));
+	background: -moz-linear-gradient(top,  #dc4242,  #db5252);
 }
 .requirements {
 	background:#F0F0F0;

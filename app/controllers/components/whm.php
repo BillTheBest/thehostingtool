@@ -39,7 +39,7 @@ class WhmComponent extends Object {
 	 * @param string The URL to operate.
 	 * @param bool Use HTTPS? Default=False
 	 * @param bool Return after the operation is complete, and do not parse data? Default=False
-	 * @param bool Return SimpleXMLElement? Default=True
+	 * @param bool Return SimpleXMLElement? Default=True. Should *always* be true.
 	 */
 	function remote($url, $https = false, $kill = false, $xml = true) {
 		if($this->serverid === false) return false;
@@ -105,10 +105,14 @@ class WhmComponent extends Object {
 	 * @param  string Password.
 	 * @param  string Domain.
 	 * @param  id Plan.
+	 * @param  bool Use HTTPs when connecting? Default=false
 	 */
-	function signup($serverid, $reseller, $username, $email, $password, $domain, $plan) {
+	function signup($serverid, $reseller, $username, $email, $password, $domain, $plan, $usehttps = false) {
 		$reseller = ($reseller ? true : false);
 		$plan = intval($plan);
+		
+		// set our server
+		$this->serverid = intval($serverid);
 		
 		$plan = $this->Plan->find("first",
 			array(
@@ -120,7 +124,98 @@ class WhmComponent extends Object {
 		);
 		
 		if(!$plan or $plan["Plan"]["disabled"]) return false;
+		$plan_name = $plan["Plan"]["backend"];
 		
-		return true; // FIXME: Stub
+		$actionUri = "/xml-api/createacct?username={$username}&password={$password}&domain={$domain}&plan={$plan_name}&contactemail={$email}";
+			if($reseller == true) $actionUri .= "&reseller=1";
+		
+		$command = $this->remote($actionUri, $usehttps);
+		// wait, check for some really stupid things here
+		if($command === false) return false;
+		
+		if($command->result->status == 1) return true;
+		else {
+			// save the error here
+			$this->lastErrorMessage = $command->result->statusmsg;
+			return false;
+		}
+	}
+	
+	/**
+	 * Suspends a user.
+	 * @param string Username
+	 * @param int Server ID
+	 * @param string The reason. Default="" (blank)
+	 * @param bool use https when connecting? default=false
+	 */
+	function suspend($user, $server, $reason = "", $usehttps = false) {
+		$this->serverid = intval($server);
+		$actionUri = "/xml-api/suspendacct?user=".strtolower($user);
+			if(!empty($reason)) $actionUri .= "&reason=".$reason;
+		
+		$command = $this->remote($actionUri, $usehttps);
+		if(!$command) return false;
+		
+		return ($command->result->status == 1);
+	}
+	
+	/**
+	 * UnSuspends a user.
+	 * @param string Username
+	 * @param int Server ID
+	 * @param bool use https when connecting? default=false
+	 */
+	function unsuspend($user, $server, $usehttps = false) {
+		$this->serverid = intval($server);
+		$actionUri = "/xml-api/unsuspendacct?user=".strtolower($user);
+		
+		$command = $this->remote($actionUri, $usehttps);
+		if(!$command) return false;
+		
+		return ($command->result->status == 1);
+	}
+	
+	/**
+	 * Terminates a user.
+	 * @param string  Username
+	 * @param int Server ID
+	 * @param bool use https when connecting? default=false
+	 */
+	function terminate($user, $server, $usehttps = false) {
+		$this->serverid = intval($server);
+		$actionUri = "/xml-api/removeacct?user=".strtolower($user);
+		$command = $this->remote($actionUri, $usehttps, true);
+		
+		return ($command === true);
+	}
+	
+	// TODO: implement listAccs
+	
+	/**
+	 * Changes a user's password.
+	 * @param string Username
+	 * @param int  Server ID
+	 * @param string New Password
+	 * @param bool Use HTTPS when connecting? default=false
+	 */
+	public function changePassword($user, $server, $newPassword, $usehttps = false) {
+		$this->serverid = $server;
+		$actionUri = '/xml-api/passwd?user='.$user.'&pass='.$newPassword;
+		$command = $this->remote($action, $usehttps);
+		if(!$command) return false;
+		
+		if($command->passwd->status == 1) {
+			return true;
+		}
+		else {
+			if(isset($command->passwd->statusmsg)) {
+				$this->lastErrorMessage = $command->passwd->statusmsg;
+				return false;
+			}
+			else {
+				$this->lastErrorMessage = "unknown error";
+				return false;
+			}
+		}
 	}
 }

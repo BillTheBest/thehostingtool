@@ -64,7 +64,7 @@ class WhmComponent extends Object {
 			*/
 		}
 		else {
-			$CurlConncetion = curl_init();
+			$CurlConnection = curl_init();
 			if($https) {
 				$ServerUri = "https://".$data["Server"]["hostname"].":2087".$url;
 				curl_setopt($CurlConnection, CURLOPT_HTTPAUTH, CURLAUTH_ANY);

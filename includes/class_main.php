@@ -59,33 +59,38 @@ class main {
 
         //Creates a drop down list of all the timezones.  (Used for people to set their time zones.)
         public function tzlist($default = ""){
-         static $regions = array(
-          DateTimeZone::AFRICA,
-          DateTimeZone::AMERICA,
-          DateTimeZone::ANTARCTICA,
-          DateTimeZone::ASIA,
-          DateTimeZone::ATLANTIC,
-          DateTimeZone::EUROPE,
-          DateTimeZone::INDIAN,
-          DateTimeZone::PACIFIC
-         );
-
-         foreach ($regions as $name => $mask) {
-          $tzlist[] = DateTimeZone::listIdentifiers($mask);
-         }
-
-         $tzones = "<select name = 'tzones' id = 'tzones'>\n";
-         $tzones .= "<option value = 'GMT'".$selected.">GMT</option>\n";
-         $tzlist = $this->array_flatten($tzlist);
-         foreach ($tzlist as $tzone_key => $tzone_val) {
-         if($default == $tzone_val){
-         $selected = " selected";
-         }
-          $tzones .= "<option value = '".$tzone_val."'".$selected.">".$tzone_val."</option>\n";
-         unset($selected);
-         }
-         $tzones .= "</select>";
+        
+         $tzones = "<select name = 'tzones' id = 'tzones'>";
+         $timezone_identifiers = DateTimeZone::listIdentifiers();
+         foreach($timezone_identifiers as $value){
+         $n++;
          
+         if($n == 1){
+            if($default == "GMT" || !$default){
+                $selected = " selected";
+            }
+            $tzones .= '<option value="GMT"'.$selected.'>GMT</option>';
+         }
+         
+            unset($selected);
+            if(preg_match('/^(Africa|America|Antartica|Arctic|Asia|Atlantic|Australia|Europe|Indian|Pacific)\//', $value)){
+                $ex = explode("/", $value);//obtain continent,city
+                if($continent != $ex[0]){
+                    $tzones .= '</optgroup>';
+                    $tzones .= '<optgroup label="'.$ex[0].'">';
+                }
+
+                $city = str_replace("_", " ", $ex[1]);
+                $continent = $ex[0];
+                if($default == $value){
+                    $selected = " selected";
+                }
+                $tzones .= '<option value="'.$value.'"'.$selected.'>'.$city.'</option>';
+            }
+         }
+         $tzones .= '</optgroup>';
+         $tzones .= '</select>';
+
          return $tzones;
 
          }

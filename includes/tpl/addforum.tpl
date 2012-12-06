@@ -11,6 +11,7 @@ function changePrefix(value)
 	if (value == 'vb') { prefix.value = 'vb_'; }
 	if (value == 'smf') { prefix.value = 'smf_'; }
 	if (value == 'aef') { prefix.value = 'aef_'; }
+	if (value == 'drupal') { prefix.value = ''; }
 }
 </script>
 <ERRORS>
@@ -58,6 +59,7 @@ function changePrefix(value)
 			  <option value="vb">vBulletin</option>
               <option value="smf">SMF</option>
               <option value="aef">AEF</option>
+			  <option value="drupal">Drupal</option>
 		    </select>
 			</label></td>
 		  </tr>

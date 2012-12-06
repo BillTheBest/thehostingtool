@@ -66,7 +66,7 @@ class page {
 				$folder = LINK ."../themes/";
 				if ($handle = opendir($folder)) { # Open the folder
 					while (false !== ($file = readdir($handle))) { # Read the files
-						if($file != "." && $file != ".." && $file != "icons") { # Check aren't these names
+						if($file != "." && $file != ".." && $file != ".svn" && $file != "icons" && $file != "index.html") { # Check aren't these names
 							$values[] = array($file, $file);
 						}
 					}
@@ -173,7 +173,7 @@ class page {
                        				$folder = LINK ."./css/";
 				if ($handle = opendir($folder)) { # Open the folder
 					while (false !== ($file = readdir($handle))) { # Read the files
-						if($file != "." && $file != "..") { # Check aren't these names
+						if($file != "." && $file != ".." && $file != ".svn") { # Check aren't these names or a svn folder
 							$values[] = array($file, $file);
 						}
 					}

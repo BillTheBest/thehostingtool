@@ -93,9 +93,12 @@ class page {
 		if(!$main->getvar['do']) {
 			$query = $db->query("SELECT * FROM `<PRE>tickets` WHERE `reply` = '0'");
 			if(!$db->num_rows($query)) {
-				echo "You currently have no tickets!";	
+				echo "You currently have no tickets!";
 			}
 			else {
+				echo "<div style=\"display: none;\" id=\"nun-tickets\">You currently have no tickets!</div>";
+				$num_rows = $db->num_rows($query);
+				echo $style->replaceVar("tpl/support/acpticketjs.tpl", array('NUM_TICKETS' => $num_rows));
 				while($data = $db->fetch_array($query)) {
 					$array['TITLE'] = $data['title'];
 					$array['UPDATE'] = $this->lastUpdated($data['id']);

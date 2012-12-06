@@ -17,7 +17,7 @@ include(LINK ."compiler.php");
 
 global $main, $db, $style;
 
-//THT Variables
+//THT Variables not really important for the XML-API but whatev
 define("PAGE", "XML-API");
 
 //Here we go...

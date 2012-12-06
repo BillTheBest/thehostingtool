@@ -127,7 +127,7 @@ class paypal_class {
       // The user will briefly see a message on the screen that reads:
       // "Please wait, your order is being processed..." and then immediately
       // is redirected to paypal.
-
+/*
       echo "<html>\n";
       echo "<head><title>Processing Payment...</title></head>\n";
       echo "<body onLoad=\"document.form.submit();\">\n";
@@ -140,6 +140,18 @@ class paypal_class {
  
       echo "</form>\n";
       echo "</body></html>\n";
+*/
+
+      //MODDED BY JONNY
+	  
+	  foreach($this->fields as $name => $value) {
+		  if(isset($n)) {
+			  $split = "&";
+		  }
+		  $post .= $split.$name."=".$value;
+		  $n++;
+	  }
+	  header("Location: ".$this->paypal_url."?".$post);
     
    }
    
@@ -254,4 +266,3 @@ class paypal_class {
 }         
 
 
- 

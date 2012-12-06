@@ -8,6 +8,7 @@
 
 //Compile THT
 define("LINK", "../includes/");
+define("CRON", 0);
 include(LINK ."compiler.php");
 
 //THT Variables

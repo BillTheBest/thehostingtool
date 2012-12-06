@@ -7,13 +7,16 @@
 //////////////////////////////
 
 class server {
-	
+
 	private $servers = array(); # All the servers in a array
 	
 	# Start the Functions #
 	private function createServer($package) { # Returns the server class for the desired package
 		global $type, $main;
 		$server = $type->determineServerType($type->determineServer($package)); # Determine server
+		if($this->servers[$server]) {
+			return;	
+		}
 		$link = LINK."servers/".$server.".php";
 		if(!file_exists($link)) {
 			$array['Error'] = "The server .php doesn't exist!";
@@ -185,6 +188,11 @@ class server {
 				if($pname['admin'] == 0) {
 					$emaildata = $db->emailTemplate("newacc");
 					echo "<strong>Your account has been completed!</strong><br />You may now use the client login bar to see your client area or proceed to your control panel. An email has been dispatched to the address on file.";
+					if($type->determineType($main->getvar['package']) == "paid") {
+						echo " This will apply only when you've made payment.";	
+						$_SESSION['clogged'] = 1;
+						$_SESSION['cuser'] = $data['id'];
+					}
 					$donecorrectly = true;
 				}
 				elseif($pname['admin'] == 1) {
@@ -215,8 +223,10 @@ class server {
 				$due = time()+intval($db->config("suspensiondays")*24*60*60);
 				$notes = "Your current hosting package monthly invoice. Package: ". $pname['name'];
 				$invoice->create($data['id'], $amount, $due, $notes);
-				$this->suspend($puser2['id']);
-				echo '<div class="errors"><b>Your account has been suspended until your invoice has been paid!</b></div>';
+				$serverphp->suspend($main->getvar['username'], $type->determineServer($main->getvar['package']));
+				$iquery = $db->query("SELECT * FROM `<PRE>invoices` WHERE `uid` = '{$data['id']}' AND `due` = '{$due}'");
+				$idata = $db->fetch_array($iquery);
+				echo '<div class="errors"><b>You are being redirected to payment! It will load in a couple of seconds..</b></div>';
 			}
 		}
 	}
@@ -264,10 +274,15 @@ class server {
 			$query2 = $db->query("SELECT * FROM `<PRE>users` WHERE `id` = '{$db->strip($data['userid'])}'");
 			$data2 = $db->fetch_array($query2);
 			$server = $type->determineServer($data['pid']);
-			if(!is_object($this->servers[$server])) {
+			global $serverphp;
+			if(!is_object($this->servers[$server]) && !$serverphp) {
 				$this->servers[$server] = $this->createServer($data['pid']); # Create server class
+				$donestuff = $this->servers[$server]->suspend($data2['user'], $server, $reason);
 			}
-			if($this->servers[$server]->suspend($data2['user'], $server, $reason) == true) {
+			else {
+				$donestuff = $serverphp->suspend($data2['user'], $server, $reason);
+			}
+			if($donestuff == true) {
 				$db->query("UPDATE `<PRE>user_packs` SET `status` = '2' WHERE `id` = '{$data['id']}'");
 				$emaildata = $db->emailTemplate("suspendacc");
 				$email->send($data2['email'], $emaildata['subject'], $emaildata['content']);

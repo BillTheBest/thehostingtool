@@ -122,7 +122,9 @@ class type {
 		$files = $main->folderFiles(LINK ."types/");
 		foreach($files as $value) {
 			$data = explode(".", $value);
-			$classes[$data[0]] = $this->createtype($data[0]);
+			if($data[1] != "svn" and $data[1] == "php") {
+				$classes[$data[0]] = $this->createtype($data[0]);
+			}
 		}
 		$this->classes = $classes;
 	}

@@ -8,6 +8,13 @@ var working = '<div align="center"><img src="<URL>themes/icons/working.gif"></di
 var result;
 var pid;
 
+$(document).ready(function(){
+   $("#username").change(function(event) {
+	   this.value = this.value.toLowerCase();
+	   check('user', this.value);
+   });
+});
+
 function stopRKey(evt) { 
   var evt = (evt) ? evt : ((event) ? event : null); 
   var node = (evt.target) ? evt.target : ((evt.srcElement) ? evt.srcElement : null); 
@@ -106,6 +113,12 @@ function nextstep() {
 				document.getElementById("finished").innerHTML = data;
 				document.getElementById("back").disabled = false;
 				document.getElementById("verify").innerHTML = "";
+				$.get("<AJAX>?function=ispaid&pid="+ document.getElementById("package").value +"&uname="+ document.getElementById("username").value, function(data2) {							
+																																							 //document.getElementById("finished").innerHTML = data2;
+				if(data2 != "") {
+					window.location = "../client/?page=invoices&iid="+data2;	
+				}
+				});
 																			});
 			break;
 	}
@@ -211,7 +224,7 @@ function previousstep() {
         	<table width="100%" border="0" cellspacing="2" cellpadding="0">
               <tr>
                 <td width="25%">Username:</td>
-                <td width="10%"><input type="text" name="username" id="username" onchange="check('user', this.value)" /></td>
+                <td width="10%"><input type="text" name="username" id="username" /></td>
                 <td width="1%" align="left"><a title="The username is your unique identity to your account. This is both your client account and control panel username." class="tooltip"><img src="<URL>themes/icons/information.png" /></a></td>
                 <td width="62%" align="left" id="usercheck">&nbsp;</td>
               </tr>

@@ -24,8 +24,15 @@ if(INSTALL == 1) {
 		global $style;
 		$pagegen .= $style->replaceVar('tpl/footergen.tpl', $array);
 		if($db->config("show_footer")) {
-			$output = shell_exec('mysql -V');
-			preg_match('@[0-9]+\.[0-9]+\.[0-9]+@', $output, $version);
+			if(ini_get('safe_mode') or
+			strpos(ini_get('disable_functions'), 'shell_exec') != false or
+			stristr(PHP_OS, 'Win')) {
+				$version[0] = "N/A";
+			}
+			else {
+				$output = shell_exec('mysql -V');
+				preg_match('@[0-9]+\.[0-9]+\.[0-9]+@', $output, $version);
+			}
 			$diskfreespace = disk_free_space('/') / 1073741824;
 			$disktotalspace = disk_total_space('/') / 1073741824;
 			global $style;

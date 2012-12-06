@@ -33,7 +33,13 @@ $version = explode(".", phpversion());
 
 //Grab DB First
 require LINK."/class_db.php"; # Get the file
-include LINK."/conf.inc.php"; # Get the config
+if(file_exists(LINK."/conf.inc.php")) {
+	include LINK."/conf.inc.php"; # Get the config
+	define("NOCONFIG", false);
+}
+else {
+	define("NOCONFIG", true);
+}
 if($sql['install']) {
 	define("INSTALL", 1);
 	$db = new db; # Create the class

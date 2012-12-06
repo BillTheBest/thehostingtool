@@ -36,7 +36,11 @@ class server {
 		global $main;
 		global $db;
 		global $type;
-			
+		
+		// Rich here - This is a new variable for the 
+		// muliple orders thingy :D
+		$newuser = true;
+		
 		//Check details
 		$query = $db->query("SELECT * FROM `<PRE>packages` WHERE `id` = '{$main->getvar['package']}' AND `is_disabled` = 0"); # Package disabled?
 		if($db->num_rows($query) != 1) {
@@ -76,7 +80,12 @@ class server {
 			$main->getvar['fdom'] = $main->getvar['csub'].".".$main->getvar['csub2'];
 		}
 		
-		if((!$main->getvar['username'])) {
+		if($_SESSION['clogged']) {
+			$cdata = $db->client($_SESSION['cuser']);
+			$newuser = false;
+		}
+		
+		if((!$main->getvar['username']) && ($newuser==true)) {
 			echo "Please enter a username!";
 			return;
 		}
@@ -87,7 +96,7 @@ class server {
 				return;
 			}
 		}
-		if((!$main->getvar['password'])) {
+		if((!$main->getvar['password']) && ($newuser==true)) {
 		   echo "Please enter a password!";
 		   return;
 		}
@@ -97,11 +106,11 @@ class server {
 				return;
 			}
 		}
-		if((!$main->getvar['email'])) {
+		if((!$main->getvar['email']) && ($newuser==true)) {
 		   echo "Please enter a email!";
 		   return;
 		}
-		if((!$main->check_email($main->getvar['email']))) {
+		if((!$main->check_email($main->getvar['email'])) && ($newuser==true)) {
 				echo "Your email is the wrong format!";	
 				return;
 		}
@@ -112,75 +121,75 @@ class server {
 				return;
 			}
 		}
-		if(($main->getvar['human'] != $_SESSION["pass"])) {
+		if(($main->getvar['human'] != $_SESSION["pass"]) && ($newuser==true)) {
 		   echo "Human test failed!";
 		   return;
 		}
-		if((!$main->getvar['firstname'])) {
+		if((!$main->getvar['firstname']) && ($newuser==true)) {
 		   echo "Please enter a valid first name!";
 		   return;
 		}
-		if((!$main->getvar['lastname'])) {
+		if((!$main->getvar['lastname']) && ($newuser==true)) {
 		   echo "Please enter a valid last name!";
 		   return;
 		}
-		if((!$main->getvar['address'])) {
+		if((!$main->getvar['address']) && ($newuser==true)) {
 		   echo "Please enter a valid address!";
 		   return;
 		}
-		if((!$main->getvar['city'])) {
+		if((!$main->getvar['city']) && ($newuser==true)) {
 		   echo "Please enter a valid city!";
 		   return;
 		}
-		if((!$main->getvar['zip'])) {
+		if((!$main->getvar['zip']) && ($newuser==true)) {
 		   echo "Please enter a valid zip code!";
 		   return;
 		}
-		if((!$main->getvar['state'])) {
+		if((!$main->getvar['state']) && ($newuser==true)) {
 		   echo "Please enter a valid state!";
 		   return;
 		}
-		if((!$main->getvar['state'])) {
+		if((!$main->getvar['state']) && ($newuser==true)) {
 		   echo "Please enter a valid state!";
 		   return;
 		}
-		if((!$main->getvar['country'])) {
+		if((!$main->getvar['country']) && ($newuser==true)) {
 		   echo "Please select a country!";
 		   return;
 		}
-		if ((!preg_match("/^([a-zA-Z\.\'\ \-])+$/",$main->getvar['firstname']))) {
+		if ((!preg_match("/^([a-zA-Z\.\'\ \-])+$/",$main->getvar['firstname'])) && ($newuser==true)) {
 			echo "Please enter a valid first name!";
 			return;			
 		}
-		if ((!preg_match("/^([a-zA-Z\.\'\ \-])+$/",$main->getvar['lastname']))) {
+		if ((!preg_match("/^([a-zA-Z\.\'\ \-])+$/",$main->getvar['lastname'])) && ($newuser==true)) {
 			echo "Please enter a valid last name!";
 			return;			
 		}
-		if ((!preg_match("/^([0-9a-zA-Z\.\ \-])+$/",$main->getvar['address']))) {
+		if ((!preg_match("/^([0-9a-zA-Z\.\ \-])+$/",$main->getvar['address'])) && ($newuser==true)) {
 			echo "Please enter a valid address!";
 			return;
 		}
-		if ((!preg_match("/^([a-zA-Z ])+$/",$main->getvar['city']))) {
+		if ((!preg_match("/^([a-zA-Z ])+$/",$main->getvar['city'])) && ($newuser==true)) {
 			echo "Please enter a valid city!";
 			return;			
 		}
-		if ((!preg_match("/^([a-zA-Z\.\ -])+$/",$main->getvar['state']))) {
+		if ((!preg_match("/^([a-zA-Z\.\ -])+$/",$main->getvar['state'])) && ($newuser==true)) {
 			echo "Please enter a valid state!";
 			return;
 		}
-		if((strlen($main->getvar['zip']) > 7)) {
+		if((strlen($main->getvar['zip']) > 7) && ($newuser==true)) {
 			echo "Please enter a valid zip/postal code!";
 			return;
 		}
-		if ((!preg_match("/^([0-9a-zA-Z\ \-])+$/",$main->getvar['zip']))) {
+		if ((!preg_match("/^([0-9a-zA-Z\ \-])+$/",$main->getvar['zip'])) && ($newuser==true)) {
 			echo "Please enter a valid zip/postal code!";
 			return;
 		}
-		if((strlen($main->getvar['phone']) > 15)) {
+		if((strlen($main->getvar['phone']) > 15) && ($newuser==true)) {
 			echo "Please enter a valid phone number!";
 			return;
 		}
-		if ((!preg_match("/^([0-9\-])+$/",$main->getvar['phone']))) {
+		if ((!preg_match("/^([0-9\-])+$/",$main->getvar['phone'])) && ($newuser==true)) {
 			echo "Please enter a valid phone number!";
 			return;
 		}
@@ -207,15 +216,24 @@ class server {
 		$serverphp = $this->createServer($main->getvar['package']); # Create server class
 		$pquery2 = $db->query("SELECT * FROM `<PRE>packages` WHERE `id` = '{$main->getvar['package']}'");
 		$pname2 = $db->fetch_array($pquery2);
-		$done = $serverphp->signup($type->determineServer($main->getvar['package']), $pname2['reseller']);
+		if ($newuser == false) {
+			$newusername = $serverphp->GenUsername();
+			$newpass = $serverphp->GenPassword();
+			$done = $serverphp->signup($type->determineServer($main->getvar['package']), $pname2['reseller'], $newusername, $cdata['email'], $newpass);
+		} 
+		else {
+			$done = $serverphp->signup($type->determineServer($main->getvar['package']), $pname2['reseller']);
+		}
 		if($done == true) { # Did the signup pass?
 			$date = time();
 			$ip = $_SERVER['REMOTE_ADDR'];
-			$salt = md5(rand(0,9999999));
-			$password = md5(md5($main->getvar['password']).md5($salt));
-			$UsrName = $main->getvar['username'];
-			$newusername = $main->getvar['username'];	
-			$db->query("INSERT INTO `<PRE>users` (user, email, password, salt, signup, ip, firstname, lastname, address, city, state, zip, country, phone) VALUES(
+			if ($newuser == true) {
+				$salt = md5(rand(0,9999999));
+				$password = md5(md5($main->getvar['password']).md5($salt));
+				$UsrName = $main->getvar['username'];
+				$newusername = $main->getvar['username'];
+				
+				$db->query("INSERT INTO `<PRE>users` (user, email, password, salt, signup, ip, firstname, lastname, address, city, state, zip, country, phone) VALUES(
 													  '{$main->getvar['username']}',
 													  '{$main->getvar['email']}',
 													  '{$password}',
@@ -230,7 +248,7 @@ class server {
 													  '{$main->getvar['zip']}',
 													  '{$main->getvar['country']}',
 													  '{$main->getvar['phone']}')");
-			$db->query("INSERT INTO `<PRE>users_bak` (user, email, password, salt, signup, ip, firstname, lastname, address, city, state, zip, country, phone) VALUES(
+				$db->query("INSERT INTO `<PRE>users_bak` (user, email, password, salt, signup, ip, firstname, lastname, address, city, state, zip, country, phone) VALUES(
 													  '{$main->getvar['username']}',
 													  '{$main->getvar['email']}',
 													  '{$password}',
@@ -245,13 +263,17 @@ class server {
 													  '{$main->getvar['zip']}',
 													  '{$main->getvar['country']}',
 													  '{$main->getvar['phone']}')");
-			$rquery = "SELECT * FROM `<PRE>users` WHERE `user` = '{$UsrName}' LIMIT 1;";
-			$rdata = $db->query($rquery);
-			$db->query("INSERT INTO `<PRE>logs` (uid, loguser, logtime, message) VALUES(
+				$rquery = "SELECT * FROM `<PRE>users` WHERE `user` = '{$UsrName}' LIMIT 1;";
+				$rdata = $db->query($rquery);
+				$db->query("INSERT INTO `<PRE>logs` (uid, loguser, logtime, message) VALUES(
 													  '{$rquery['userid']}',
 													  '{$main->getvar['username']}',
 													  '{$date}',
 													  'Registered.')");
+			}
+			else {
+				$UsrName = $cdata['user'];
+			}
 			$newSQL = "SELECT * FROM `<PRE>users` WHERE `user` = '{$UsrName}' LIMIT 1;";
 			$query = $db->query($newSQL);
 			if($db->num_rows($query) == 1) {
@@ -277,7 +299,8 @@ class server {
 													  'Package created ({$main->getvar['fdom']})')");
 				global $email;
 				$array['USER'] = $newusername;
-				$array['PASS'] = $main->getvar['password']; $array['EMAIL'] = $main->getvar['email'];
+				if ($newuser == true) { $array['PASS'] = $main->getvar['password']; $array['EMAIL'] = $main->getvar['email']; }
+				else { $array['PASS'] = $newpass; $array['EMAIL'] = $cdata['email']; }
 				$array['DOMAIN'] = $main->getvar['fdom'];
 				
 				//Get plan email friendly name

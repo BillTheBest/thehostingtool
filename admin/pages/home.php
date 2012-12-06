@@ -30,7 +30,7 @@ class page {
     
     public function checkDir($dir){
     	if (is_dir($dir)) { 
-    		return "<div class='warn'><img src='../themes/icons/cross.png' alt='' /> Warning: Your install directory still exists. Delete or rename it now!</div>";
+    		return "<div class='warn'><img src='../themes/icons/cross.png' alt='' /> Warning: Your install directory still exists and its unlocked. Delete it now!</div>";
 		}
 		else{
 			return "";
@@ -38,8 +38,7 @@ class page {
 	}
 	
 	public function checkPerms($file){
-		$filechk = substr(sprintf('%o', fileperms($file)), -3);
-		if ($filechk != 444){
+		if (is_writable($file)){
 			return "<div class='warn'><img src='../themes/icons/error.png' alt='' /> Warning: Configuration file (conf.inc.php) is still writable, please chmod it to 444!</div>";
 		}
 		else{

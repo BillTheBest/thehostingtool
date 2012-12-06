@@ -31,7 +31,7 @@ if($db->config("general") == 0) {
 elseif(!$main->checkIP($ip) && !$db->config("multiple")) {
 	$maincontent = $main->table("IP Already Exists!", "Your IP already exists in the database!");
 }
-elseif($_SESSION['clogged']) {
+elseif($_SESSION['clogged'] && !$db->config("multiple")) {
 	$maincontent = $main->table("Unable to sign-up!", "One package per account!");
 }
 else {

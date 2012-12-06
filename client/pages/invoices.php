@@ -27,17 +27,20 @@ class page {
 				$main->errors("Your invoice hasn't been paid!");
 			}
 		}
+		if(isset($_GET['iid'])){
+			// Ugly little hack. But it works :D
+			$pay = $invoice->pay($_GET['iid'], "client/index.php?page=invoices");
+		}
 		// List invoices. :)
-		$query = $db->query("SELECT * FROM `<PRE>invoices` WHERE `uid` = '{$_SESSION['cuser']}' ORDER BY `id` ASC");
+		$query = $db->query("SELECT * FROM `<PRE>invoices` WHERE `uid` = '{$_SESSION['cuser']}'");
 		$array2['list'] = "";
 		while($array = $db->fetch_array($query)){
 			$array['due'] = strftime("%D", $array['due']);
-			$array["paid"] = ($array["is_paid"] == 1 ? "<span style='color:green;font-size:20px;'>Paid</span>" :
-			"<span style='color:red;font-size:20px;'>Unpaid</span>");
+			$array["paid"] = ($array["is_paid"] == 1 ? "<span style='color:green'>Already Paid</span>" :
+			"<span style='color:red'>Unpaid. Due date: {$array['due']}</span>");
 			$array["pay"] = ($array["is_paid"] == 0 ? 
-			'<input type="button" name="pay" id="pay" value="Pay Now" onclick="doswirl(\''.$array['id'].'\')" />' :
-			'');
-			$array['amount'] = $array['amount']." ".$db->config("currency");
+			"<a href='index.php?page=invoices&iid={$array['id']}' class='tooltip' title='Pay invoice'><img src='../themes/icons/money.png' alt='Pay' /></a>" :
+			"<a class='tooltip' title='Invoice is already paid'><img src='../themes/icons/tick.png' alt='Already paid!' /></a>");
 			$array2['list'] .= $style->replaceVar("tpl/invoices/invoice-list-item.tpl", $array);
 		}
 		$array2['num'] = mysql_num_rows($query);

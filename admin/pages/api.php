@@ -1,7 +1,7 @@
 <?php
 //////////////////////////////
 // The Hosting Tool
-// Admin Area - API
+// Admin Area - (Page Name)
 // By Kevin M
 // Released under the GNU-GPL
 //////////////////////////////
@@ -14,14 +14,14 @@ class page {
         public $navlist = array();
 
         public function __construct() {
-            $this->navtitle = "API Functions";
+            $this->navtitle = "XML-API";
             $this->navlist[] = array("Get API Key", "key.png", "getkey");
             $this->navlist[] = array("Generate New Key", "key_add.png", "genkey");
         }
 
         public function description() {
-            return "<strong>Managing your API</strong><br />
-		Here you can manage the API for TheHostingTool. This allows you to
+            return "<strong>Managing XML-API</strong><br />
+		Here you can manage the XML-API interface for TheHostingTool. This allows you to
                 connect a client to your THT installation so it can perform tasks remotely
                 instead of interacting on a database level. TheHostingTool (official) client app
                 will use this API to connect.";

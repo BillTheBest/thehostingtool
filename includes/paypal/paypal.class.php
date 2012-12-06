@@ -116,16 +116,30 @@ class paypal_class {
 
    function submit_paypal_post() {
  
-      //MODDED BY JONNY
-	  
-	  foreach($this->fields as $name => $value) {
-		  if(isset($n)) {
-			  $split = "&";
-		  }
-		  $post .= $split.$name."=".$value;
-		  $n++;
-	  }
-	  header("Location: ".$this->paypal_url."?".$post);
+      // this function actually generates an entire HTML page consisting of
+      // a form with hidden elements which is submitted to paypal via the 
+      // BODY element's onLoad attribute.  We do this so that you can validate
+      // any POST vars from you custom form before submitting to paypal.  So 
+      // basically, you'll have your own form which is submitted to your script
+      // to validate the data, which in turn calls this function to create
+      // another hidden form and submit to paypal.
+ 
+      // The user will briefly see a message on the screen that reads:
+      // "Please wait, your order is being processed..." and then immediately
+      // is redirected to paypal.
+
+      echo "<html>\n";
+      echo "<head><title>Processing Payment...</title></head>\n";
+      echo "<body onLoad=\"document.form.submit();\">\n";
+      echo "<center><h3>Please wait, your order is being processed...</h3></center>\n";
+      echo "<form method=\"post\" name=\"form\" action=\"".$this->paypal_url."\">\n";
+
+      foreach ($this->fields as $name => $value) {
+         echo "<input type=\"hidden\" name=\"$name\" value=\"$value\">";
+      }
+ 
+      echo "</form>\n";
+      echo "</body></html>\n";
     
    }
    

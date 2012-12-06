@@ -159,23 +159,6 @@ class page {
 							$array['BOX'] = "";
 							$array['CONTENT'] = $style->replaceVar("tpl/emailclient.tpl");
 							break;
-						case "passwd":
-							if($_POST) {
-								if(empty($main->postvar['passwd'])) {
-									$main->errors('A password was never provided.');
-									break;
-								}
-								$command = $server->changePwd($pack['id'], $main->postvar['passwd']);
-								if($command == true) {
-									$main->errors('Password was changed!');
-								}
-								else {
-									$main->errors($command);
-								}
-							}
-							$array['BOX'] = "";
-							$array['CONTENT'] = $style->replaceVar("tpl/clientpwd.tpl");
-							break;
 					}
                                         $array["URL"] = URL;
 					echo $style->replaceVar("tpl/clientview.tpl", $array);

@@ -1,16 +1,16 @@
 -- phpMyAdmin SQL Dump
--- version 3.2.4
+-- version 2.11.9.5
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Mar 21, 2010 at 10:29 PM
--- Server version: 5.0.89
+-- Generation Time: Sep 05, 2009 at 07:01 PM
+-- Server version: 5.0.81
 -- PHP Version: 5.2.6
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
 --
--- Database: `%PRE%testtrunk`
+-- Database: `%PRE%newdev`
 --
 
 -- --------------------------------------------------------
@@ -45,7 +45,7 @@ INSERT INTO `%PRE%acpnav` (`id`, `visual`, `icon`, `link`) VALUES
 (12, 'Client Importer', 'user_orange.png', 'import'),
 (13, 'Tickets', 'page_white_text.png', 'tickets'),
 (14, 'Knowledge Base', 'folder.png', 'kb'),
-(17, 'API', 'brick.png', 'api'),
+(17, 'XML-API', 'brick.png', 'api'),
 (15, 'Look & Feel', 'rainbow.png', 'lof'),
 (19, 'Invoice Management', 'script.png', 'invoices');
 
@@ -128,16 +128,11 @@ CREATE TABLE IF NOT EXISTS `%PRE%config` (
 --
 
 INSERT INTO `%PRE%config` (`name`, `value`) VALUES
-('url', 'http://thehostingtool.com/'),
-('version', '1.2.1'),
-('smtp_user', 'user'),
-('senabled', '1'),
-('api-key', '%API-KEY%'),
-('whm-ssl', '0'),
-('paypalemail', 'your@email.com'),
 ('default', 'order'),
 ('theme', 'Reloaded2'),
+('url', 'http://thehostingtool.com/'),
 ('name', 'TheHostingTool'),
+('version', '1.2'),
 ('tos', '<p><span style="font-weight: bold;"><span style="color: #333333; font-family: Tahoma; font-size: 11px; font-weight: normal;"><span style="color: #ff0000;">The following content is prohibited on our servers:</span><ol>\r\n<li><strong>Illegal use</strong></li>\r\n<li><strong>Threatening Material</strong></li>\r\n<li><strong>Fraudulent Content</strong></li>\r\n<li><strong>Forgery or Impersonation</strong></li>\r\n<li><strong>Unsolicited Content</strong></li>\r\n<li><strong>Copyright Infringements</strong></li>\r\n<li><strong>Collection of Private Date (Unless DPA Registered)</strong></li>\r\n<li><strong>Viruses</strong></li>\r\n<li><strong>IRC Networks (Including all IRC Material)</strong></li>\r\n<li><strong>Peer to Peer software&nbsp;<br /></strong></li>\r\n<li><strong>Any Adult Content</strong></li>\r\n<li><strong>Non-english Content</strong></li>\r\n</ol></span></span></p>'),
 ('multiple', '1'),
 ('general', '1'),
@@ -158,11 +153,16 @@ INSERT INTO `%PRE%config` (`name`, `value`) VALUES
 ('show_footer', '1'),
 ('senabled', '1'),
 ('smessage', '<p>Support area isn''t enabled. Sorry, contact your host for more details.</p>'),
+('api-key', '%API-KEY%'),
 ('terminationdays', '14'),
 ('suspensiondays', '14'),
+('whm-ssl', '0'),
 ('tldonly', '0'),
 ('currency', 'USD'),
+('paypalemail', 'your@email.com'),
 ('ui-theme', 'cupertino');
+
+
 
 -- --------------------------------------------------------
 
@@ -181,11 +181,7 @@ CREATE TABLE IF NOT EXISTS `%PRE%invoices` (
   `notes` text NOT NULL,
   `uniqueid` varchar(255) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
---
--- Dumping data for table `%PRE%invoices`
---
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=29 ;
 
 
 -- --------------------------------------------------------
@@ -231,11 +227,7 @@ CREATE TABLE IF NOT EXISTS `%PRE%packages` (
   `additional` text NOT NULL,
   `order` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
---
--- Dumping data for table `%PRE%packages`
---
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=21 ;
 
 
 -- --------------------------------------------------------
@@ -270,12 +262,11 @@ CREATE TABLE IF NOT EXISTS `%PRE%servers` (
   `accesshash` text NOT NULL,
   `type` varchar(10) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
 --
 -- Dumping data for table `%PRE%servers`
 --
-
 
 -- --------------------------------------------------------
 
@@ -292,12 +283,10 @@ CREATE TABLE IF NOT EXISTS `%PRE%staff` (
   `salt` text NOT NULL,
   `perms` text NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=10 ;
 
 --
 -- Dumping data for table `%PRE%staff`
---
-
 
 -- --------------------------------------------------------
 
@@ -310,11 +299,7 @@ CREATE TABLE IF NOT EXISTS `%PRE%subdomains` (
   `subdomain` varchar(20) NOT NULL,
   `server` varchar(5) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
---
--- Dumping data for table `%PRE%subdomains`
---
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
 
 -- --------------------------------------------------------
@@ -395,7 +380,7 @@ CREATE TABLE IF NOT EXISTS `%PRE%tickets` (
   `userid` mediumint(9) NOT NULL,
   `status` mediumint(9) NOT NULL default '1',
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=16 ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 --
 -- Dumping data for table `%PRE%tickets`
@@ -439,11 +424,7 @@ CREATE TABLE IF NOT EXISTS `%PRE%users` (
   `signup` varchar(20) NOT NULL,
   `ip` text NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
---
--- Dumping data for table `%PRE%users`
---
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=36 ;
 
 
 -- --------------------------------------------------------
@@ -461,10 +442,4 @@ CREATE TABLE IF NOT EXISTS `%PRE%user_packs` (
   `status` varchar(1) NOT NULL,
   `additional` text NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
---
--- Dumping data for table `%PRE%user_packs`
---
-
-
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=37 ;

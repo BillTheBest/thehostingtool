@@ -17,7 +17,7 @@ include(LINK ."compiler.php");
 
 global $main, $db, $style;
 
-//THT Variables not really important for the XML-API but whatev
+//THT Variables
 define("PAGE", "XML-API");
 
 //Here we go...
@@ -105,15 +105,15 @@ switch($function) {
                     $listOutput['ACCOUNTS'] = $style->replaceVar('tpl/xml-api/listaccts_one.tpl', $array) . "\n";
                 }
                 else {
-                    $listOutput['ACCOUNTS'] .= $style->replaceVar('tpl/api/listaccts_one.tpl', $array);
+                    $listOutput['ACCOUNTS'] .= $style->replaceVar('tpl/xml-api/listaccts_one.tpl', $array);
                 }
                 $i++;
             }
-            echo $style->replaceVar('tpl/api/listaccts.tpl', $listOutput);
+            echo $style->replaceVar('tpl/xml-api/listaccts.tpl', $listOutput);
         }
         break;
     case "listpkgs":
-        echo $style->replaceVar('tpl/api/listpkgs.tpl');
+        echo $style->replaceVar('tpl/xml-api/listpkgs.tpl');
         break;
 }
 

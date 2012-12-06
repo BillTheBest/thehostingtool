@@ -49,10 +49,8 @@ class p2h {
 				if($_POST) {
 					foreach($main->postvar as $key => $value) {
 						if($value == "" && !$n) {
-							if($key != "prefix") {
 							$main->errors("Please fill in all the fields!");
 							$n++;
-							}
 						}
 					}
 					if(!$n) {
@@ -181,11 +179,11 @@ class p2h {
 					break;
 
 				case 3:
-					return "Forum username is incorrect!";
+					return "Forum username is false!";
 					break;
 
 				case 4:
-					return "Forum password is incorrect!";
+					return "Forum password is false!";
 					break;
 			}
 		}
@@ -453,39 +451,6 @@ class p2h {
 					}
 				}
 				break;
-			
-			case "drupal":
-				$n = 0;
-				$result = mysql_query("SELECT * FROM `{$prefix}users` WHERE name = '{$fuser}' LIMIT 1", $this->con);
-				$mem = mysql_fetch_assoc($result);
-				$result = mysql_query("SELECT * FROM `{$prefix}node` WHERE `type` = 'forum' AND `uid` = {$mem["uid"]}", $this->con);
-				while($node = mysql_fetch_assoc($result)) {
-					$nodes[] = $node;
-				}
-				//Ack! Loops within loops! =P
-				foreach($nodes as $key => $value) {
-					$date = explode(":", strftime("%m:%y", $value['created']));
-					if($nmonth <= $date[0] && $nyear <= $date[1]) {
-						$n++;
-					}
-					
-					$result = mysql_query("SELECT * FROM `{$prefix}comments` WHERE `nid` = {$value["nid"]} AND `uid` = {$mem["uid"]}", $this->con);
-					//It messes up if I don't do this.
-					unset($comments);
-					//
-					while($comment = mysql_fetch_assoc($result)) {
-						$comments[] = $comment;
-					}
-					foreach($comments as $key2 => $value2) {
-						$date = explode(":", strftime("%m:%y", $value2['timestamp']));
-						if($nmonth <= $date[0] && $nyear <= $date[1]) {
-							$n++;
-						}
-					}
-				}
-				
-				
-			break;
 		}
 		return $n;
 	}
@@ -496,7 +461,6 @@ class p2h {
 		$fuser = $main->getvar['type_fuser'];
 		$fpass = $main->getvar['type_fpass'];
 		$signup = $this->getSignup($main->getvar['package']);
-		file_put_contents("log.log", $forum . "HELLO", FILE_APPEND);
 
 		switch($forum) {
 			case "ipb":
@@ -687,39 +651,6 @@ class p2h {
 						return array('true' => '0', 'customerror' => '<h1>Error</h1>That forum password is incorrect!');
 					}
 				}
-				break;
-				
-				case "drupal":
-					$result = mysql_query("SELECT * FROM `{$prefix}users` WHERE name = '{$fuser}' LIMIT 1", $this->con);
-					if(mysql_num_rows($result) == 0) {
-						return 3;
-					}
-					else {
-						$member = mysql_fetch_array($result);
-						if(md5($fpass) == $member['pass']) {
-							$uid = $member['uid'];
-							$drupalPosts = 0;
-							$result = mysql_query("SELECT * FROM `{$prefix}node` WHERE `type` = 'forum' AND `uid` = {$uid}", $this->con);
-							$drupalPosts = $drupalPosts + mysql_num_rows($result);
-							while($threadsArray = mysql_fetch_assoc($result)) {
-								$stuff[] = $threadsArray;
-							}
-							
-							foreach($stuff as $key => $value) {
-								$result = mysql_query("SELECT * FROM `{$prefix}comments` WHERE `nid` = {$value["nid"]} AND `uid` = {$uid}", $this->con);
-								$drupalPosts = $drupalPosts + mysql_num_rows($result);
-							}
-							if($drupalPosts >= $signup) {
-								return 1;
-							}
-							else {
-								return 0;
-							}
-						}
-						else {
-							return 4;
-						}
-					}
 				break;
 		}
 	}

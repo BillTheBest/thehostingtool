@@ -84,6 +84,7 @@ class style {
 	public function javascript() { # Returns the HTML code for the header that includes all the JS in the javascript folder
 		$folder = LINK ."javascript/";
 		$html .= "<script type=\"text/javascript\" src='".URL."includes/javascript/jquery.js'></script>\n";
+		$html .= "<script type=\"text/javascript\" src='".URL."includes/javascript/simpletip.js'></script>\n";
 		if ($handle = opendir($folder)) { # Open the folder
 			while (false !== ($file = readdir($handle))) { # Read the files
 				if($file != "." && $file != ".." && $file != "jquery.js" && $file != "simpletip.js") { # Check aren't these names

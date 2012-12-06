@@ -41,20 +41,6 @@ class AJAX {
 	public function usercheck() {
 		global $main;
 		global $db;
-		
-		//If it's over 8 characters then complain.
-		if(strlen($main->getvar['user']) > 8) {
-			echo 0;
-			return;
-		}
-		else {
-			//If the first character is a number, then complain.
-			if(is_numeric(substr($main->getvar['user'], 0, 1))) {
-				echo 0;
-				return;
-			}
-		}
-		
 		if(!$main->getvar['user']) {
 			$_SESSION['check']['user'] = false;
 		   echo 0;
@@ -947,35 +933,10 @@ class AJAX {
                }
            }
        }
-	   
-	   function ispaid() {
-			global $db, $main;
-			$package = $db->fetch_array($db->query("SELECT * FROM `<PRE>packages` WHERE `id` = '{$main->getvar['pid']}'"));
-			if($package['type'] == "paid") {
-				$username = $db->fetch_array($db->query("SELECT * FROM `<PRE>users` WHERE `user` = '{$main->getvar['uname']}'"));
-				$id = $username['id'];
-				$invoice = $db->fetch_array($db->query("SELECT * FROM `<PRE>invoices` WHERE `uid` = '{$id}'"));
-				echo $invoice['id'];
-			}
-	   }
-	   
-	   function deleteTicket() {
-		   if($_SESSION['logged']) {
-			   global $main, $db;
-			   $tid = $main->getvar['ticket'];
-			   if($tid != "" and is_numeric($tid)) {
-				   $query = "DELETE FROM `<PRE>tickets` WHERE `id` = {$tid}";
-				   $db->query($query);
-				   $query = "DELETE FROM `<PRE>tickets` WHERE `ticketid` = {$tid}";
-				   $db->query($query);
-			   }
-		   }
-	   }
 }
-if(isset($_GET['function']) and $_GET['function'] != "") {
-	$ajax = new AJAX;
-	$ajax->{$_GET['function']}();
-	include(LINK."output.php");
-}
+
+$ajax = new AJAX;
+$ajax->{$_GET['function']}();
+include(LINK."output.php");
 
 ?>

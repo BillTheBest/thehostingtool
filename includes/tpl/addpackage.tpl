@@ -30,7 +30,7 @@
     <td>
     <select name="type" id="type" onchange="ajaxSlide('customform','<AJAX>?function=acpPadd&type='+ this.value)">
       <option value="free">Free</option>
-      <option value="p2h">Post 2 Host</option>
+      %P2HOPTION%
       <option value="paid">Paid</option>
     </select><a title="The type of your package. You can choose between <em>free</em>, <em>post2host</em> and <em>paid</em>." class="tooltip"><img src="<URL>themes/icons/information.png" /></a>
     </td>

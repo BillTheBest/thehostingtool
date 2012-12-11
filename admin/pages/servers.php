@@ -16,16 +16,16 @@ class page {
 							
 	public function __construct() {
 		$this->navtitle = "Servers Sub Menu";
+		$this->navlist[] = array("Add Server", "server_add.png", "add");
 		$this->navlist[] = array("View/Edit Servers", "server_go.png", "view");
 		$this->navlist[] = array("Test Servers", "server_connect.png", "test");
-		$this->navlist[] = array("Add Server", "server_add.png", "add");
 		$this->navlist[] = array("Delete Server", "server_delete.png", "delete");
 	}
 	
 	public function description() {
 		return "<strong>Managing Hosting Servers</strong><br />
 		Welcome to the Servers Management Area. Here you can view, add, and delete servers.<br />
-		To get started, choose a link from the sidebar's SubMenu.";	
+		To get started, choose a link from the sidebar's SubMenu.";
 	}
 	
 	public function content() { # Displays the page 
@@ -36,13 +36,13 @@ class page {
 			default:
 				if($_POST) {
 					foreach($main->postvar as $key => $value) {
-						if($value == "" && !$n) {
+						if($value == "" && !$n && $key != "whmport") {
 							$main->errors("Please fill in all the fields!");
 							$n++;
 						}
 					}
 					if(!$n) {
-						$db->query("INSERT INTO `<PRE>servers` (name, host, user, accesshash, type) VALUES('{$main->postvar['name']}', '{$main->postvar['host']}', '{$main->postvar['user']}', '{$main->postvar['hash']}', '{$main->postvar['type']}')");
+						$db->query("INSERT INTO `<PRE>servers` (ip, whmport, port, nameservers, name, host, user, accesshash, type) VALUES('{$main->postvar['ip']}', '{$main->postvar['whmport']}',  '{$main->postvar['port']}', '{$_POST['nameservers']}', '{$main->postvar['name']}', '{$main->postvar['host']}', '{$main->postvar['user']}', '{$main->postvar['hash']}', '{$main->postvar['type']}')");
 						$main->errors("Server has been added!");
 					}
 				}
@@ -51,7 +51,7 @@ class page {
 					include(LINK."servers/".$value);
 					$fname = explode(".", $value);
 					$stype = new $fname[0];
-					$values[] = array($stype->name, $fname[0]);	
+					$values[] = array($stype->name, $fname[0]);
 				}
 				$array['TYPE'] = $main->dropDown("type", $values, 0, 0);
 				echo $style->replaceVar("tpl/addserver.tpl", $array);
@@ -61,22 +61,18 @@ class page {
 				if(isset($main->getvar['do'])) {
 					$query = $db->query("SELECT * FROM `<PRE>servers` WHERE `id` = '{$main->getvar['do']}'");
 					if($db->num_rows($query) == 0) {
-						echo "That server doesn't exist!";	
+						echo "That server doesn't exist!";
 					}
 					else {
 						if($_POST) {
 							foreach($main->postvar as $key => $value) {
-								if($value == "" && !$n) {
+								if($value == "" && !$n && $key != "whmport") {
 									$main->errors("Please fill in all the fields!");
 									$n++;
 								}
 							}
 							if(!$n) {
-								$db->query("UPDATE `<PRE>servers` SET `name` = '{$main->postvar['name']}' WHERE `id` = '{$main->getvar['do']}'");
-								$db->query("UPDATE `<PRE>servers` SET `user` = '{$main->postvar['user']}' WHERE `id` = '{$main->getvar['do']}'");
-								$db->query("UPDATE `<PRE>servers` SET `host` = '{$main->postvar['host']}' WHERE `id` = '{$main->getvar['do']}'");
-								$db->query("UPDATE `<PRE>servers` SET `accesshash` = '{$main->postvar['hash']}' WHERE `id` = '{$main->getvar['do']}'");
-								$db->query("UPDATE `<PRE>servers` SET `type` = '{$main->postvar['type']}' WHERE `id` = '{$main->getvar['do']}'");
+								$db->query("UPDATE `<PRE>servers` SET `whmport` = '{$_POST['whmport']}', `ip` = '{$_POST['ip']}', `nameservers` = '{$_POST['nameservers']}', `port` = '{$main->postvar['port']}', `name` = '{$main->postvar['name']}', `user` = '{$main->postvar['user']}', `host` = '{$main->postvar['host']}', `accesshash` = '{$main->postvar['hash']}', `type` = '{$main->postvar['type']}' WHERE `id` = '{$main->getvar['do']}'");
 								$main->errors("Server edited!");
 								$main->done();
 							}
@@ -86,13 +82,17 @@ class page {
 						$array['HOST'] = $data['host'];
 						$array['NAME'] = $data['name'];
 						$array['HASH'] = $data['accesshash'];
+						$array['PORT'] = $data['port'];
+						$array['SERVERIP'] = $data['ip'];
+						$array['RESELLERPORT'] = $data['whmport'];
+						$array['NAMESERVERS'] = $data['nameservers'];
 						$array['ID'] = $data['id'];
 						$files = $main->folderFiles(LINK."servers/");
 						foreach($files as $value) {
 							include(LINK."servers/".$value);
 							$fname = explode(".", $value);
 							$stype = new $fname[0];
-							$values[] = array($stype->name, $fname[0]);	
+							$values[] = array($stype->name, $fname[0]);
 						}
 						$array['TYPE'] = $main->dropDown("type", $values, $data['type'], 0, 0);
 						echo $style->replaceVar("tpl/viewserver.tpl", $array);
@@ -101,14 +101,14 @@ class page {
 				else {
 					$query = $db->query("SELECT * FROM `<PRE>servers`");
 					if($db->num_rows($query) == 0) {
-						echo "There are no servers to view!";	
+						echo "There are no servers to view!";
 					}
 					else {
 						echo "<ERRORS>";
 						while($data = $db->fetch_array($query)) {
 							echo $main->sub("<strong>".$data['name']."</strong>", '<a href="?page=servers&sub=view&do='.$data['id'].'"><img src="'. URL .'themes/icons/magnifier.png"></a>');
 							if($n) {
-								echo "<br />";	
+								echo "<br />";
 							}
 							$n++;
 						}
@@ -119,18 +119,18 @@ class page {
 			case "delete":
 				if($main->getvar['do']) {
 					$db->query("DELETE FROM `<PRE>servers` WHERE `id` = '{$main->getvar['do']}'");
-					$main->errors("Server Account Deleted!");		
+					$main->errors("Server Deleted!");
 				}
 				$query = $db->query("SELECT * FROM `<PRE>servers`");
 				if($db->num_rows($query) == 0) {
-					echo "There are no servers to delete!";	
+					echo "There are no servers to delete!";
 				}
 				else {
 					echo "<ERRORS>";
 					while($data = $db->fetch_array($query)) {
 						echo $main->sub("<strong>".$data['name']."</strong>", '<a href="?page=servers&sub=delete&do='.$data['id'].'"><img src="'. URL .'themes/icons/delete.png"></a>');
 						if($n) {
-							echo "<br />";	
+							echo "<br />";
 						}
 						$n++;
 					}
@@ -153,14 +153,14 @@ class page {
 				else {
 					$query = $db->query("SELECT * FROM `<PRE>servers`");
 					if($db->num_rows($query) == 0) {
-						echo "There are no servers to view!";	
+						echo "There are no servers to view!";
 					}
 					else {
 						echo "Caution: Some servers are set to automatically ban the IP address of this server (".$main->getWanIp().") after a certain number of failed logins.<br />";
 						while($data = $db->fetch_array($query)) {
 							echo $main->sub("<strong>".$data['name']."</strong>", '<a href="?page=servers&sub=test&do='.$data['id'].'"><img src="'. URL .'themes/icons/server_chart.png"></a>');
 							if($n) {
-								echo "<br />";	
+								echo "<br />";
 							}
 							$n++;
 						}

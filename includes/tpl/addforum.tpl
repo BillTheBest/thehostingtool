@@ -63,17 +63,20 @@ function changePrefix(value)
 		    </select>
 			</label></td>
 		  </tr>
-          
           <tr>
             <td>Forum Prefix:</td>
             <td><input name="prefix" type="text" class="form" id="prefix" value="phpbb_" /></td>
           </tr>
-          
+		  <tr>
+		  	<td>Forum URL:</td>
+		  	<td><input name="url" type="text" class="form" id="url" value="" /></td>
+		  </tr>
 		  <tr>
 			<td colspan="2" align="center">
 			  <label>
 				<input type="submit" name="type" id="type" value="Add Forum" class="button" />
-			  </label>			</td>
+			  </label>
+			</td>
 		  </tr>
 		</table>
 </form>

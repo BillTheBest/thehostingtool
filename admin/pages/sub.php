@@ -23,7 +23,7 @@ class page {
 	public function description() {
 		return "<strong>Managing Subdomains</strong><br />
 		This is where you add domains so users can make subdomains with them.<br />
-		To get started, choose a link from the sidebar's SubMenu.";	
+		To get started, choose a link from the sidebar's SubMenu.";
 	}
 	public function content() { # Displays the page 
 		global $main;
@@ -49,7 +49,7 @@ class page {
 					return;
 				}
 				while($data = $db->fetch_array($query)) {
-					$values[] = array($data['name'], $data['id']);	
+					$values[] = array($data['name'], $data['id']);
 				}
 				$array['SERVER'] = $main->dropDown("server", $values);
 				echo $style->replaceVar("tpl/addsubdomain.tpl", $array);
@@ -59,7 +59,7 @@ class page {
 				if(isset($main->getvar['do'])) {
 					$query = $db->query("SELECT * FROM `<PRE>subdomains` WHERE `id` = '{$main->getvar['do']}'");
 					if($db->num_rows($query) == 0) {
-						echo "That subdomain doesn't exist!";	
+						echo "That subdomain doesn't exist!";
 					}
 					else {
 						if($_POST) {
@@ -81,7 +81,7 @@ class page {
 						$array['SUBDOMAIN'] = $data['subdomain'];
 						$query = $db->query("SELECT * FROM `<PRE>servers`");
 						while($data = $db->fetch_array($query)) {
-							$values[] = array($data['name'], $data['id']);	
+							$values[] = array($data['name'], $data['id']);
 						}
 						$array['SERVER'] = $array['THEME'] = $main->dropDown("server", $values, $data['server']);
 						echo $style->replaceVar("tpl/editsubdomain.tpl", $array);
@@ -90,7 +90,7 @@ class page {
 				else {
 					$query = $db->query("SELECT * FROM `<PRE>subdomains`");
 					if($db->num_rows($query) == 0) {
-						echo "There are no subdomains to edit!";	
+						echo "There are no subdomains to edit!";
 					}
 					else {
 						echo "<ERRORS>";
@@ -104,11 +104,11 @@ class page {
 			case "delete":
 				if(isset($main->getvar['do'])) {
 					$db->query("DELETE FROM `<PRE>subdomains` WHERE `id` = '{$main->getvar['do']}'");
-					$main->errors("Subdomain Deleted!");		
+					$main->errors("Subdomain Deleted!");
 				}
 				$query = $db->query("SELECT * FROM `<PRE>subdomains`");
 				if($db->num_rows($query) == 0) {
-					echo "There are no subdomains to delete!";	
+					echo "There are no subdomains to delete!";
 				}
 				else {
 					echo "<ERRORS>";

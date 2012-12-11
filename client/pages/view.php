@@ -10,7 +10,7 @@
 if(THT != 1){die();}
 
 class page {
-	
+
 	public function content() { # Displays the page 
 		global $style, $db, $main, $server;
 		$data = $db->client($_SESSION['cuser']);
@@ -21,11 +21,11 @@ class page {
 		$query3 = $db->query("SELECT * FROM `<PRE>users` WHERE `id` = '{$db->strip($data['id'])}'");
 		$data4 = $db->fetch_array($query3);
 		$array['USER'] = $data4['user'];
-		$array['SIGNUP'] = strftime("%D", $data3['signup']);
+		$array['SIGNUP'] = $main->convertdate("n/d/Y", $data3['signup']);
 		$array['DOMAIN'] = $data3['domain'];
 		$array['PACKAGE'] = $data2['name'];
 		$array['DESCRIPTION'] = $data2['description'];
-		
+
 		if($_POST) {
 				if(md5(md5($main->postvar['currentpass']) . md5($data['salt'])) == $data['password']) {
 					if($main->postvar['newpass'] == $main->postvar['cpass']) {
@@ -45,7 +45,7 @@ class page {
 					$main->errors("Your current password wasn't correct!");	
 				}
 		}
-		
+
 		echo $style->replaceVar("tpl/cview.tpl", $array);
 	}
 }

@@ -22,7 +22,7 @@ foreach($classes as $key => $value) {
 	// Has the type got a cron?
 	if($classes[$key]->cron) {
 		// Well run it then...
-		$classes[$key]->cron();	
+		$classes[$key]->cron();
 	}
 }
 
@@ -34,11 +34,11 @@ $data = ob_get_clean(); // Get all the HTML created by the script and clean the 
 echo $data; // Lets just show it. Tickles my pickle. Don't have to keep checking emails.
 
 // Now we mo truckin email it. Yeah I said it. Aren't I smart?
-if($data != "") {
+if($data != "" && $db->config("emailoncron") == "1") {
 	// TBD: Provide an option to have an email where the cron output is sent to
-	//$email->staff("Cron Job", $data);
+	$email->staff("Cron Job", $data); //Email all staff members the cron's output.
 }
 
-// We've done.. Should I say I.
+// We're done.. Should I say I.
 
 ?>

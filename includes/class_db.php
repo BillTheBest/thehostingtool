@@ -68,6 +68,7 @@ class db {
 					$array[$k] = $this->strip($v);
 				}
 				else {
+					$v = str_replace("\r\n", "", $v);
 					if(get_magic_quotes_gpc()) { # Check if Magic Quotes are on
 						  $v = stripslashes($v); 
 					}
@@ -83,6 +84,7 @@ class db {
 			return $array;
 		}
 		else {
+			$value = str_replace("\r\n", "", $value);
 			if(get_magic_quotes_gpc()) { # Check if Magic Quotes are on
 				  $value = stripslashes($value); 
 			}
@@ -130,7 +132,7 @@ class db {
 		$query = $this->query("SELECT * FROM `<PRE>staff` WHERE `id` = '{$id}'");
 		if($this->num_rows($query) == 0) {
 			$error['Error'] = "Couldn't retrieve staff data!";
-			$error['Username'] = $name;
+			$error['Username'] = $id;
 			global $main;
 			$main->error($error);
 		}
@@ -145,7 +147,7 @@ class db {
 		$query = $this->query("SELECT * FROM `<PRE>users` WHERE `id` = '{$id}'");
 		if($this->num_rows($query) == 0) {
 			$error['Error'] = "Couldn't retrieve client data!";
-			$error['Username'] = $name;
+			$error['Username'] = $id;
 			global $main;
 			$main->error($error);
 		}
@@ -176,10 +178,10 @@ class db {
 	public function emailTemplate($name = 0, $id = 0) { # Retrieves a email template with name or id
 		global $main, $db;
 		if($name) {
-			$query = $db->query("SELECT * FROM `<PRE>templates` WHERE `name` = '{$this->strip($name)}'");	
+			$query = $db->query("SELECT * FROM `<PRE>templates` WHERE `name` = '{$this->strip($name)}'");
 		}
 		elseif($id) {
-			$query = $db->query("SELECT * FROM `<PRE>templates` WHERE `id` = '{$this->strip($id)}'");		
+			$query = $db->query("SELECT * FROM `<PRE>templates` WHERE `id` = '{$this->strip($id)}'");
 		}
 		else {
 			$array['Error'] = "No name/id was sent onto the reciever!";
@@ -192,7 +194,26 @@ class db {
 			$main->error($array);
 		}
 		else {
-			return $db->fetch_array($query);	
+			$template_info = $db->fetch_array($query);
+			$tmpl_file_base = LINK."tpl/email/".$template_info['name'];
+			$tmpl_content_file = @file_get_contents($tmpl_file_base.".tpl");
+			$tmpl_descrip_file = @file_get_contents($tmpl_file_base."_descrip.tpl");
+
+			if(!$tmpl_content_file && !$tmpl_descrip_file){
+				$array['Error'] = "One of the template files don't exist.<br>";
+				$array['Template locations'] = "<br>".$tmpl_file_base.".tpl<br>" . $tmpl_file_base."_descrip.tpl";
+				$main->error($array);
+			}else{
+				$template_data = array(
+					"id" => $template_info['id'],
+					"name" => $template_info['name'],
+					"acpvisual" => $template_info['acpvisual'],
+					"subject" => $template_info['subject'],
+					"content" => $tmpl_content_file,
+					"description" => $tmpl_descrip_file
+				);
+				return $template_data;
+			}
 		}
 	}
 }

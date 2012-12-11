@@ -41,6 +41,7 @@ class p2h {
 		$this->acpForm[] = array("Forum", $main->dropDown("forum", $values), 'forum');
 		$this->acpNav[] = array("P2H Forums", "forums", "lightning.png", "P2H Forums");
 		$this->clientNav[] = array("Forum Posting", "forums", "lightning.png", "Forum Posting");
+		$this->warnDate = $db->config("p2hwarndate");
 	}
 
 	public function acpPage() {
@@ -51,30 +52,30 @@ class p2h {
 					foreach($main->postvar as $key => $value) {
 						if($value == "" && !$n) {
 							if($key != "prefix") {
-							$main->errors("Please fill in all the fields!");
+							$main->errors("Please fill in all the fields!<br>");
 							$n++;
 							}
 						}
 					}
 					if(!$n) {
 						if(strpos($main->postvar['name'], ';:;') !== false) {
-							$main->errors("You cannot have <code>;:;</code> in your database name! Sorry!");
+							$main->errors("You cannot have <code>;:;</code> in your database name! Sorry!<br>");
 							$array['CONTENT'] = $style->replaceVar("tpl/addforum.tpl");
 							break;
 						}
 						$forumcon = @mysql_connect($main->postvar['hostname'], $main->postvar['username'], $main->postvar['password'], true);
 						if(!$forumcon) {
-							$main->errors("Couldn't connect to the MySQL server...");
+							$main->errors("Couldn't connect to the MySQL server...<br>");
 						}
 						else {
 							$select = @mysql_select_db($main->postvar['database'], $forumcon);
 							if(!$select) {
-								$main->errors("Couldn't select the database. Does the provided user have access to that database? Does it even exist?");
+							$main->errors("Couldn't select the database. Does the provided user have access to that database? Does it even exist?<br>");
 							}
 							else {
 								$query = $this->queryForums($main->postvar['name']);
 								if($db->num_rows($query) != 0) {
-									$main->errors("This forum name has already been used! Please choose a new one.");
+									$main->errors("This forum name has already been used! Please choose a new one.<br>");
 								}
 								else {
 									$db->query("INSERT INTO `<PRE>config` (name, value) VALUES('p2hforum;:;username;:;{$main->postvar['name']}', '{$main->postvar['username']}')");
@@ -83,7 +84,8 @@ class p2h {
 									$db->query("INSERT INTO `<PRE>config` (name, value) VALUES('p2hforum;:;hostname;:;{$main->postvar['name']}', '{$main->postvar['hostname']}')");
 									$db->query("INSERT INTO `<PRE>config` (name, value) VALUES('p2hforum;:;prefix;:;{$main->postvar['name']}', '{$main->postvar['prefix']}')");
 									$db->query("INSERT INTO `<PRE>config` (name, value) VALUES('p2hforum;:;type;:;{$main->postvar['name']}', '{$main->postvar['forum']}')");
-									$main->errors("Your forum has been added!");
+									$db->query("INSERT INTO `<PRE>config` (name, value) VALUES('p2hforum;:;url;:;{$main->postvar['name']}', '{$main->postvar['url']}')");
+									$main->errors("Your forum has been added!<br>");
 								}
 							}
 						}
@@ -95,26 +97,47 @@ class p2h {
 			case "edit":
 				$query = $this->queryForums();
 				if($db->num_rows($query) == 0) {
-					$array['CONTENT'] = "There are no forums to delete!";
+					$array['CONTENT'] = "There are no forums to edit!<br>";
 				}
 				else {
 					if($main->getvar['name']) {
 						if($_POST) {
 							foreach($main->postvar as $key => $value) {
 								if($value == "" && !$n && $key != "password") {
-									$main->errors("Please fill in all the fields!");
+									$main->errors("Please fill in all the fields!<br>");
 									$n++;
 								}
 							}
 							if(!$n) {
-								$db->query("UPDATE `<PRE>config` SET `value` = '{$main->postvar['username']}' WHERE `name` = 'p2hforum;:;username;:;{$main->getvar['name']}'");
-								$db->query("UPDATE `<PRE>config` SET `value` = '{$main->postvar['database']}' WHERE `name` = 'p2hforum;:;database;:;{$main->getvar['name']}'");
-								$db->query("UPDATE `<PRE>config` SET `value` = '{$main->postvar['hostname']}' WHERE `name` = 'p2hforum;:;hostname;:;{$main->getvar['name']}'");
-								$db->query("UPDATE `<PRE>config` SET `value` = '{$main->postvar['prefix']}' WHERE `name` = 'p2hforum;:;prefix;:;{$main->getvar['name']}'");
-								if($main->postvar['password']) {
-									$db->query("UPDATE `<PRE>config` SET `value` = '{$main->postvar['password']}' WHERE `name` = 'p2hforum;:;password;:;{$main->getvar['name']}'");
+								if(strpos($main->postvar['name'], ';:;') !== false) {
+									$main->errors("You cannot have <code>;:;</code> in your database name! Sorry!");
+									$array['CONTENT'] = $style->replaceVar("tpl/addforum.tpl");
+									break;
 								}
-								$main->errors("Forum Edited!");
+								$forumcon = @mysql_connect($main->postvar['hostname'], $main->postvar['username'], $main->postvar['password'], true);
+								if(!$forumcon) {
+									$main->errors("Couldn't connect to the MySQL server...<br>");
+								}else{
+									$select = @mysql_select_db($main->postvar['database'], $forumcon);
+									if(!$select) {
+										$main->errors("Couldn't select the database. Does the provided user have access to that database? Does it even exist?<br>");
+									}else{
+										$query = $this->queryForums($main->postvar['name']);
+										if($db->num_rows($query) == 0) {
+											$main->errors("This forum name does not exist.<br>");
+										}else{
+											$db->query("UPDATE `<PRE>config` SET `value` = '{$main->postvar['username']}' WHERE `name` = 'p2hforum;:;username;:;{$main->getvar['name']}'");
+											$db->query("UPDATE `<PRE>config` SET `value` = '{$main->postvar['database']}' WHERE `name` = 'p2hforum;:;database;:;{$main->getvar['name']}'");
+											$db->query("UPDATE `<PRE>config` SET `value` = '{$main->postvar['hostname']}' WHERE `name` = 'p2hforum;:;hostname;:;{$main->getvar['name']}'");
+											$db->query("UPDATE `<PRE>config` SET `value` = '{$main->postvar['prefix']}' WHERE `name` = 'p2hforum;:;prefix;:;{$main->getvar['name']}'");
+											$db->query("UPDATE `<PRE>config` SET `value` = '{$main->postvar['url']}' WHERE `name` = 'p2hforum;:;url;:;{$main->getvar['name']}'");
+											if($main->postvar['password']) {
+												$db->query("UPDATE `<PRE>config` SET `value` = '{$main->postvar['password']}' WHERE `name` = 'p2hforum;:;password;:;{$main->getvar['name']}'");
+											}
+											$main->errors("Forum Edited!<br>");
+										}
+									}
+								}
 							}
 						}
 						$forumdata = $this->forumData($main->getvar['name']);
@@ -123,6 +146,7 @@ class p2h {
 						$array2['HOST'] = $forumdata['hostname'];
 						$array2['NAME'] = $main->getvar['name'];
 						$array2['PREFIX'] = $forumdata['prefix'];
+						$array2['URL'] = $forumdata['url'];
 						$array['CONTENT'] = $style->replaceVar("tpl/editforum.tpl", $array2);
 					}
 					else {
@@ -141,12 +165,13 @@ class p2h {
 			case "delete":
 				$query = $this->queryForums();
 				if($db->num_rows($query) == 0) {
-					$array['CONTENT'] = "There are no forums to delete!";
+					$array['CONTENT'] = "There are no forums to delete!<br>";
 				}
 				else {
 					if($main->getvar['name']) {
 						$db->query("DELETE FROM `<PRE>config` WHERE `name` LIKE 'p2hforum;:;%;:;{$main->getvar['name']}'");
-						$main->errors("Forum deleted!");
+						$main->errors("Forum deleted!<br>");
+						$query = $this->queryForums();
 					}
 					$array['CONTENT'] .= "<ERRORS>";
 					while($data = $db->fetch_array($query)) {
@@ -157,6 +182,27 @@ class p2h {
 						$fname = $content[2];
 					}
 				}
+				break;
+
+			case "config":
+				if($_POST) {
+					foreach($main->postvar as $key => $value) {
+						if($value == "" && !$n && $key != "password") {
+							$main->errors("Please fill in all the fields!<br>");
+							$n++;
+						}
+					}
+					if(!$n) {
+						if(!is_numeric($main->postvar['p2hwarndate']) || !($main->postvar['p2hwarndate'] < 28)){
+							$main->errors("The P2H Warn date must be a number less than 28.<br>");
+						}else{
+							$db->query("UPDATE `<PRE>config` SET value = '".$main->postvar['p2hwarndate']."' WHERE name = 'p2hwarndate' LIMIT 1");
+							$main->errors("Configuration updated.<br>");
+						}
+					}
+				}
+				$config_array['WARNDATE'] = $db->config("p2hwarndate");
+				$array['CONTENT'] = $style->replaceVar("tpl/forumconfig.tpl", $config_array);
 				break;
 		}
 		echo $style->replaceVar("tpl/manageforums.tpl", $array);
@@ -210,23 +256,23 @@ class p2h {
 		// Time to deal with possible bad values
 		if($db->config("p2hcheck") == "") {
 			// Probably a new install. Cron has never run before.
-			$db->updateConfig("p2hcheck", "0:0");
+			$db->updateConfig("p2hcheck", "0:0:0");
 		}
 		$checkdate = explode(":", $db->config("p2hcheck"));
 		if($checkdate === array($db->config("p2hcheck"))) {
 			// ":" wasn't found anywhere! Oh noes! Gonna' append it.
-			$db->updateConfig("p2hcheck", $db->config("p2hcheck") . ":0");
+			$db->updateConfig("p2hcheck", $db->config("p2hcheck") . ":0:0");
 			$checkdate = explode(":", $db->config("p2hcheck"));
 		}
 		elseif(array_key_exists(1, $checkdate)) {
 			if($checkdate[1] == "") {
 				// Probably nothing after the colon. Append 0.
-				$db->updateConfig("p2hcheck", $checkdate[0] . ":0");
+				$db->updateConfig("p2hcheck", $checkdate[0] . ":0:0");
 				$checkdate = explode(":", $db->config("p2hcheck"));
 			}
 		}
 		// If today is the last day of the month (and hasn't been run yet)
-		if(date("d") == date("t") && (int)$checkdate[0] < (int)date("m")) {
+		if(date("d") == date("t") && ((int)$checkdate[0] < (int)date("m") || ((int)$checkdate[0] == (int)date("m") && $checkdate[2] == "0"))) {
 			$query = $db->query("SELECT * FROM `<PRE>user_packs`");
 			while($data = $db->fetch_array($query)) {
 				$ptype = $type->determineType($data['pid']);
@@ -246,7 +292,7 @@ class p2h {
 						// If the user just signed up today, don't punish them.
 						if(date("mdY") != date("mdY", $userPack['signup'])) {
 							// Suspend the user.
-							$server->suspend($data['id'], "Only posted $posts out of $mposts");
+							$server->suspend($data['id'], "Only posted $posts post out of the required $mposts monthly posts");
 							// Output to the cron.
 							echo "<strong>".$user['user']." (".$fuser['fuser']."):</strong> Suspended for not posting the required amount. ($posts out of $mposts)<br />";
 						}
@@ -260,7 +306,7 @@ class p2h {
 			else {
 				$checkmonth = date("m");
 			}
-			$db->updateConfig("p2hcheck", $checkmonth.":0");
+			//$db->updateConfig("p2hcheck", $checkmonth.":0:1");
 		}
 		// If today is the warn day (and hasn't been run yet)
 		elseif((int)date("d") == $this->warnDate && (int)$checkdate[1] != 1) {
@@ -274,6 +320,10 @@ class p2h {
 					$this->con = $this->forumCon($forum);
 					$posts = $this->checkMonthly($fdetails['type'], $fuser['fuser'], $fdetails['prefix']);
 					$mposts = $this->getMonthly($data['pid']);
+
+					$query_url = $db->query("SELECT * FROM `<PRE>config` WHERE `name` LIKE 'p2hforum;:;url;:;".$forum."'");
+					$data_url = $db->fetch_array($query_url);
+					$furl = $data_url['value'];
 					// If the user hasn't posted enough yet
 					if($posts < $mposts) {
 						$user = $db->client($data['userid']);
@@ -282,6 +332,7 @@ class p2h {
 						$emaildata = $db->emailTemplate("p2hwarning");
 						$array['USERPOSTS'] = $posts;
 						$array['MONTHLY'] = $mposts;
+						$array['URL'] = $furl;
 						// Warn the user that they still have some more posting to do!
 						$email->send($user['email'], $emaildata['subject'], $emaildata['content'], $array);
 						// Output to the cron.
@@ -290,7 +341,7 @@ class p2h {
 				}
 			}
 			// This prevents the post warnings from being sent again today/this month.
-			$db->updateConfig("p2hcheck", $checkdate[0].":1");
+			$db->updateConfig("p2hcheck", $checkdate[0].":1:0");
 		}
 	}
 
@@ -336,12 +387,30 @@ class p2h {
 		$posts = $this->checkMonthly($fdetails['type'], $user['fuser'], $fdetails['prefix']);
 		$monthly = $this->getMonthly($data['pid']);
 		$array['USER'] = $user['fuser'];
+		$need = $monthly - $posts;
+		if($monthly == "1"){
+			$s = "";
+		}else{
+			$s = "s";
+		}
+
+		if($posts == "1"){
+			$s2 = "";
+		}else{
+			$s2 = "s";
+		}
+
+		if($need == "1"){
+			$s3 = "";
+		}else{
+			$s3 = "s";
+		}
+
 		if($posts >= $monthly) {
-			$array['MESSAGE'] = "<strong>Well Done!</strong><br />You have achieved the monthly posts of ". $monthly .". You're total posts is ". $posts .".";
+			$array['MESSAGE'] = "<strong>Well Done!</strong><br />Your plan requires you to post ". $monthly ." time$s. You have posted ". $posts ." time$s2.";
 		}
 		else {
-			$need = $monthly - $posts;
-			$array['MESSAGE'] = "<strong>You Need More Posts!</strong><br />You haven't achieved the monthly posts of ". $monthly .". You're total posts is ". $posts .". You need ". $need ." more posts!";
+			$array['MESSAGE'] = "<strong>You Need More Posts!</strong><br />You haven't posted the monthly required ". $monthly ." post$s. You're total number of posts is ". $posts ." post$s2. You need ". $need ." more post$s3.";
 		}
 		echo $style->replaceVar("tpl/forumposting.tpl", $array);
 	}
@@ -381,6 +450,7 @@ class p2h {
 	}
 
 	private function checkMonthly($forum, $fuser, $prefix) {
+		global $main;
 		$nmonth = date("m");
 		$nyear = date("y");
 
@@ -397,7 +467,7 @@ class p2h {
 
 				//Count with time
 				while($data2 = mysql_fetch_array($sposts)) {
-					$date = explode(":", strftime("%m:%y" ,$data2['post_date']));
+					$date = explode(":", $main->convertdate("m:y", $data2['post_date']));
 					if($nmonth <= $date[0] && $nyear <= $date[1]) {
 						$n++;
 					}
@@ -415,7 +485,7 @@ class p2h {
 
 				//Count with time
 				while($data2 = mysql_fetch_array($sposts)) {
-					$date = explode(":", strftime("%m:%y" ,$data2['post_date']));
+					$date = explode(":", $main->convertdate("m:y", $data2['post_date']));
 					if($nmonth <= $date[0] && $nyear <= $date[1]) {
 						$n++;
 					}
@@ -428,7 +498,7 @@ class p2h {
 				$select = mysql_query("SELECT * FROM {$prefix}posts WHERE `username` = '{$forumuser}'", $this->con);
 
 				while($data2 = mysql_fetch_array($select)) {
-					$date = explode(":", strftime("%m:%y" ,$data2['dateline']));
+					$date = explode(":", $main->convertdate("m:y", $data2['dateline']));
 					if($nmonth <= $date[0] && $nyear <= $date[1]) {
 						$n++;
 					}
@@ -442,7 +512,7 @@ class p2h {
 				$select = mysql_query("SELECT * FROM {$prefix}posts WHERE `poster_id` = '{$mem['user_id']}'", $this->con);
 
 				while($data2 = mysql_fetch_array($select)) {
-					$date = explode(":", strftime("%m:%y" ,$data2['post_time']));
+					$date = explode(":", $main->convertdate("m:y", $data2['post_time']));
 					if($nmonth <= $date[0] && $nyear <= $date[1]) {
 						$n++;
 					}
@@ -456,7 +526,7 @@ class p2h {
 				$select = mysql_query("SELECT * FROM {$prefix}posts WHERE `poster_id` = '{$mem['user_id']}'", $this->con);
 
 				while($data2 = mysql_fetch_array($select)) {
-					$date = explode(":", strftime("%m:%y" ,$data2['post_time']));
+					$date = explode(":", $main->convertdate("m:y", $data2['post_time']));
 					if($nmonth <= $date[0] && $nyear <= $date[1]) {
 						$n++;
 					}
@@ -469,7 +539,7 @@ class p2h {
 				$select = mysql_query("SELECT * FROM {$prefix}post WHERE `username` = '{$forumuser}'", $this->con);
 
 				while($data2 = mysql_fetch_array($select)) {
-					$date = explode(":", strftime("%m:%y" ,$data2['dateline']));
+					$date = explode(":", $main->convertdate("m:y", $data2['dateline']));
 					if($nmonth <= $date[0] && $nyear <= $date[1]) {
 						$n++;
 					}
@@ -482,7 +552,7 @@ class p2h {
 				$select = mysql_query("SELECT * FROM {$prefix}messages WHERE `posterName` = '{$forumuser}'", $this->con);
 
 				while($data2 = mysql_fetch_array($select)) {
-					$date = explode(":", strftime("%m:%y" ,$data2['posterTime']));
+					$date = explode(":", $main->convertdate("m:y", $data2['posterTime']));
 					if($nmonth <= $date[0] && $nyear <= $date[1]) {
 						$n++;
 					}
@@ -497,7 +567,7 @@ class p2h {
 				$select = mysql_query("SELECT * FROM {$prefix}posts WHERE `poster_id` = '{$mem['id']}'", $this->con);
 
 				while($data2 = mysql_fetch_array($select)) {
-					$date = explode(":", strftime("%m:%y" ,$data2['ptime']));
+					$date = explode(":", $main->convertdate("m:y", $data2['ptime']));
 					if($nmonth <= $date[0] && $nyear <= $date[1]) {
 						$n++;
 					}
@@ -514,7 +584,7 @@ class p2h {
 				}
 				//Ack! Loops within loops! =P
 				foreach($nodes as $key => $value) {
-					$date = explode(":", strftime("%m:%y", $value['created']));
+					$date = explode(":", $main->convertdate("m:y", $value['created']));
 					if($nmonth <= $date[0] && $nyear <= $date[1]) {
 						$n++;
 					}
@@ -527,7 +597,7 @@ class p2h {
 						$comments[] = $comment;
 					}
 					foreach($comments as $key2 => $value2) {
-						$date = explode(":", strftime("%m:%y", $value2['timestamp']));
+						$date = explode(":", $main->convertdate("m:y", $value2['timestamp']));
 						if($nmonth <= $date[0] && $nyear <= $date[1]) {
 							$n++;
 						}

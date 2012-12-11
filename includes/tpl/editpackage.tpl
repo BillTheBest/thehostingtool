@@ -1,10 +1,10 @@
 <script type="text/javascript" src="<URL>includes/tinymce/jscripts/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript">
-	tinyMCE.init({
-	mode : "textareas",
-	skin : "o2k7",
-	theme : "simple"
-	});
+        tinyMCE.init({
+        mode : "textareas",
+        skin : "o2k7",
+        theme : "advanced"
+        });
 </script>
 <ERRORS>
 <form id="addpackage" name="addpackage" method="post" action="">
@@ -24,6 +24,16 @@
   <tr>
     <td valign="top">Description:</td>
     <td><textarea name="description" id="description" cols="45" rows="5">%DESCRIPTION%</textarea></td>
+  </tr>
+  <tr>
+    <td valign="top">Type:</td>
+    <td>
+    <select name="type" id="type" onchange="ajaxSlide('customform','<AJAX>?function=acpPedit&type='+ this.value +'&values=%ADDITIONALVALS%&origtype=%ORIGTYPE%')">
+      <option value="free" %SELECTED1%>Free</option>
+      %P2HOPTION%
+      <option value="paid" %SELECTED3%>Paid</option>
+    </select><a title="The type of your package. You can choose between <em>free</em>, <em>post2host</em> and <em>paid</em>." class="tooltip"><img src="<URL>themes/icons/information.png" /></a>
+    </td>
   </tr>
   <tr>
     <td valign="top">Server:</td>

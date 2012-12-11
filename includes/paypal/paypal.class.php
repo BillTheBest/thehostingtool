@@ -93,7 +93,8 @@ class paypal_class {
       $this->last_error = '';
       
       $this->ipn_log_file = 'ipn_log.txt';
-      $this->ipn_log = false;
+      $this->ipn_log = true;
+      $this->ipn_log_type = "db";  //file or db
       $this->ipn_response = '';
       
       // populate $fields array with a few default values.  See the paypal
@@ -116,23 +117,27 @@ class paypal_class {
 
    function submit_paypal_post() {
  
-      //MODDED BY JONNY
+   //MODDED BY JONNY, fixed by Na'ven.  ;)
 	  
-	  foreach($this->fields as $name => $value) {
-		  if(isset($n)) {
-			  $split = "&";
+   ?>
+   <form action='<?PHP echo $this->paypal_url; ?>' method='post' name='frm'>
+   <?php
+   foreach ($this->fields as $a => $b) {
+   echo "<input type='hidden' name='".$a."' value='".$b."'>";
 		  }
-		  $post .= $split.$name."=".$value;
-		  $n++;
-	  }
-	  header("Location: ".$this->paypal_url."?".$post);
-    
+   ?>
+   </form>
+   <script language="JavaScript">
+   document.frm.submit();
+   </script>
+   <?PHP
+   exit;
    }
    
    function validate_ipn() {
 
       // parse the paypal URL
-      $url_parsed=parse_url($this->paypal_url);        
+      $url_parsed=parse_url($this->paypal_url);
 
       // generate the post string from the _POST vars aswell as load the
       // _POST vars into an arry so we can play with them from the calling
@@ -145,24 +150,21 @@ class paypal_class {
       $post_string.="cmd=_notify-validate"; // append ipn command
 
       // open the connection to paypal
-      $fp = fsockopen($url_parsed[host],"80",$err_num,$err_str,30); 
+      $fp = fsockopen("ssl://".$url_parsed[host],"443",$err_num,$err_str,30);
       if(!$fp) {
           
          // could not open the connection.  If loggin is on, the error message
          // will be in the log.
-         $this->last_error = "fsockopen error no. $errnum: $errstr";
+         $this->last_error = "fsockopen error no. $err_num: $err_str";
          $this->log_ipn_results(false);       
          return false;
          
-      } else { 
- 
+      } else {
          // Post the data back to paypal
-         fputs($fp, "POST $url_parsed[path] HTTP/1.1\r\n"); 
-         fputs($fp, "Host: $url_parsed[host]\r\n"); 
-         fputs($fp, "Content-type: application/x-www-form-urlencoded\r\n"); 
-         fputs($fp, "Content-length: ".strlen($post_string)."\r\n"); 
-         fputs($fp, "Connection: close\r\n\r\n"); 
-         fputs($fp, $post_string . "\r\n\r\n"); 
+         fputs($fp, "POST /cgi-bin/webscr HTTP/1.0\r\n");
+         fputs($fp, "Content-Type: application/x-www-form-urlencoded\r\n");
+         fputs($fp, "Content-Length: ".strlen($post_string)."\r\n\r\n");
+         fputs($fp, $post_string . "\r\n\r\n");
 
          // loop through the response from the server and append to variable
          while(!feof($fp)) { 
@@ -191,6 +193,7 @@ class paypal_class {
    }
    
    function log_ipn_results($success) {
+      global $db;
        
       if (!$this->ipn_log) return;  // is logging turned off?
       
@@ -198,23 +201,54 @@ class paypal_class {
       $text = '['.date('m/d/Y g:i A').'] - '; 
       
       // Success or failure being logged?
-      if ($success) $text .= "SUCCESS!\n";
-      else $text .= 'FAIL: '.$this->last_error."\n";
+      if($success){
+      $text .= "SUCCESS!<br>";
+      }else{
+      $text .= 'FAIL: '.$this->last_error."<br>";
+      }
       
       // Log the POST variables
-      $text .= "IPN POST Vars from Paypal:\n";
+      $text .= "IPN POST Vars from PayPal:<br><br>";
+      $text .= "<table width = '672' cellpaddin = '0' cellspacing = '0' border = '1' bordercolor = '#000000' style='border-collapse: collapse'>";
       foreach ($this->ipn_data as $key=>$value) {
-         $text .= "$key=$value, ";
+      if($color = ''){
+      $color = '';
+      }else{
+      $color = " bgcolor = '#888888'";
+      }
+         $text .= "<tr><td width = '30%'".$color."><b>$key</b></td><td>$value</td></tr>";
+      }
+      $text .= "</table>";
+ 
+      //This section prevents paypal's response headers from pulling the page out of wack.  - Silly, I know, but hey, I'm a perfectionist.  What can I say?
+      //This won't split the html responses, though.  This way we an still show the page properly that comes up if something goes wrong.
+      if(substr_count($paypal_response, "<") == "0"){
+       $paypal_response = explode("\n", $this->ipn_response);
+       $i=0;
+        foreach($paypal_response as $paypal_response_key => $paypal_response_val){
+         if(strlen($paypal_response_val) > 100){
+          $paypal_response_val = wordwrap($paypal_response_val, 100, "<br>", true);
+          $paypal_response[$i] = $paypal_response_val;
+          break;
+         }
+         $i++;
+        }
+       $paypal_response = implode("<br><br>", $paypal_response);
+      }else{
+       $paypal_response = $this->ipn_response;
       }
  
       // Log the response from the paypal server
-      $text .= "\nIPN Response from Paypal Server:\n ".$this->ipn_response;
+      $text .= "<br><br>IPN Response from PayPal Server:<br>".$paypal_response;
       
       // Write to log
+      if($this->ipn_log_type == "file"){
       $fp=fopen($this->ipn_log_file,'a');
-      fwrite($fp, $text . "\n\n"); 
-
+      fwrite($fp, $text . "\n\n");
       fclose($fp);  // close file
+      }else{
+      $db->query("INSERT INTO <PRE>logs SET uid = 's', loguser = 'PayPal', logtime = '".time()."', message = '".addslashes($text)."'");
+      }
    }
 
    function dump_fields() {
@@ -240,4 +274,3 @@ class paypal_class {
 }         
 
 
- 

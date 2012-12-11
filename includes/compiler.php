@@ -10,8 +10,18 @@ error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE);
 // Define the main THT
 define("THT", 1);
 
-// Helps prevent against CSRF attacks.
-require_once("csrf-magic.php");
+date_default_timezone_set("GMT");
+
+$path = dirname($_SERVER['PHP_SELF']);
+$position = strrpos($path,'/') + 1;
+define("FOLDER", substr($path,$position)); # Add current folder name to global
+
+if(!($_GET['page'] == 'invoices' && FOLDER == "client")){
+	//As this prevents PayPal from using the site, disable this script when PayPal might be trying to get through.
+
+	// Helps prevent against CSRF attacks and PayPal execution.
+	require_once("csrf-magic.php");
+}
 
 // We don't want this to be called directly.
 $compile = explode("/", $_SERVER["SCRIPT_FILENAME"]);
@@ -73,7 +83,39 @@ if ($handle = opendir($folder)) { # Open the folder
 }
 closedir($handle); #Close the folder
 
+
+//Define the Admin directory
+if(!defined("ADMINDIR")){
+	$admin_dir = find_admin_dir("../");
+	define("ADMINDIR", $admin_dir);
+	if(INSTALL == 1) {
+		$db->query("UPDATE <PRE>navbar SET link = '".ADMINDIR."' WHERE visual = 'Admin Area' LIMIT 1"); //Update the NavBar admin directory
+	}
+}
+
 if(INSTALL == 1) {
+////////////////////
+//AKISMET
+
+//Akismet requires a special initialization.  Putting it here will aid in future use of Akismet.  (Ex. Contact forms and the like.)
+
+$akismetkey = $db->config('akismetkey');
+if($db->config('useakismet') == "1" && $akismetkey){
+//Let's keep the URL consistent.
+if($_SERVER['SERVER_PORT'] == "443"){
+	$akismeturl = "https://".$_SERVER['HTTP_HOST'];
+}else{
+	$akismeturl = "http://".$_SERVER['HTTP_HOST'];
+}
+
+include(LINK."Akismet/Akismet.php");
+$akismet = new Akismet($akismeturl, $akismetkey);
+global $akismet;
+}
+
+//END AKISMET
+///////////////////
+
 	define("THEME", $db->config("theme")); # Set the default theme
 	// Sets the URL THT is located at
 	if($_SERVER["HTTPS"]) {
@@ -103,7 +145,7 @@ if(isset($_GET)) {
 			$main->getvar[$key] = $db->strip($value);
 		}
 		else {
-			$main->getvar[$key] = $value;	
+			$main->getvar[$key] = $value;
 		}
 	}
 }
@@ -124,7 +166,7 @@ $position = strrpos($path,'/') + 1;
 define("FOLDER", substr($path,$position)); # Add current folder name to global
 
 // Cheap. I know.
-if(!is_dir("../includes") && !is_dir("../themes") && !is_dir("../admin")) {
+if(!is_dir("../includes") && !is_dir("../themes") && !is_dir("../".ADMINDIR)) {
 	$check = explode("/", dirname($_SERVER["SCRIPT_NAME"]));
 	if($check[count($check)-1] == "install") {
 		die("Please change your THT directory's name from something else other than \"install\". Please?");
@@ -180,5 +222,14 @@ function checkForDependencies() {
 		return $output;
 	}
 }
-	
+
+function find_admin_dir($dir){
+	foreach(glob($dir.'/*', GLOB_ONLYDIR) as $dir_search) {
+		if(is_file($dir_search."/ADMIN_DIR")){
+			$admindir = str_replace($dir."/", "", $dir_search);
+			return $admindir;
+		}
+	}
+}
+
 ?>

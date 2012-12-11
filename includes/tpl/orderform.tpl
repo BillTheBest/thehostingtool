@@ -33,7 +33,7 @@ function check(name, value) {
 			}
 			else {
 				$("#"+name+"check").html(wrong);
-			}													
+			}
 			document.getElementById("next").disabled = false;
 		});
 	},500);
@@ -82,15 +82,71 @@ function nextstep() {
 			break;
 			
 		case 3:
-			$.get("<AJAX>?function=clientcheck", function(data) {
-			if(data == "1") {
-				document.getElementById("verify").innerHTML = right;
-				showhide(step, step + 1)
-				step = step + 1
-			}
-			else {
+			//I don't know JS very well, so I said screw it with the loops after 6 hours.  This works, so I'm using it.  - Na'ven
+
+			var usernamefield = document.getElementById("username").value
+			var passwordfield = document.getElementById("password").value
+			var confirmpfield = document.getElementById("confirmp").value
+			var emailfield = document.getElementById("email").value
+			var firstnamefield = document.getElementById("firstname").value
+			var lastnamefield = document.getElementById("lastname").value
+			var addressfield = document.getElementById("address").value
+			var cityfield = document.getElementById("city").value
+			var statefield = document.getElementById("state").value
+			var zipfield = document.getElementById("zip").value
+			var countryfield = document.getElementById("country").value
+			var phonefield = document.getElementById("phone").value
+			var humanfield = document.getElementById("human").value
+
+			var userver = document.getElementById("usercheck").innerHTML
+			var passver = document.getElementById("passcheck").innerHTML
+			var emailver = document.getElementById("emailcheck").innerHTML
+			var firstnamever = document.getElementById("firstnamecheck").innerHTML
+			var lastnamever = document.getElementById("lastnamecheck").innerHTML
+			var addressver = document.getElementById("addresscheck").innerHTML
+			var cityver = document.getElementById("citycheck").innerHTML
+			var statever = document.getElementById("statecheck").innerHTML
+			var zipver = document.getElementById("zipcheck").innerHTML
+			var phonever = document.getElementById("phonecheck").innerHTML
+			var humanver = document.getElementById("humancheck").innerHTML
+
+			$.get("<AJAX>?function=akismetcheck&checkthisname="+document.getElementById("firstname").value+" "+document.getElementById("lastname").value+"&checkthisemail="+document.getElementById("email").value, function(data){
+			if(data == "0"){
 				document.getElementById("verify").innerHTML = wrong;
-			}													
+			}else{
+				if(usernamefield == "" ||
+					passwordfield == "" ||
+					confirmpfield == "" ||
+					emailfield == "" ||
+					firstnamefield == "" ||
+					lastnamefield == "" ||
+					addressfield == "" ||
+					cityfield == "" ||
+					statefield == "" ||
+					zipfield == "" ||
+					countryfield == "" ||
+					phonefield == "" ||
+					humanfield == "" ||
+
+					userver == wrong ||
+					passver == wrong ||
+					emailver == wrong ||
+					firstnamever == wrong ||
+					lastnamever == wrong ||
+					addressver == wrong ||
+					cityver == wrong ||
+					statever == wrong ||
+					zipver == wrong ||
+					phonever == wrong ||
+					humanver == wrong)
+				{
+					document.getElementById("verify").innerHTML = wrong;
+				}else{
+					document.getElementById("verify").innerHTML = right;
+					showhide(step, step + 1)
+					step = step + 1
+				}
+			}
 																		});
 			break;
 			
@@ -101,9 +157,9 @@ function nextstep() {
 			  var i;
 			  for(i="0"; i < document.order.length; i++){
 				  if(document.order.elements[i].type == "checkbox"){
-					  url = url+"&"+document.order.elements[i].id+"="+document.order.elements[i].checked;
+						url = url+"&"+document.order.elements[i].id+"="+document.order.elements[i].checked;
 				  }else{
-					  url = url+"&"+document.order.elements[i].id+"="+document.order.elements[i].value;
+						url = url+"&"+document.order.elements[i].id+"="+urlencode(document.order.elements[i].value);
 				  }
 			  }
 			  document.getElementById("finished").innerHTML = working;
@@ -115,16 +171,23 @@ function nextstep() {
 					document.getElementById("back").disabled = false;
 				}
 				document.getElementById("verify").innerHTML = "";
-				$.get("<AJAX>?function=ispaid&pid="+ document.getElementById("package").value +"&uname="+ document.getElementById("username").value, function(data2) {							
+				$.get("<AJAX>?function=ispaid&pid="+ document.getElementById("package").value +"&uname="+ document.getElementById("username").value, function(data2) {
 																																							 //document.getElementById("finished").innerHTML = data2;
 				if(data2 != "") {
-					window.location = "../client/?page=invoices&iid="+data2;	
+					setTimeout("location.href = '../client/?page=invoices&iid="+data2+"';",3000);
 				}
 				});
-																			});
+				});
 			break;
 	}
 }
+
+function urlencode (str) {
+	str = (str + '').toString();
+	return encodeURIComponent(str).replace(/!/g, '%21').replace(/'/g, '%27').replace(/\(/g, '%28').
+	replace(/\)/g, '%29').replace(/\*/g, '%2A').replace(/%20/g, '+');
+}
+
 function showhide(hide, show) {
 	document.getElementById("next").disabled = true;
 	document.getElementById("back").disabled = true;
@@ -223,60 +286,60 @@ function previousstep() {
         <div class="text">
         	<table border="0" cellspacing="2" cellpadding="0" align="center" style="width: 100%;">
               <tr>
-                <td>Username:</td>
-                <td><input type="text" name="username" id="username" /></td>
-                <td align="left"><a title="The username is your unique identity to your account. This is both your client account and control panel username. Please keep it under 8 characters." class="tooltip"><img src="<URL>themes/icons/information.png" /></a></td>
+                <td width = "200">Username:</td>
+                <td width = "250"><input type="text" name="username" id="username" size = "47" /></td>
+                <td align="left" width = "16"><a title="The username is your unique identity to your account. This is both your client account and control panel username. Please keep it under 8 characters." class="tooltip"><img src="<URL>themes/icons/information.png" /></a></td>
                 <td align="left" id="usercheck">&nbsp;</td>
               </tr>
               <tr>
                 <td>Password:</td>
-                <td><input type="password" name="password" id="password" onchange="check('pass', this.value+':'+document.getElementById('confirmp').value)"/></td>
-                <td rowspan="2" align="left" valign="middle"><a title="Your password is your own personal key that allows only you to log you into your account." class="tooltip"><img src="<URL>themes/icons/information.png" /></a></td>
-                <td rowspan="2" align="left" valign="middle" id="passcheck">&nbsp;</td>
+                <td><input type="password" name="password" id="password" onchange="check('pass', this.value+':'+document.getElementById('confirmp').value)" size = "47" /></td>
+                <td align="left" valign="middle"><a title="Your password is your own personal key that allows only you to log you into your account." class="tooltip"><img src="<URL>themes/icons/information.png" /></a></td>
+                <td align="left" valign="middle" id="passcheck">&nbsp;</td>
               </tr>
               <tr>
                 <td>Confirm Password:</td>
-                <td><input type="password" name="confirmp" id="confirmp" onchange="check('pass', this.value+':'+document.getElementById('password').value)"/></td>
+                <td colspan = "3"><input type="password" name="confirmp" id="confirmp" onchange="check('pass', this.value+':'+document.getElementById('password').value)" size = "47" /></td>
               </tr>
               <tr>
                 <td>Email:</td>
-                <td><input type="text" name="email" id="email" onchange="check('email', this.value)" /></td>
+                <td><input type="text" name="email" id="email" onchange="check('email', this.value)" size = "47" /></td>
                 <td align="left"><a title="Your email is your own address where all <NAME> emails will be sent to. Make sure this is valid." class="tooltip"><img src="<URL>themes/icons/information.png" /></a></td>
                 <td id="emailcheck" align="left">&nbsp;</td>
               </tr>
               <tr>
                 <td>First Name:</td>
-                <td><input type="text" name="firstname" id="firstname" onchange="check('firstname', this.value)" /></td>
+                <td><input type="text" name="firstname" id="firstname" onchange="check('firstname', this.value)" size = "47" /></td>
                 <td align="left"><a title="Your first name." class="tooltip"><img src="<URL>themes/icons/information.png" /></a></td>
                 <td id="firstnamecheck" align="left">&nbsp;</td>
               </tr>
               <tr>
                 <td>Last Name:</td>
-                <td><input type="text" name="lastname" id="lastname" onchange="check('lastname', this.value)" /></td>
+                <td><input type="text" name="lastname" id="lastname" onchange="check('lastname', this.value)" size = "47" /></td>
                 <td align="left"><a title="Your last name." class="tooltip"><img src="<URL>themes/icons/information.png" /></a></td>
                 <td id="lastnamecheck" align="left">&nbsp;</td>
               </tr>
               <tr>
                 <td>Address:</td>
-                <td><input type="text" name="address" id="address" onchange="check('address', this.value)" /></td>
+                <td><input type="text" name="address" id="address" onchange="check('address', this.value)" size = "47" /></td>
                 <td align="left"><a title="Your personal address." class="tooltip"><img src="<URL>themes/icons/information.png" /></a></td>
                 <td id="addresscheck" align="left">&nbsp;</td>
               </tr>
               <tr>
                 <td>City:</td>
-                <td><input type="text" name="city" id="city" onchange="check('city', this.value)" /></td>
+                <td><input type="text" name="city" id="city" onchange="check('city', this.value)" size = "47" /></td>
                 <td align="left"><a title="Your city. Letters only." class="tooltip"><img src="<URL>themes/icons/information.png" /></a></td>
                 <td id="citycheck" align="left">&nbsp;</td>
               </tr>
               <tr>
                 <td>State:</td>
-                <td><input type="text" name="state" id="state" onchange="check('state', this.value)" /></td>
+                <td><input type="text" name="state" id="state" onchange="check('state', this.value)" size = "47" /></td>
                 <td align="left"><a title="Your state. Letters only." class="tooltip"><img src="<URL>themes/icons/information.png" /></a></td>
                 <td id="statecheck" align="left">&nbsp;</td>
               </tr>
               <tr>
                 <td>Zip Code:</td>
-                <td><input type="text" name="zip" id="zip" onchange="check('zip', this.value)" /></td>
+                <td><input type="text" name="zip" id="zip" onchange="check('zip', this.value)" size = "47" /></td>
                 <td align="left"><a title="Your zip/postal code. Numbers only." class="tooltip"><img src="<URL>themes/icons/information.png" /></a></td>
                 <td id="zipcheck" align="left">&nbsp;</td>
               </tr>
@@ -288,13 +351,19 @@ function previousstep() {
               </tr>
               <tr>
                 <td>Phone Number:</td>
-                <td><input type="text" name="phone" id="phone" onchange="check('phone', this.value)" /></td>
+                <td><input type="text" name="phone" id="phone" onchange="check('phone', this.value)" size = "47" /></td>
                 <td align="left"><a title="Your personal phone number. Numbers and dashes only." class="tooltip"><img src="<URL>themes/icons/information.png" /></a></td>
                 <td id="phonecheck" align="left">&nbsp;</td>
               </tr>
               <tr>
+                <td>Time Zone:</td>
+                <td>%TZADJUST%</td>
+                <td align="left"><a title="Select your time zone to show the dates and times on this site in your timezone." class="tooltip"><img src="<URL>themes/icons/information.png" /></a></td>
+                <td id="tzonescheck" align="left">&nbsp;</td>
+              </tr>
+              <tr>
                 <td><img src="<URL>includes/captcha_image.php"></td>
-                <td><input type="text" name="human" id="human" onchange="check('human', this.value)" /></td>
+                <td><input type="text" name="human" id="human" onchange="check('human', this.value)" size = "47" /></td>
                 <td align="left"><a title="Answer the question to prove you are not a bot." class="tooltip"><img src="<URL>themes/icons/information.png" /></a></td>
                 <td id="humancheck" align="left">&nbsp;</td>
               </tr>
@@ -307,9 +376,9 @@ function previousstep() {
         <div class="text">
         	<table width="100%" border="0" cellspacing="2" cellpadding="0">
               <tr id="dom">
-                <td width="20%" id="domtitle">Domain:</td>
-                <td width="78%" id="domcontent">%DOMAIN%</td>
-                <td width="2%" align="left" id="domaincheck"><a title="Your domain, this must be in the format: <strong>example.com</strong>" class="tooltip"><img src="<URL>themes/icons/information.png" /></a></td>
+                <td width="10%" id="domtitle">Domain:</td>
+                <td width="10%" id="domcontent">%DOMAIN%</td>
+                <td align="left" id="domaincheck"><a title="Your domain, this must be in the format: <strong>example.com</strong>" class="tooltip"><img src="<URL>themes/icons/information.png" /></a></td>
               </tr>
               <tr id="sub">
                 <td width="20%" id="domtitle">Subdomain:</td>

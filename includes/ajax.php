@@ -72,11 +72,11 @@ class Ajax {
 			$query = $db->query("SELECT * FROM `<PRE>users` WHERE `user` = '{$main->getvar['user']}'");
 			if($db->num_rows($query) == 0) {
 				$_SESSION['check']['user'] = true;
-				echo 1;	
+				echo 1;
 			}
 			else {
 				$_SESSION['check']['user'] = false;
-				echo 0;	
+				echo 0;
 			}
 		}
 	}
@@ -91,11 +91,11 @@ class Ajax {
 			$pass = explode(":", $main->getvar['pass']);
 			if($pass[0] == $pass[1]) {
 				$_SESSION['check']['pass'] = true;
-				echo 1;	
+				echo 1;
 			}
 			else {
 				$_SESSION['check']['pass'] = false;
-				echo 0;	
+				echo 0;
 			}
 		}
 	}
@@ -126,7 +126,7 @@ class Ajax {
 
 	public function firstnamecheck() {
 		global $main;
-		if(!preg_match("/^([a-zA-Z\.\'\ \-])+$/",$main->getvar['firstname'])) {
+		if(!preg_match("/^([a-zA-Z\.\'\ \-])+$/",stripslashes($main->getvar['firstname']))) {
 			$_SESSION['check']['firstname'] = false;
 			echo 0;
 		}
@@ -138,7 +138,7 @@ class Ajax {
 	
 	public function lastnamecheck() {
 		global $main;
-		if(!preg_match("/^([a-zA-Z\.\'\ \-])+$/",$main->getvar['lastname'])) {
+		if(!preg_match("/^([a-zA-Z\.\'\ \-])+$/",stripslashes($main->getvar['lastname']))) {
 			$_SESSION['check']['lastname'] = false;
 			echo 0;
 		}
@@ -164,13 +164,13 @@ class Ajax {
 		global $main;
 		if (!preg_match("/^([a-zA-Z ])+$/",$main->getvar['city'])) {
 			$_SESSION['check']['city'] = false;
-			echo 0;			
+			echo 0;
 		}
 		else {
 			$_SESSION['check']['city'] = true;
 			echo 1;
 		}
-	}		
+	}
 	
 	public function statecheck() {
 		global $main;
@@ -182,7 +182,7 @@ class Ajax {
 			$_SESSION['check']['state'] = true;
 			echo 1;
 		}
-	}				
+	}
 	
 	public function zipcheck() {
 		global $main;
@@ -218,26 +218,26 @@ class Ajax {
 				echo 1;
 				}
 			}
-	}	
+	}
 	//Basic captcha check... thanks http://frikk.tk!
 	public function humancheck() {
 		global $main;
 		if($main->getvar['human'] != $_SESSION["pass"]) {
 			$_SESSION['check']['human'] = false;
-			echo 0;			
-		}		
+			echo 0;
+		}
 		else {
 			$_SESSION['check']['human'] = true;
-			echo 1;			
+			echo 1;
 		}
 	}
 	
 	public function clientcheck() {
 		if($_SESSION['check']['email'] == true && $_SESSION['check']['user'] == true && $_SESSION['check']['pass'] == true && $_SESSION['check']['human'] == true && $_SESSION['check']['address'] == true && $_SESSION['check']['state'] == true && $_SESSION['check']['zip'] == true && $_SESSION['check']['phone'] == true) {
-			echo 1;	
+			echo 1;
 		}
 		else {
-			echo 1;	
+			echo 0;
 		}
 	}
 	
@@ -249,10 +249,10 @@ class Ajax {
 		else {
 			$data = explode(".", $main->getvar['domain']);
 			if(!$data[0] || !$data[1]) {
-				echo 0;	
+				echo 0;
 			}
 			else {
-				echo 1;	
+				echo 1;
 			}
 		}
 	}
@@ -276,7 +276,7 @@ class Ajax {
 		$pass = $main->getvar['pass'];
 		$query = $db->query("SELECT * FROM `<PRE>users` WHERE `id` = '{$db->strip($user)}'");
 		if($db->num_rows($query) == 0) {
-			echo "That account doesn't exist!";	
+			echo "That account doesn't exist!";
 		}
 		else {
 			$data = $db->fetch_array($query);
@@ -288,11 +288,11 @@ class Ajax {
 					session_destroy();
 				}
 				else {
-					echo "Your account wasn't cancelled! Try again..";	
+					echo "Your account wasn't cancelled! Try again..";
 				}
 			}
 			else {
-				echo "That password is wrong!";	
+				echo "That password is wrong!";
 			}
 		}
 	}
@@ -307,8 +307,18 @@ class Ajax {
 				$main->error($array);
 			}
 			else {
-				$data = $db->fetch_array($query);
-				echo $data['subject']."{}[]{}".$data['description']."{}[]{}".$data['content'];
+				$template_info = $db->fetch_array($query);
+				$tmpl_file_base = LINK."tpl/email/".$template_info['name'];
+				$tmpl_content_file = @file_get_contents($tmpl_file_base.".tpl");
+				$tmpl_descrip_file = @file_get_contents($tmpl_file_base."_descrip.tpl");
+
+				if(!$tmpl_content_file && !$tmpl_descrip_file){
+					$array['Error'] = "One of the template files don't exist.<br>";
+					$array['Template locations'] = "<br>".$tmpl_file_base.".tpl<br>" . $tmpl_file_base."_descrip.tpl";
+					$main->error($array);
+				}else{
+					echo $template_info['subject']."{}[]{}<b>Description: </b>".$tmpl_descrip_file."{}[]{}".$tmpl_content_file;
+				}
 			}
 		}
 	}
@@ -354,7 +364,7 @@ class Ajax {
 				$show = $main->getvar['num'];
 			}
 			else {
-				$show = 10;	
+				$show = 10;
 			}
 			if($main->getvar['page'] != 1) {
 				$lower = $main->getvar['page'] * $show;
@@ -365,10 +375,13 @@ class Ajax {
 				$lower = 0;
 				$upper = $show;
 			}
-			$query = $db->query("SELECT * FROM `<PRE>users`, `<PRE>user_packs` WHERE `{$type}` LIKE '%{$value}%' AND <PRE>user_packs.userid = <PRE>users.id ORDER BY `{$type}` ASC LIMIT {$lower}, {$upper}");
+			if($type == "id"){
+				$type = '<PRE>users.id';
+			}
+			$query = $db->query("SELECT * FROM `<PRE>users`, `<PRE>user_packs` WHERE {$type} LIKE '%{$value}%' AND <PRE>user_packs.userid = <PRE>users.id ORDER BY {$type} ASC LIMIT {$lower}, {$upper}");
 			$rownum = $db->num_rows($query);
 			if($db->num_rows($query) == 0) {
-				echo "No clients found!";	
+				echo "No clients found!";
 			}
 			else {
 				while($data = $db->fetch_array($query)) {
@@ -385,35 +398,35 @@ class Ajax {
 						}
 						elseif($client['status'] == "1") {
 							$array['TEXT'] = "Suspend";
-							$array['FUNC'] = "sus";	
+							$array['FUNC'] = "sus";
 							$array['IMG'] = "exclamation.png";
 						}
 						elseif($client['status'] == "3") {
 							//Fixes caption added by J.Montoya
 							$array['TEXT'] = "Validate";
-							$array['FUNC'] = "none";	
+							$array['FUNC'] = "none";
 							$array['IMG'] = "user_suit.png";
 						}
 						elseif($client['status'] == "4") {
 							$array['TEXT'] = "Awaiting Payment";
-							$array['FUNC'] = "none";	
+							$array['FUNC'] = "none";
 							$array['IMG'] = "money.png";
 						}
 						else {
 							$array['TEXT'] = "Other Status";
-							$array['FUNC'] = "none";	
-							$array['IMG'] = "help.png";	
+							$array['FUNC'] = "none";
+							$array['IMG'] = "help.png";
 						}
-						echo $style->replaceVar("tpl/clientsearchbox.tpl", $array);	
+						echo $style->replaceVar("tpl/clientsearchbox.tpl", $array);
 						$n++;
 					}
 				}
 				echo '<div class="break"></div>';
 				echo '<div align="center">';
-				$query = $db->query("SELECT * FROM `<PRE>users`, `<PRE>user_packs` WHERE `{$type}` LIKE '%{$value}%' AND <PRE>user_packs.userid = <PRE>users.id ORDER BY `{$type}` ASC");
+				$query = $db->query("SELECT * FROM `<PRE>users`, `<PRE>user_packs` WHERE {$type} LIKE '%{$value}%' AND <PRE>user_packs.userid = <PRE>users.id ORDER BY {$type} ASC");
 				$num = $db->num_rows($query);
 				$pages = ceil($num/$show);
-				echo "Page..";
+				echo "Page";
 				for($i; $i != $pages + 1; $i += 1) {
 					echo ' <a href="Javascript: page(\''.$i.'\')">'.$i.'</a>';
 				}
@@ -441,27 +454,46 @@ class Ajax {
 	public function status() {
 		global $db;
 		global $main;
-		$id = $main->getvar['id'];
-		$status = $main->getvar['status'];
-		$query = $db->query("UPDATE `<PRE>tickets` SET `status` = '{$status}' WHERE `id` = '{$id}'");
-		if($query) {
-			echo "<img src=". URL ."themes/icons/accept.png>";
-		}
-		else {
-			echo "<img src=". URL ."themes/icons/cross.png>";
+		if($_SESSION['logged']){
+			$id = $main->getvar['id'];
+			$status = $main->getvar['status'];
+			$query = $db->query("UPDATE `<PRE>tickets` SET `status` = '{$status}' WHERE `id` = '{$id}'");
+			if($query) {
+				echo "<img src=". URL ."themes/icons/accept.png>";
+			}
+			else {
+				echo "<img src=". URL ."themes/icons/cross.png>";
+			}
 		}
 	}
 	
+	public function ticketstatus() {
+		global $db;
+		global $main;
+		if($_SESSION['cuser']){
+			$userid = $_SESSION['cuser'];
+			$id = $main->getvar['id'];
+			$status = $main->getvar['status'];
+			$query = $db->query("UPDATE `<PRE>tickets` SET `status` = '{$status}' WHERE `id` = '{$id}' AND userid = '".$userid."' LIMIT 1");
+			if($query) {
+				echo "<img src=". URL ."themes/icons/accept.png>";
+			}
+			else {
+				echo "<img src=". URL ."themes/icons/cross.png>";
+			}
+		}
+	}
+        
 	public function serverhash() {
 		global $main;
 		$type = $main->getvar['type'];
 		include(LINK ."servers/". $type .".php");
 		$server = new $type;
 		if($server->hash) {
-			echo 0;	
+			echo 0;
 		}
 		else {
-			echo 1;	
+			echo 1;
 		}
 	}
 	
@@ -473,10 +505,10 @@ class Ajax {
 			include(LINK ."servers/". $type .".php");
 			$server = new $type;
 			if($server->hash) {
-				echo 0;	
+				echo 0;
 			}
 			else {
-				echo 1;	
+				echo 1;
 			}
 			$query = $db->query("SELECT * FROM `<PRE>servers` WHERE `id` = '{$id}'");
 			$data = $db->fetch_array($query);
@@ -741,7 +773,7 @@ class Ajax {
 	}
 	function padd() {
 		global $style;
-		echo $style->replaceVar("tpl/acppacks/addbox.tpl");	
+		echo $style->replaceVar("tpl/acppacks/addbox.tpl");
 	}
 	function pedit() {
 		if($_SESSION['logged']) {
@@ -753,13 +785,13 @@ class Ajax {
 			$array['DESCRIPTION'] = $data['description'];
 			$array['NAME'] = $data['name'];
 			if($data['admin'] == 1) {
-				$array['CHECKED'] = 'checked="checked"';	
+				$array['CHECKED'] = 'checked="checked"';
 			}
 			else {
 				$array['CHECKED'] = "";
 			}
 			if($data['reseller'] == 1) {
-				$array['CHECKED2'] = 'checked="checked"';	
+				$array['CHECKED2'] = 'checked="checked"';
 			}
 			else {
 				$array['CHECKED2'] = "";
@@ -773,12 +805,24 @@ class Ajax {
 			$array['FORM'] = $type->acpPedit($data['type'], $cform);
 			$query = $db->query("SELECT * FROM `<PRE>servers`");
 			while($data = $db->fetch_array($query)) {
-				$values[] = array($data['name'], $data['id']);	
+				$values[] = array($data['name'], $data['id']);
 			}
-			$array['SERVER'] = $array['THEME'] = $main->dropDown("server", $values, $data['server']);	
+			$array['SERVER'] = $array['THEME'] = $main->dropDown("server", $values, $data['server']);
 			echo $style->replaceVar("tpl/acppacks/editbox.tpl", $array);
 		}
 	}
+
+        function acpPedit(){
+                global $type;
+                global $main;
+                echo $type->acpPedit($main->getvar['type'], $main->getvar['values'], $main->getvar['origtype']);
+        }
+
+        function editbackupservers(){
+                global $type;
+                global $main;
+                echo $type->editbackupservers($main->getvar['switchto']);
+        }
 
         function nedit() {
             if($_SESSION['logged']) {
@@ -894,15 +938,17 @@ class Ajax {
                    $link = $main->postvar['link'];
                    switch($action) {
                        case "add":
-                           if(isset($P['name']) and
-                               isset($P['icon']) and isset($P['link'])
+                           if(
+							isset($P['name']) && isset($P['icon']) && isset($P['link']) &&
+							$P['name'] && $P['icon'] && $P['link']
                            ) {
                                 $db->query("INSERT INTO `<pre>navbar` (visual, icon, link) VALUES('{$name}', '{$icon}','{$link}')");
                            }
                            break;
                        case "edit":
-                           if(isset($P['id']) and isset($P['name']) and
-                               isset($P['icon']) and isset($P['link'])
+                           if(
+							isset($P['id']) && isset($P['name']) && isset($P['icon']) && isset($P['link']) &&
+							$P['id'] && $P['name'] && $P['icon'] && $P['link']
                            ) {
                                 $db->query("UPDATE `<pre>navbar` SET
                                 `visual` = '{$name}',
@@ -912,7 +958,7 @@ class Ajax {
                            }
                            break;
                        case "delete":
-                           if(isset($_GET['id'])) {
+                           if(isset($_GET['id']) && $_GET['id']) {
                                $db->query("DELETE FROM `<PRE>navbar` WHERE `id` = '{$main->getvar['id']}'");
                            }
                            break;
@@ -1063,10 +1109,11 @@ class Ajax {
            }
        }
 	   
-	   function ispaid() {
+		function ispaid() {
+			//Used in the order form.  This will now return an id if the plan isn't set to be approved by an admin.
 			global $db, $main;
 			$package = $db->fetch_array($db->query("SELECT * FROM `<PRE>packages` WHERE `id` = '{$main->getvar['pid']}'"));
-			if($package['type'] == "paid") {
+			if($package['type'] == "paid" && $package['admin'] != "1") {
 				$username = $db->fetch_array($db->query("SELECT * FROM `<PRE>users` WHERE `user` = '{$main->getvar['uname']}'"));
 				$id = $username['id'];
 				$invoice = $db->fetch_array($db->query("SELECT * FROM `<PRE>invoices` WHERE `uid` = '{$id}'"));
@@ -1105,6 +1152,25 @@ class Ajax {
 			   echo '1';
 		   }
 	   }
+
+	function akismetcheck(){
+		global $db, $main, $akismet;
+		$checkthisname = $main->getvar['checkthisname'];
+		$checkthisemail = $main->getvar['checkthisemail'];
+		$useakismet = $db->config('useakismet');
+
+		if($useakismet == "1"){
+			$akismet->setCommentAuthor($checkthisname);
+			$akismet->setCommentAuthorEmail($checkthisemail);
+			if($akismet->isCommentSpam()){
+				echo "0";
+			}else{
+				echo "1";
+			}
+		}else{
+			echo "1";
+		}
+	}
 	   
 }
 if(isset($_REQUEST['function']) and $_REQUEST['function'] != "") {

@@ -34,22 +34,34 @@ function acp() {
 			$header = "Credits";
 			break;
 		
-		case "ticketsall":
-			$header = "All Tickets";
-			break;
-		
 		default:
-			$header = $page['visual'];
+			if($page['visual'] == "Tickets" && $main->getvar['mode'] == 'ticketsall'){
+				$header = "All Tickets";
+			}else{
+				$header = $page['visual'];
+			}
 			break;
 	}
 	$link = "pages/". $main->getvar['page'] .".php";
+	$query_perms = $db->query("SELECT * FROM `<PRE>staff` WHERE `id` = '{$_SESSION['user']}'");
+	$data_perms = $db->fetch_array($query_perms);
+	$user_perms = $data_perms['perms'];
+	if(substr_count($user_perms, "paid") == '1'){
+		$nopaid = '1';
+	}
+	if(substr_count($user_perms, "p2h") == '1'){
+		$nop2h = '1';
+	}
 	if(!file_exists($link)) {
-		$html = "<strong>THT Fatal Error:</strong> Seems like the .php is non existant. Is it deleted?";	
+		$html = "<strong>THT Fatal Error:</strong> That page doesn't exist.";
 	}
-	elseif(!$main->checkPerms($page['id']) && $db->num_rows($query) != 0) {
-		$html = "You don't have access to this page.";	
-	}
-	else {
+	elseif(!$main->checkPerms($page['id']) && !$nopaid && !$nop2h && $db->num_rows($query) != 0) {
+		$html = "You don't have access to this page.";
+	}elseif($main->getvar['page'] == "type" && $main->getvar['type'] == "paid" && $nopaid){
+		$html = "You don't have access to this page.";
+	}elseif($main->getvar['page'] == "type" && $main->getvar['type'] == "p2h" && $nop2h){
+		$html = "You don't have access to this page.";
+	}else {
 		//If deleting something
 		if(preg_match("/[\.*]/", $main->getvar['page']) == 0) {
 			include($link);
@@ -73,16 +85,18 @@ function acp() {
 			 */
 			$type->createAll();
 			foreach($type->classes as $key => $value) {
-				if($type->classes[$key]->acpNav) {
-					foreach($type->classes[$key]->acpNav as $key2 => $value)  {
-						$array2['IMGURL'] = $value[2];
-						$array2['LINK'] = "?page=type&type=".$key."&sub=".$value[1];
-						$array2['VISUAL'] = $value[0];
-						$array['LINKS'] .= $style->replaceVar("tpl/sidebarlink.tpl", $array2);	
-						if($main->getvar['page'] == "type" && $main->getvar['type'] == $key && $main->getvar['sub'] == $value[1]) {
-							define("SUB", $value[3]);
-							$header = $value[3];
-							$main->getvar['myheader'] = $value[3];
+				if(($key == "paid" && $nopaid != "1") || ($key == "p2h" && $nop2h != "1") || ($key != "paid" && $key != "p2h")){
+					if($type->classes[$key]->acpNav) {
+						foreach($type->classes[$key]->acpNav as $key2 => $value)  {
+							$array2['IMGURL'] = $value[2];
+							$array2['LINK'] = "?page=type&type=".$key."&sub=".$value[1];
+							$array2['VISUAL'] = $value[0];
+							$array['LINKS'] .= $style->replaceVar("tpl/sidebarlink.tpl", $array2);
+							if($main->getvar['page'] == "type" && $main->getvar['type'] == $key && $main->getvar['sub'] == $value[1]) {
+								define("SUB", $value[3]);
+								$header = $value[3];
+								$main->getvar['myheader'] = $value[3];
+							}
 						}
 					}
 				}
@@ -114,7 +128,7 @@ function acp() {
 				foreach($content->navlist as $key => $value) {
 					if($value[2] == $main->getvar['sub']) {
 						if(!$value[0]) {
-							define("SUB", $main->getvar['page']);	
+							define("SUB", $main->getvar['page']);
 							$header = $main->getvar['page'];
 						}
 						else {
@@ -129,16 +143,16 @@ function acp() {
 					$array['HIDDEN'] .= '<input name="'.$key.'" type="hidden" value="'.$value.'" />';
 				}
 				$array['HIDDEN'] .= " ";
-				$html = $style->replaceVar("tpl/warning.tpl", $array);	
+				$html = $style->replaceVar("tpl/warning.tpl", $array);
 			}
 			elseif($main->getvar['sub'] == "delete" && isset($main->getvar['do']) && $_POST && !$main->getvar['confirm']) {
 				if($main->postvar['yes']) {
 					foreach($main->getvar as $key => $value) {
 					  if($i) {
-						  $i = "&";	
+						  $i = "&";
 					  }
 					  else {
-						  $i = "?";	
+						  $i = "?";
 					  }
 					  $url .= $i . $key . "=" . $value;
 					}
@@ -146,7 +160,7 @@ function acp() {
 					$main->redirect($url);
 				}
 				elseif($main->postvar['no']) {
-					$main->done();	
+					$main->done();
 				}
 			}
 			else {
@@ -227,6 +241,7 @@ if(!$_SESSION['logged']) {
 					$db->query("UPDATE `<PRE>staff` SET `password` = '{$newpass}' WHERE `id` = '{$curstaff['id']}'");
 					$main->errors("Password reset!");
 					$array['PASS'] = $password;
+					$array['LINK'] = $db->config("url").ADMINDIR;
 					$emaildata = $db->emailTemplate("areset");
 					$email->send($email2, $emaildata['subject'], $emaildata['content'], $array);
 				}
@@ -238,14 +253,14 @@ if(!$_SESSION['logged']) {
 	}
 	else{
 		define("SUB", "Login");
-		define("INFO", " ");
+		define("INFO", "<b>Welcome to <NAME></b><br>".SUB);
 		if($_POST) { # If user submitts form
 		if($main->staffLogin($main->postvar['user'], $main->postvar['pass'])) {
 			$queryString = $_SERVER["QUERY_STRING"];
 			if($queryString == "") {
 				$queryString = "page=home";
 			}
-			$main->redirect(URL . "admin/?" . $queryString);	
+			$main->redirect(URL . ADMINDIR."/?" . $queryString);
 		}
 		else {
 			$main->errors("Incorrect username or password!");

@@ -10,7 +10,7 @@
 <style>.CodeMirror {background: #f8f8f8;}</style> 
 <script>
 $(document).ready(function() {
-	%COMMENTHACK%var editor = CodeMirror.fromTextArea(document.getElementById("tplCode"), {mode: "htmlmixed"});
+        %COMMENTHACK%var editor = CodeMirror.fromTextArea(document.getElementById("tplCode"), {mode: "htmlmixed"});
     $("#editTheTplNao").click(function() {
         $("#" + this.id).blur();
         $("#" + this.id).attr("disabled", "disabled");
@@ -44,7 +44,7 @@ $(document).ready(function() {
 <strong>Editing your Footer Template</strong><br />
 <p>Want to edit your style in an web based interface? Here it is!<br /><br />
 <em>Variables:</em><br /> &lt;PAGEGEN&gt; tag shows the debug stuff.<br />
-&lt;COPYRIGHT&gt; the "Powered by" notice.
+&lt;COPYRIGHT&gt; the "Powered by" notice.<br><br>
 <textarea cols="75" style="width:99%; height:300px;" id="tplCode" rows="25" wrap="no" name="edit"%READONLY%>%CSSCONTENT%</textarea>
 <div id="belowDynamic">
     <div id="spaceForButton">

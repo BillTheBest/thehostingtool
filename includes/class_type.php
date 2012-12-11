@@ -17,7 +17,7 @@ class type {
 	# Start the functions #
 
 	public function acpPadd($type) { # Returns the html of a custom form
-		global $style;
+		global $db, $style;
 		if(!$this->classes[$type]) {
 			$type = $this->createType($type);
 		}
@@ -64,7 +64,6 @@ class type {
 				$array['FORM'] = $value[1];
 				$html .= $style->replaceVar("tpl/acptypeform.tpl", $array);
 			}
-                        $html .= "<button id=\"submitIt\">Submit</button>";
 			return $html;
 		}
 	}
@@ -190,8 +189,9 @@ class type {
 		}
 	}
 
-	public function acpPedit($type, $values) { // Returns the type's acpForm[] content
+	public function acpPedit($type, $values, $origtype) { // Returns the type's acpForm[] content
 		global $style;
+		$usingtype = $type;
 		if(!$this->classes[$type]) {
 			$type = $this->createType($type);
 		}
@@ -199,17 +199,154 @@ class type {
 			$type = $this->classes[$type];
 		}
 		if($type->acpForm) {
-			foreach($type->acpForm as $value) {
-				$array['NAME'] = $value[0] .":";
-				$hit = explode("/>", $value[1]); // haha... $hit
-				$default = "";
-				if(stripos($value[1], "</select>") === false) {
-					$default = ' value="'.$values[$value[2]].'" />';
+			$html .= $style->javascript();
+			$html .= '<script type="text/javascript">
+                        var gi = 0;
+                        $(document).ready(function(){
+                            //var info = new Array();
+                            var info;
+                            $("#submitIt").click(function() {
+                                $("input").each(function(i) {
+                                    if(gi == 0) {
+                                        info = this.name + "="  + $("#" + this.id).val();
+                                    }
+                                    else {
+                                        info = info + "," + this.name + "="  + $("#" + this.id).val();
+                                    }
+
+
+                                    gi++;
+                                });
+                                $("select").each(function(i) {
+                                    if(gi == 0) {
+                                        info = this.name + "="  + $("#" + this.id).val();
+                                    }
+                                    else {
+                                        info = info + "," + this.name + "="  + $("#" + this.id).val();
+                                    }
+                                    gi++;
+                                });
+                                var id = window.name.toString().split("-")[1];
+                                window.opener.transfer(id, info);
+                                window.close();
+                            });
+                        });
+                        </script>';
+
+			if($usingtype != $origtype){
+				foreach($type->acpForm as $key => $value) {
+					$array['NAME'] = $value[0] .":";
+					$array['FORM'] = $value[1];
+					$html .= $style->replaceVar("tpl/acptypeform.tpl", $array);
 				}
-				$array['FORM'] = $hit[0]. $default;
-				$html .= $style->replaceVar("tpl/acptypeform.tpl", $array);
+			}else{
+				$values = explode(",", $values);
+				foreach($values as $key => $value) {
+					$me = explode("=", $value);
+					$cform[$me[0]] = $me[1];
+				}
+				foreach($type->acpForm as $value) {
+					$array['NAME'] = $value[0] .":";
+					$hit = explode("/>", $value[1]); // haha... $hit
+					$default = "";
+					if(stripos($value[1], "</select>") === false) {
+						$default = ' value="'.$cform[$value[2]].'" />';
+					}
+					$array['FORM'] = $hit[0]. $default;
+					$html .= $style->replaceVar("tpl/acptypeform.tpl", $array);
+				}
 			}
 			return $html;
+		}
+	}
+
+	public function editbackupservers($server) { // Returns the backup server settings form for ACP
+		global $db,$style;
+		if($server){
+			$html .= $style->javascript();
+			$html .= '<script type="text/javascript">
+                        var gi = 0;
+                        $(document).ready(function(){
+                            //var info = new Array();
+                            var info;
+                            $("#submitIt").click(function() {
+                                $("input").each(function(i) {
+                                    if(gi == 0) {
+                                        info = this.name + "="  + $("#" + this.id).val();
+                                    }
+                                    else {
+                                        info = info + "," + this.name + "="  + $("#" + this.id).val();
+                                    }
+
+
+                                    gi++;
+                                });
+                                $("select").each(function(i) {
+                                    if(gi == 0) {
+                                        info = this.name + "="  + $("#" + this.id).val();
+                                    }
+                                    else {
+                                        info = info + "," + this.name + "="  + $("#" + this.id).val();
+                                    }
+                                    gi++;
+                                });
+                                var id = window.name.toString().split("-")[1];
+                                window.opener.transfer(id, info);
+                                window.close();
+                            });
+                        });
+                        </script>';
+
+			$serverinfo = $db->query("SELECT * FROM <PRE>servers WHERE id = '".$server."'");
+			$serverinfo = $db->fetch_array($serverinfo);
+
+			if(!$serverinfo['ftpport']){
+				$serverinfo['ftpport'] = "21";
+			}
+
+			$array['NAME'] = "FTP User:";
+			$array['NAMEID'] = "ftpuser";
+			$array['INPUTTYPE'] = "test";
+			$array['VALUE'] = $serverinfo['ftpuser'];
+			$array['TTINFO'] = "The FTP username to log into the backup server.";
+			$array['BUTTONCODE'] = "";
+			$html .= $style->replaceVar("tpl/backupserversform.tpl", $array);
+
+			$array['NAME'] = "FTP Pass:";
+			$array['NAMEID'] = "ftppass";
+			$array['INPUTTYPE'] = "password";
+			$array['VALUE'] = $serverinfo['ftppass'];
+			$array['TTINFO'] = "The FTP password to log into the backup server.";
+			$array['BUTTONCODE'] = "";
+			$html .= $style->replaceVar("tpl/backupserversform.tpl", $array);
+
+			$array['NAME'] = "FTP Port:";
+			$array['NAMEID'] = "ftpport";
+			$array['INPUTTYPE'] = "test";
+			$array['VALUE'] = $serverinfo['ftpport'];
+			$array['TTINFO'] = "The FTP port to log into the backup server on.";
+			$array['BUTTONCODE'] = "";
+			$html .= $style->replaceVar("tpl/backupserversform.tpl", $array);
+
+			$array['NAME'] = "FTP Host:";
+			$array['NAMEID'] = "ftphost";
+			$array['INPUTTYPE'] = "test";
+			$array['VALUE'] = $serverinfo['ftphost'];
+			$array['TTINFO'] = "The host containing the backup files.  This can be an IP or a domain, but don't add the http://.";
+			$array['BUTTONCODE'] = "";
+			$html .= $style->replaceVar("tpl/backupserversform.tpl", $array);
+
+			$array['NAME'] = "FTP Path:";
+			$array['NAMEID'] = "ftppath";
+			$array['INPUTTYPE'] = "test";
+			$array['VALUE'] = $serverinfo['ftppath'];
+			$array['TTINFO'] = "The path to change to after login.  This cannot be a full path and must be a path accessible from the point it logs in at.  (Ex. /%UNAME% or /backups/%UNAME% not /home/backups/%UNAME%)  To use the username of the client being backed up, enter %UNAME%.  %UNAME% may only appear at the end of the path or the connection will fail.  The directory's contents will be shown to the client performing the restore.";
+			$array['BUTTONCODE'] = '<input type="submit" name="updateserver" id="updateserver" value="Update Server" />';
+			$html .= $style->replaceVar("tpl/backupserversform.tpl", $array);
+
+			return $html;
+		}else{
+			return "";
 		}
 	}
 

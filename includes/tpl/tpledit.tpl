@@ -10,7 +10,7 @@ $(document).ready(function() {
 </script>
 <strong>Editing Templates</strong>
 <p>This is an advanced feature for you to edit specific templates in your THT Installation. This is NOT recommended for beginners
-unless you have enough HTML knowledge to do so. Its always recommended to have a backup of the templates before editing.</p>
+unless you have enough HTML knowledge to do so. Its always recommended to have a backup of the templates before editing.<br><br></p>
 <strong>Select a template to edit:</strong>
 <select name="tpl" id="tplSelect">
     <option value="null" disabled="disabled" selected="selected">Choose an template to edit</option>

@@ -4,6 +4,7 @@
 	mode : "textareas",
 	skin : "o2k7",
 	theme : "advanced",
+	remove_linebreaks : false,
 	// Theme options
 	theme_advanced_buttons1 : "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect",
 	theme_advanced_buttons2 : "cut,copy,paste,pastetext,pasteword,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,forecolor,backcolor",
@@ -22,16 +23,16 @@ function templates(id) {
 			if(document.getElementById("templatebit").style.display == "none") {
 				document.getElementById("subject").value = result[0];
 				document.getElementById("description").innerHTML = result[1];
-				tinyMCE.get("content").execCommand('mceSetContent',false, result[2] );
-				$("#templatebit").slideDown(500);	
+				tinyMCE.get("msgcontent").execCommand('mceSetContent',false, result[2] );
+				$("#templatebit").slideDown(500);
 			}
 			else {
 				$("#templatebit").slideUp(500, function(data) {
 					document.getElementById("subject").value = result[0];
 					document.getElementById("description").innerHTML = result[1];
-					tinyMCE.get("content").execCommand('mceSetContent',false, result[2] );
+					tinyMCE.get("msgcontent").execCommand('mceSetContent',false, result[2] );
 					$("#templatebit").slideDown(500);
-														});		
+				});
 			}
 															});
 }
@@ -49,13 +50,18 @@ function templates(id) {
 	<br />
     <table width="100%" border="0" cellspacing="2" cellpadding="0">
       <tr>
+        <td colspan="2" valign="top" id="description"></td>
+      </tr>
+      <tr>
+        <td colspan="2" height = "10"></td>
+      </tr>
+      <tr>
         <td valign="top">Subject:</td>
         <td><input type="text" name="subject" id="subject" />
         <a title="The subject of the email." class="tooltip"><img src="<ICONDIR>information.png" /></a></td>
       </tr>
       <tr>
-        <td width="20%" valign="top" id="description"></td>
-        <td><textarea name="content" id="content" cols="" rows=""></textarea></td>
+        <td colspan="2"><textarea name="emailcontent" id="msgcontent" cols="" rows=""></textarea></td>
       </tr>
       <tr>
         <td colspan="2" align="center"><input name="edit" id="edit" type="submit" value="Edit Template" /></td>

@@ -1,10 +1,10 @@
 <ERRORS>
 <div class="subborder">
-	<div class="sub">
-    	<strong>Ticket Information</strong>
+        <div class="sub">
+            <strong>Ticket Information</strong>
         <div class="break"></div>
         <strong>Author:</strong> %AUTHOR%<br />
-        <strong>Status:</strong> %STATUS%<br />
+        <strong>Status:</strong> <font color = '#%STATUSCOLOR%'>%STATUS%</font><br />
         <strong>Urgency:</strong> %URGENCY%<br />
         <strong>Created on:</strong> %TIME%<br />
         <strong>Number of replies:</strong> %NUMREPLIES%<br />

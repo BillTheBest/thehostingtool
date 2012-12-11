@@ -16,10 +16,13 @@ class invoice {
 	public function create($uid, $amount, $due, $notes) {
 		global $db;
 		global $email;
+		global $main;
 		$client = $db->client($uid);
 		$emailtemp = $db->emailTemplate("newinvoice");
 		$array['USER'] = $client['user'];
-		$array['DUE'] = strftime("%D", $due);
+		$array['AMOUNT'] = $amount;
+		$array['LINK'] = $db->config("url")."/client/?page=invoices";
+		$array['DUE'] = $main->convertdate("n/d/Y", $due);
 		$email->send($client['email'], $emailtemp['subject'], $emailtemp['content'], $array);
 		return $db->query("INSERT INTO `<PRE>invoices` (uid, amount, due, notes) VALUES('{$uid}', '{$amount}', '{$due}', '{$notes}')");
 	}
@@ -41,16 +44,21 @@ class invoice {
 	}
 
 	public function pay($iid, $returnURL = "order/index.php") {
-		global $db;
+		global $db, $main;
 		require_once("paypal/paypal.class.php");
 		$paypal = new paypal_class;
 		$query = $db->query("SELECT * FROM `<PRE>invoices` WHERE `id` = '{$iid}'");
 		$array = $db->fetch_array($query);
 		if($_SESSION['cuser'] == $array['uid']) {
-			$paypal->paypal_url = 'https://www.paypal.com/cgi-bin/webscr';
-			$paypal->add_field('business', $db->config('paypalemail'));
-			$paypal->add_field('return', $db->config('url')."client/index.php?page=invoices&invoiceID=".$iid);
-			$paypal->add_field('cancel_return', $db->config('url')."client/index.php?page=invoices&invoiceID=".$iid);
+			if($db->config("paypalmode") == "sandbox"){
+				$paypal->paypal_url = 'https://www.sandbox.paypal.com/cgi-bin/webscr';
+				$paypal->add_field('business', $db->config('paypalsandemail'));
+			}else{
+				$paypal->paypal_url = 'https://www.paypal.com/cgi-bin/webscr';
+				$paypal->add_field('business', $db->config('paypalemail'));
+			}
+			$paypal->add_field('return', $db->config('url')."client/index.php?page=invoices");
+			$paypal->add_field('cancel_return', $db->config('url')."client/index.php?page=invoices");
 			$paypal->add_field('notify_url',  $db->config('url')."client/index.php?page=invoices&invoiceID=".$iid);
 			$paypal->add_field('item_name', 'THT Order: '.$array['notes']);
 			$paypal->add_field('amount', $array['amount']);
@@ -58,7 +66,8 @@ class invoice {
 			$paypal->submit_paypal_post(); // submit the fields to paypal
 		}
 		else {
-			echo "You don't seem to be the person who owns that invoice!";	
+			echo "You don't seem to be the person who owns that invoice!";
+			exit;
 		}
 	}
 	
@@ -75,20 +84,22 @@ class invoice {
 				if(mysql_num_rows($query3) > 0){
 					$array3 = $db->fetch_array($query3);
 					#$userinfo = $db->client($uid);
+					# +30 Days
 					if($time > strtotime($array3['created'])+2592000){
 						$this->create($uid, $array3['amount'], $time+intval($db->config("suspensiondays")*24*60*60), $array3['notes']); # Create Invoice
 					}
 					
 					$lastmonth = $time-2592000;
 					$suspenddays = intval($db->config('suspensiondays'));
+					$terminationdays = $suspenddays + $db->config('terminationdays');
 					$suspendseconds = $suspenddays*24*60*60;
 					$terminateseconds = intval($db->config('terminationdays'))*24*60*60;
 					if($array3['due'] < $time and $array3['is_paid'] == 0){
-						if(($time-$suspendseconds) > intval($array3['due']) and $this->is_paid($array3['id']) !== false){
-							$server->suspend($array2['id']);
+						if(($time-$suspendseconds) > intval($array3['due']) && $array2['status'] == '1'){
+							$server->suspend($array2['id'], "Your account is overdue.  Please log in and pay your invoice to bring your account out of suspension.");
 						}
-						elseif(($time-$suspendseconds-$terminateseconds) > intval($array3['due']) and $this->is_paid($array3['id']) !== false){
-							$server->terminate($array2['id']);
+						elseif(($time-$suspendseconds-$terminateseconds) > intval($array3['due'])){
+							$server->terminate($array2['id'], "Your account was overdue for more than ".$terminationdays." days.");
 						}
 					}
 				}
@@ -97,21 +108,21 @@ class invoice {
 					// monthly=50,add=Add Package
 					$monthly = explode(",", $monthly);
 					$monthly = explode("=", $monthly[0]);
-					$amount = intval($monthly);
-					$this->create($uid, $amount, $time+2592000, ""); # Create Invoice
+					$amount = $monthly[1];
+					$this->create($uid, $amount, $time+2592000, ""); # Create Invoice +30 Days
 				}
 			}
 		}
 	}
 	
-	public function set_paid($iid) { # Pay the invoice by giving invoice id
+	public function set_paid($iid, $noemail = 0) { # Pay the invoice by giving invoice id
 		global $db, $server;
 		$query = $db->query("UPDATE `<PRE>invoices` SET `is_paid` = '1' WHERE `id` = '{$iid}'");
 		$query2 = $db->query("SELECT * FROM `<PRE>invoices` WHERE `id` = '{$iid}' LIMIT 1");
 		$data2 = $db->fetch_array($query2);
 		$query3 = $db->query("SELECT * FROM `<PRE>user_packs` WHERE `userid` = '{$data2['uid']}'");
 		$data3 = $db->fetch_array($query3);
-		$server->unsuspend($data3['id']);
+		$server->unsuspend($data3['id'], $noemail);
 		return $query;
 	}
 	
@@ -125,10 +136,10 @@ class invoice {
 		global $db;
 		$data = $db->fetch_array($db->query("SELECT * FROM `<PRE>invoices` WHERE `id` = '{$id}'"));
 		if($data['is_paid']) {
-			return true;	
+			return true;
 		}
 		else {
-			return false;	
+			return false;
 		}
 	}
 

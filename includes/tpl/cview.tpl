@@ -1,11 +1,11 @@
 <script type="text/javascript">
 function check() {
-	if(document.getElementById("change").checked == true) {
-		$("#changepass").slideDown(500);
-	}
-	else {
-		$("#changepass").slideUp(500);
-	}
+        if(document.getElementById("change").checked == true) {
+                $("#changepass").slideDown(500);
+        }
+        else {
+                $("#changepass").slideUp(500);
+        }
 }
 </script>
 <ERRORS>
@@ -37,7 +37,7 @@ function check() {
     </td>
   </tr>
   <tr>
-    <td colspan="2"><strong>Change cPanel Password:</strong> <input name="change" type="checkbox" id="change" value="1" onchange="check()" /></td>
+    <td colspan="2"><strong>Change Password:</strong> <input name="change" type="checkbox" id="change" value="1" onchange="check()" /></td>
   </tr>
   <tr>
   <td colspan="2">
@@ -48,12 +48,12 @@ function check() {
      <a title="Type your current account password here." class="tooltip"><img src="<ICONDIR>information.png" /></a></td>
   </tr>
   <tr>
-  <td>New cPanel Password:</td>
+  <td>New Password:</td>
     <td><input type="password" name="newpass" id="newpass" />
      <a title="Type your new cPanel password here." class="tooltip"><img src="<ICONDIR>information.png" /></a></td>
   </tr>
   <tr>
-  <td>Confirm cPanel Password:</td>
+  <td>Confirm Password:</td>
     <td><input type="password" name="cpass" id="cpass" />
      <a title="Confirm your new cPanel password here." class="tooltip"><img src="<ICONDIR>information.png" /></a></td>
   </tr>

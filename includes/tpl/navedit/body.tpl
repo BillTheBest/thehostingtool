@@ -2,7 +2,7 @@
     var id;
     var divId;
         $(document).ready(function(){
-		$("#packs").sortable({handle : '#grabber'});
+                $("#packs").sortable({handle : '#grabber'});
                 $("#addnavlinkLink").click(function(){
                         $("#nbit").slideToggle(500);
                 });
@@ -27,11 +27,11 @@
                         }
                     });
                 });
-	});
+        });
 </script>
 <div class="subborder">
-	<div class="sub">
-    	<table width="100%" border="0" cellspacing="3" cellpadding="0">
+        <div class="sub">
+            <table width="100%" border="0" cellspacing="3" cellpadding="0">
           <tr>
             <td width="1%"><img src="<ICONDIR>add.png" alt="Add Navlink"/></td>
             <td><a href="javascript:void(0)" id="addnavlinkLink">Add Navigation Link</a></td>
@@ -44,7 +44,7 @@
 <ERRORS>
 <form id="addnavlink" name="addnavlink" method="post" action="">
 <table width="100%" border="0" cellspacing="2" cellpadding="0">
-	<tr><td colspan="2"><strong>Add Navication Link</strong></td></tr>
+        <tr><td colspan="2"><strong>Add Navication Link</strong></td></tr>
   <tr>
     <td width="25%">Name:</td>
     <td>
@@ -66,7 +66,7 @@
   <tr>
     <td width="25%">Link:</td>
     <td>
-        <input name="link" type="text" id="link" /><a title="The relative URL for the navigation link.<br />Example: admin/" class="tooltip"><img src="<URL>themes/icons/link.png" /></a>
+        <input name="link" type="text" id="link" /><a title="The relative URL for the navigation link.<br />Example: <ADMINDIR>" class="tooltip"><img src="<URL>themes/icons/link.png" /></a>
     </td>
 </tr>
 
@@ -85,6 +85,6 @@
 </div></div></div>
 <div id="nedit" style="display:none;"></div>
 <div id="packs">
-	%PACKS%
+        %PACKS%
 </div>
 <div align="center"><input name="saveorder" id="saveorder" type="button" value="Save navigation link order" /></div>

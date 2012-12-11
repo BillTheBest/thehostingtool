@@ -31,10 +31,15 @@
             <td><input name="prefix" type="text" class="form" id="prefix" value="%PREFIX%" /></td>
           </tr>
 		  <tr>
+			<td>Forum URL:</td>
+			<td><input name="url" type="text" class="form" id="url" value="%URL%" /></td>
+		  </tr>
+		  <tr>
 			<td colspan="2" align="center">
 			  <label>
 				<input type="submit" name="type" id="type" value="Edit Forum" class="button" />
-			  </label>			</td>
+			  </label>
+			</td>
 		  </tr>
 		</table>
 </form>

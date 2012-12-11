@@ -1,47 +1,53 @@
 <script type="text/javascript">
 function addme() {
-	$("#addbox").slideToggle(500);	
+        $("#addbox").slideToggle(500);        
 }
 </script>
 <script type="text/javascript">
 function editme(id) {
-	$.get("<AJAX>?function=%AJAX%&id="+id, function(data) {
-			var result = data.split("{}[]{}");
-			if(document.getElementById("editbox").style.display == "none") {
-				document.getElementById("editname").value = result[0];
-				tinyMCE.get("editdescription").execCommand('mceSetContent',false, result[1] );
-				$("#editbox").slideDown(500);	
-			}
-			else {
-				$("#editbox").slideUp(500, function(data) {
-					document.getElementById("editname").value = result[0];
-					tinyMCE.get("editdescription").execCommand('mceSetContent',false, result[1] );
-					$("#editbox").slideDown(500);
-														});		
-			}
-			document.getElementById("id").value = id;
-															});
+        $.get("<AJAX>?function=%AJAX%&id="+id, function(data) {
+                        var result = data.split("{}[]{}");
+                        if(document.getElementById("editbox").style.display == "none") {
+                                document.getElementById("editname").value = result[0];
+                                tinyMCE.get("editdescription").execCommand('mceSetContent',false, result[1] );
+                                if(result[2]){
+                                document.getElementById("catidedit").value = result[2];
+                                }
+                                $("#editbox").slideDown(500);        
+                        }
+                        else {
+                                $("#editbox").slideUp(500, function(data) {
+                                        document.getElementById("editname").value = result[0];
+                                        tinyMCE.get("editdescription").execCommand('mceSetContent',false, result[1] );
+                                        if(result[2]){
+                                        document.getElementById("catidedit").value = result[2];
+                                        }
+                                        $("#editbox").slideDown(500);
+                                });
+                        }
+                        document.getElementById("id").value = id;
+      });
 }
 </script>
 <script type="text/javascript" src="<URL>includes/tinymce/jscripts/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript">
-	tinyMCE.init({
-	mode : "textareas",
-	skin : "o2k7",
-	theme : "simple",
-	width : "75%"
-	});
+        tinyMCE.init({
+        mode : "textareas",
+        skin : "o2k7",
+        theme : "simple",
+        width : "75%"
+        });
 </script>
 <ERRORS>
 <div class="subborder">
-	<div class="sub">
-   	  <table width="100%" border="0" cellspacing="2" cellpadding="0">
-    	  <tr>
-    	    <td width="1%"><img src="<ICONDIR>add.png"></td>
-    	    <td><a href="Javascript:addme()">Add %NAME%</a></td>
-  	    </tr>
-  	  </table>
-	</div>
+        <div class="sub">
+             <table width="100%" border="0" cellspacing="2" cellpadding="0">
+              <tr>
+                <td width="1%"><img src="<ICONDIR>add.png"></td>
+                <td><a href="Javascript:addme()">Add %NAME%</a></td>
+              </tr>
+            </table>
+        </div>
 </div>
 <form action="" method="post" name="add%NAME%">
     <div class="subborder" id="addbox" style="display:none;">
@@ -73,6 +79,7 @@ function editme(id) {
             <tr>
                 <td colspan="2"><strong>Edit %NAME%</strong></td>
             </tr>
+            %CATIDEDIT%
             <tr>
                 <td width="20%">%SUB%:</td>
                 <td><input name="editname" type="text" id="editname" size="40" /></td>

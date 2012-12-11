@@ -1,11 +1,11 @@
 <script type="text/javascript">
 function check() {
-	if(document.getElementById("change").checked == true) {
-		$("#changepass").slideDown(500);
-	}
-	else {
-		$("#changepass").slideUp(500);
-	}
+        if(document.getElementById("change").checked == true) {
+                $("#changepass").slideDown(500);
+        }
+        else {
+                $("#changepass").slideUp(500);
+        }
 }
 </script>
 <ERRORS>
@@ -29,14 +29,14 @@ function check() {
     <tr>
     <td width="20%">First Name:</td>
     <td>
-      <input type="text" name="firstname" id="firstname" value="%FIRSTNAME%" readonly="readonly" />
+      <input type="text" name="firstname" id="firstname" value="%FIRSTNAME%" />
       <a title="Your first name." class="tooltip"><img src="<ICONDIR>information.png" /></a>
     </td>
   </tr>
     <tr>
     <td width="20%">Last Name:</td>
     <td>
-      <input type="text" name="lastname" id="lastname" value="%LASTNAME%" readonly="readonly"/>
+      <input type="text" name="lastname" id="lastname" value="%LASTNAME%"/>
       <a title="Your last name." class="tooltip"><img src="<ICONDIR>information.png" /></a>
     </td>
   </tr>
@@ -70,9 +70,7 @@ function check() {
   </tr>
   <tr>
     <td width="50%">Country:</td>
-    <td>
-		<img src="<URL>themes/flags/%COUNTRY%.gif" />
-	</td>
+    <td>%COUNTRY%</td>
   </tr>
   <tr>
     <td width="20%">Phone Number:</td>
@@ -82,12 +80,18 @@ function check() {
     </td>
   </tr>
   <tr>
+    <td width="20%">Time Zone Modifier:</td>
+    <td>%TZADJUST%
+      <a title="Select your time zone to show the dates and times on this site in your timezone." class="tooltip"><img src="<ICONDIR>information.png" /></a>
+    </td>
+  </tr>
+  <tr>
     <td>Change Password: 
     </td>
     <td><input name="change" type="checkbox" id="change" value="1" onchange="check()" /></td>
   </tr>
   <tr>
-  	<td colspan="2">
+          <td colspan="2">
     <div class="subborder" id="changepass" style="display:none;"><div class="sub"><table width="100%" border="0" cellspacing="0" cellpadding="1">
   <tr>
     <td width="20%">Current Password:</td>

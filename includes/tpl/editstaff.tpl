@@ -18,6 +18,11 @@
     <td><input type="text" name="name" id="name" value="%NAME%"/>
     <a title="The staff member's full name." class="tooltip"><img src="<URL>themes/icons/information.png" /></a></td>
   </tr>
+  <tr>
+    <td width="20%">Time Zone Modifier:</td>
+    <td>%TZADJUST%<a title="Select your time zone to show the dates and times on this site in your timezone." class="tooltip"><img src="<ICONDIR>information.png" /></a>
+    </td>
+  </tr>
   <tr id="staffperms">
     <td valign="top">ACP Pages: <br />(Check the ones you don't want them to see)</td>
     <td align="center">%PAGES%</td>

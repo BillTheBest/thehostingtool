@@ -14,6 +14,14 @@
 		<script type="text/javascript">
 		//<![CDATA[
 		$(document).ready(function(){
+
+			var divs = document.getElementsByTagName("div");
+			for (var i = 0; i < divs.length; i++) {
+				if(divs[i].id.indexOf("saveChangesDiv-") == 0){
+					$("#" + divs[i].id).slideUp(0)
+				}
+			}
+
 			$(".column").sortable({
 				connectWith: '.column'
 			});
@@ -57,14 +65,14 @@
                                 var link = $("#inputLink-" + id).val();
                                 if(id == "new") {
                                     $.post("<AJAX>?function=navbar", { action: "add", "name": name,
-                                        "icon": icon, "link": link }, function(data) {
+                                        "icon": icon, "link": link, __tht_csrf_magic: csrfMagicToken }, function(data){
                                             window.location.reload();
                                         });
                                 }
                                 else {
                                     $.post("<AJAX>?function=navbar", { action: "edit", "name": name,
-                                        "icon": icon, "link": link, "id": id }, function(data) {
-                                        $("#saveChangesDiv-" + id).slideDown(500);
+                                        "icon": icon, "link": link, "id": id, __tht_csrf_magic: csrfMagicToken }, function(data){
+                                            window.location.reload();
                                         });
                                 }
                                 $("#noticeChanges").slideDown(500);
@@ -77,6 +85,7 @@
 
                         $("#kthxSaveOrder").click(function() {
                         $("#" + this.id).blur();
+                            $("#noticeChanges").slideUp(500);
                             $("#buttonSpace").slideUp(500, function() {
                                 var id = this.id;
                                 var array2 = $(".column").sortable('toArray');
@@ -94,8 +103,9 @@
                                         submit = submit + "-" + array2[i];
                                     }
                                 }
-                                $.post(url, { action: "order", order: submit }, function(data) {
+                                $.post(url, { action: "order", order: submit, __tht_csrf_magic: csrfMagicToken }, function(data) {
                                     $("#buttonSpace").slideDown(500);
+                                    $("#noticeChanges").html('<strong><em style="color: #008800;">Changes have been made! Please <a href="javascript:window.location.reload();">refresh</a> to see them in action!</em></strong>');
                                     $("#noticeChanges").slideDown(500);
                                 });
                             });
@@ -129,10 +139,10 @@
 				<tr>
 					<td><label for="inputLink-%ID%">Link:</label></td>
 					<td><input class="inputClass" type="text" class="tooltip" name="link" id="inputLink-new" /></td>
-					<td><a class="tooltip" title="The relative URL for the navagation link. Example: admin/"><img src="<ICONDIR>link.png" alt="Link" /></a></td>
+					<td><a class="tooltip" title="The relative URL for the navagation link. Example: <ADMINDIR>"><img src="<ICONDIR>link.png" alt="Link" /></a></td>
 				</tr>
 			</table>
-                        <div align="center" class="hidden saveChangesDiv" id="saveChangesDiv-new"><button class="saveChangesBtn" id="saveChangesBtn-new">Save Changes</button></div>
+			<div align="center" class="saveChangesDiv" id="saveChangesDiv-new"><button class="saveChangesBtn" id="saveChangesBtn-new">Save Changes</button></div>
 		</div>
 	</div></div>
 

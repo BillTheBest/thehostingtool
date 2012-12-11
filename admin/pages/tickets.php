@@ -15,15 +15,15 @@ class page {
 	public $navlist = array();
 	
 	private function lastUpdated($id) { # Returns a the date of last updated on ticket id
-		global $db;
+		global $db, $main;
 		$query = $db->query("SELECT * FROM `<PRE>tickets` WHERE `ticketid` = '{$db->strip($id)}' AND `reply` = '1' ORDER BY `time` DESC");
 		if(!$db->num_rows($query)) {
-			return "None";	
+			return "None";
 		}
 		else {
 			$data = $db->fetch_array($query);
 			$username = $this->determineAuthor($data['userid'], $data['staff']);
-			return strftime("%D - %T", $data['time']) ." by ". $username;
+			return $main->convertdate("n/d/Y - g:i A", $data['time'])." by ". $username;
 		}
 	}
 	
@@ -68,19 +68,19 @@ class page {
 		$query = $db->query("SELECT * FROM `<PRE>tickets` WHERE `id` = '{$id}'");
 		$data = $db->fetch_array($query);
 		$array['AUTHOR'] = $this->determineAuthor($data['userid'], $data['staff']);
-		$array['CREATED'] = "Posted on: ". strftime("%D at %T", $data['time']);
+		$array['CREATED'] = "Posted on: ". $main->convertdate("n/d/Y - g:i A", $data['time']);
 		$array['REPLY'] = $data['content'];
 		$array['TITLE'] = $data['title'];
 		$orig = $db->query("SELECT * FROM `<PRE>tickets` WHERE `id` = '{$data['ticketid']}'");
 		$dataorig = $db->fetch_array($orig);
 		if($dataorig['userid'] == $data['userid']) {
-			$array['DETAILS'] = "Original Poster";	
+			$array['DETAILS'] = "Original Poster";
 		}
 		elseif($data['staff'] == 1) {
 			$array['DETAILS'] = "Staff Member";
 		}
 		else {
-			$array['DETAILS'] = "";	
+			$array['DETAILS'] = "";
 		}
 		return $style->replaceVar("tpl/support/replybox.tpl", $array);
 	}
@@ -90,13 +90,28 @@ class page {
 		global $style;
 		global $db;
 		global $email;
+
+		if($_GET['mode'] == 'ticketsall'){
+			$query = "";
+			$no_tickets_msg = "You currently have no tickets.";
+			$view_mode_text = "<center><i><u><a href=\"?page=tickets\" title=\"View open tickets\">View open tickets</a></u></i></center>";
+		}else{
+			$query = " AND `status` != '3'";
+			$no_tickets_msg = "You currently have no new tickets! <i><u><a href=\"?page=tickets&mode=ticketsall\" title=\"View all tickets.\">View all tickets</a></u></i>";
+			$view_mode_text = "<center><i><u><a href=\"?page=tickets&mode=ticketsall\" title=\"View all tickets\">View all tickets</a></u></i></center>";
+		}
+
 		if(!$main->getvar['do']) {
-			$query = $db->query("SELECT * FROM `<PRE>tickets` WHERE `reply` = '0' AND `status` != '3' ORDER BY `time` DESC");
+			$query = $db->query("SELECT * FROM `<PRE>tickets` WHERE `reply` = '0'".$query." ORDER BY `time` DESC");
 			if(!$db->num_rows($query)) {
-				echo "You currently have no new tickets! <i><u><a href=\"?page=ticketsall\" title=\"View all tickets.\">View all tickets</a></u></i>";
+				echo $no_tickets_msg;
 			}
 			else {
-				echo "<div style=\"display: none;\" id=\"nun-tickets\">You currently have no new tickets!</div>";
+				if($_GET['mode'] == 'ticketsall'){
+					echo "<div style=\"display: none;\" id=\"nun-tickets\">You currently have no tickets!</div>";
+				}else{
+					echo "<div style=\"display: none;\" id=\"nun-tickets\">You currently have no new tickets!</div>";
+				}
 				$num_rows = $db->num_rows($query);
 				echo $style->replaceVar("tpl/support/acpticketjs.tpl", array('NUM_TICKETS' => $num_rows));
 				$css = "font-weight: bold; font-style: italic;";
@@ -120,18 +135,19 @@ class page {
 					$array['TITLE'] = $data['title'];
 					$array['UPDATE'] = $this->lastUpdated($data['id']);
 					$array['STATUS'] = $data['status'];
+					$array['STATUSMSG'] = $this->status($data['status']);
 					$array['URGCOLOR'] = $urg;
 					$array['ID'] = $data['id'];
 					$array['URGENCYTEXT'] = $txt;
 					echo $style->replaceVar("tpl/support/acpticketviewbox.tpl", $array);
 				}
-				echo "<center><i><u><a href=\"?page=ticketsall\" title=\"View all tickets.\">View all tickets</a></u></i></center>";
+				echo $view_mode_text;
 			}
 		}
 		else {
 			$query = $db->query("SELECT * FROM `<PRE>tickets` WHERE `id` = '{$main->getvar['do']}' OR `ticketid` = '{$main->getvar['do']}' ORDER BY `time` ASC");
 			if(!$db->num_rows($query)) {
-				echo "That ticket doesn't exist!";	
+				echo "That ticket doesn't exist!";
 			}
 			else {
 				if($_POST) {
@@ -145,6 +161,8 @@ class page {
 						$time = time();
 						$db->query("INSERT INTO `<PRE>tickets` (title, content, time, userid, reply, ticketid, staff) VALUES('{$main->postvar['title']}', '{$main->postvar['content']}', '{$time}', '{$_SESSION['user']}', '1', '{$main->getvar['do']}', '1')");
 						$main->errors("Reply has been added!");
+						$last_ticket = $db->query("SELECT * FROM <PRE>tickets WHERE time = '".$time."' LIMIT 1");
+						$last_ticket_data = $db->fetch_array($last_ticket);        
 						$data = $db->fetch_array($query);
 						$client = $db->staff($_SESSION['user']);
 						$user = $db->client($data['userid']);
@@ -152,19 +170,30 @@ class page {
 						$array['TITLE'] = $data['title'];
 						$array['STAFF'] = $client['name'];
 						$array['CONTENT'] = $main->postvar['content'];
+						$array['LINK'] = $db->config("url")."/client/?page=tickets&sub=view&do=".$last_ticket_data['ticketid'];
 						$email->send($user['email'], $template['subject'], $template['content'], $array);
 						$main->redirect("?page=tickets&sub=view&do=". $main->getvar['do']);
 					}
 				}
 				$data = $db->fetch_array($query);
 				$array['AUTHOR'] = $this->determineAuthor($data['userid'], $data['staff']);
-				$array['TIME'] = strftime("%D", $data['time']);
+				$array['TIME'] = $main->convertdate("n/d/Y - g:i A", $data['time']);
 				$array['NUMREPLIES'] = $db->num_rows($query) - 1;
 				$array['UPDATED'] = $this->lastUpdated($data['id']);
 				$array['ORIG'] = $this->showReply($data['id']);
 				$array['URGENCY'] = $data['urgency'];
 				$array['STATUS'] = $this->status($data['status']);
-				
+
+				if($data['status'] == "1"){
+					$array['STATUSCOLOR'] = "779500";
+				}elseif($data['status'] == "2"){
+					$array['STATUSCOLOR'] = "FF9500";
+				}elseif($data['status'] == "3"){
+					$array['STATUSCOLOR'] = "FF0000";
+				}else{
+					$array['STATUSCOLOR'] = "000000";
+				}
+
 				$array['REPLIES'] = "";
 				$n = 0;
 				while($reply = $db->fetch_array($query)) {
@@ -187,7 +216,7 @@ class page {
 				$array2['TITLE'] = "RE: ". $data['title'];
 				$array['ADDREPLY'] .= $style->replaceVar("tpl/support/addreply.tpl", $array2);
 				
-				echo $style->replaceVar("tpl/support/viewticket.tpl", $array);	
+				echo $style->replaceVar("tpl/support/viewticket.tpl", $array);
 			}
 		}
 	}

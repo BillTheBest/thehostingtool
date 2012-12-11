@@ -13,6 +13,111 @@ class main {
 	
 	public $postvar = array(), $getvar = array(), $requestvar = array(); # All post/get/request strings
 	
+	public function convertdate($dtformat, $time){
+		global $db;
+		if($_SESSION['logged']){
+			$table = "staff";
+			$userid = $_SESSION['user'];
+		}elseif($_SESSION['clogged']){
+			$table = "users";
+			$userid = $_SESSION['cuser'];
+		}
+        
+		if($table){
+			$query = $db->query("SELECT tzadjust,id FROM <PRE>".$table." WHERE id = '".$userid."' LIMIT 1");
+			$data = $db->fetch_array($query);
+			$tzadjust = $data['tzadjust']; //The user's set timezone
+			$gmt = date("Y-m-d h:i:s A");  //As compiler has the time zone set to GMT, we grab GMT's value now.
+
+			date_default_timezone_set($tzadjust);
+			$local = date("Y-m-d h:i:s A");
+
+			date_default_timezone_set("GMT");
+			$local = strtotime($local);
+			$gmt = strtotime($gmt);
+			$diff = $local - $gmt;
+
+			return date($dtformat, $time+$diff);  //Returns the requested date/time.
+		}else{
+			return date($dtformat, $time);        //Using GMT
+		}
+	}
+        
+	//Used by tzlist()
+	function array_flatten($array) {
+		$result = array();
+		foreach ($array as $key => $value) {
+			if (is_array($value)) {
+				$result = array_merge($result, $this->array_flatten($value));
+			}else{
+				$result[$key] = $value;
+			}
+		}
+		return $result;
+	}
+
+	//Creates a drop down list of all the timezones.  (Used for people to set their time zones.)
+	public function tzlist($default = ""){
+		$tzones = "<select name = 'tzones' id = 'tzones'>";
+		$timezone_identifiers = DateTimeZone::listIdentifiers();
+		foreach($timezone_identifiers as $value){
+			$n++;
+
+			if($n == 1){
+				if($default == "GMT" || !$default){
+					$selected = " selected";
+				}
+				$tzones .= '<option value="GMT"'.$selected.'>GMT</option>';
+			}
+
+			unset($selected);
+			if(preg_match('/^(Africa|America|Antartica|Arctic|Asia|Atlantic|Australia|Europe|Indian|Pacific)\//', $value)){
+				$ex = explode("/", $value);//obtain continent,city
+				if($continent != $ex[0]){
+					$tzones .= '</optgroup>';
+					$tzones .= '<optgroup label="'.$ex[0].'">';
+				}
+
+				$city = str_replace("_", " ", $ex[1]);
+				$continent = $ex[0];
+				if($default == $value){
+					$selected = " selected";
+				}
+				$tzones .= '<option value="'.$value.'"'.$selected.'>'.$city.'</option>';
+			}
+		}
+		$tzones .= '</optgroup>';
+		$tzones .= '</select>';
+
+		return $tzones;
+	}
+
+	public function editemailtpl($filetochange) {
+		if($_SESSION['logged']) {
+			$contents = $_POST['emailcontent'];
+			if(isset($filetochange) and isset($contents)) {
+				$contents = stripslashes($contents);
+				$contents = str_replace("\r", "", $contents);
+				$filetochangeOpen = fopen($filetochange,"w");
+				fputs($filetochangeOpen,$contents);
+				fclose($filetochangeOpen);
+				return true;
+			}
+		}
+	}
+
+	public function csrf_get_secret() {
+		if ($GLOBALS['csrf']['secret']) return $GLOBALS['csrf']['secret'];
+		$dir = dirname(__FILE__);
+		$file = LINK . '/csrf-secret.php';
+		$secret = '';
+		if (file_exists($file)) {
+			include $file;
+			return $secret;
+		}
+		return '';
+	}
+
 	public function cleaninteger($var){ # Transforms an Integer Value (1/0) to a Friendly version (Yes/No)
 	     $patterns[0] = '/0/';
          $patterns[1] = '/1/';
@@ -33,11 +138,18 @@ class main {
 	     }
 	}
 	public function error($array) { # The main THT Error show
-		echo "<strong>/////////////////THT ERROR<br /></strong>";
+		global $style;
+		$error = "<strong>THT ERROR<br /></strong>";
 		foreach($array as $key => $data) {
-			echo "<strong>". $key . ":</strong> ". $data ."<br />";
+			$error .= "<strong>". $key . ":</strong> ". $data ."<br />";
 		}
-		echo "/////////////////<br />";
+		$error .= "<br />";
+		$errors['ERROR'] = $error;
+		if(!method_exists($style, "replaceVar")){
+			echo $error;
+		}else{
+			echo $style->replaceVar("../includes/tpl/error.tpl", $errors);
+		}
 	}
 	
 	public function redirect($url, $headers = 0, $long = 0) { # Redirects user, default headers
@@ -63,10 +175,10 @@ class main {
 	public function table($header, $content = 0, $width = 0, $height = 0) { # Returns the HTML for a THT table
 		global $style;
 		if($width) {
-			$props = "width:".$width.";";	
+			$props = "width:".$width.";";
 		}
 		if($height) {
-			$props .= "height:".height.";";	
+			$props .= "height:".height.";";
 		}
 		$array['PROPS'] = $props;
 		$array['HEADER'] = $header;
@@ -108,10 +220,10 @@ class main {
 		foreach($main->getvar as $key => $value) {
 			if($key != "do") {
 				if($i) {
-					$i = "&";	
+					$i = "&";
 				}
 				else {
-					$i = "?";	
+					$i = "?";
 				}
 				$url .= $i . $key . "=" . $value;
 			}
@@ -128,9 +240,9 @@ class main {
 		}
 	}
 	
-	public function dropDown($name, $values, $default = 0, $top = 1, $class = "") { # Returns HTML for a drop down menu with all values and selected
+	public function dropDown($name, $values, $default = 0, $top = 1, $class = "", $custom = "") { # Returns HTML for a drop down menu with all values and selected
 		if($top) {
-			$html .= '<select name="'.$name.'" id="'.$name.'" class="'.$class.'">';
+			$html .= '<select name="'.$name.'" id="'.$name.'" class="'.$class.'" '.$custom.'>';
 		}
 		if($values) {
 			foreach($values as $key => $value) {
@@ -155,7 +267,7 @@ class main {
 			$array['Error'] = "That user doesn't exist!";
 			$array['User ID'] = $id;
 			$main->error($array);
-			return;	
+			return;
 		}
 		else {
 			$data = $db->fetch_array($query);
@@ -184,7 +296,7 @@ class main {
 			return false;
 		}
 		else {
-			return true;	
+			return true;
 		}
 	}
 	
@@ -196,7 +308,7 @@ class main {
 		$query = $db->query("SELECT * FROM `<PRE>staff` WHERE `id` = '{$user}'");
 		if($db->num_rows($query) == 0) {
 			$array['Error'] = "Staff member not found";
-			$array['Staff ID'] = $id;
+			$array['Staff ID'] = $user;
 			$main->error($array);
 		}
 		else {
@@ -204,7 +316,7 @@ class main {
 			$perms = explode(",", $data['perms']);
 			foreach($perms as $value) {
 				if($value == $id) {
-					return false;	
+					return false;
 				}
 			}
 			return true;
@@ -230,6 +342,7 @@ class main {
 														'{$main->postvar['user']}',
 														'{$date}',
 														'Login successful ($ip)')");
+					$db->query("UPDATE `<PRE>users` SET ip = '".$ip."' WHERE `user` = '{$main->postvar['user']}'");
 					return true;
 				}
 				else {
@@ -456,17 +569,18 @@ class main {
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		$data = curl_exec($ch);
 		if($data === false) {
-			$this->error(array('$main->getWanIp() Failed' => curl_error($ch)));
-			return false;
+			//$this->error(array('$main->getWanIp() Failed' => curl_error($ch)));
+			return $_SERVER['SERVER_ADDR'];
 		}
 		curl_close($ch);
 		try {
 			$xml = @new SimpleXMLElement($data);
 		}
 		catch (Exception $ex) {
-			echo 'Something went wrong when running $main->getWanIp()... $data dump follows:' . "<br />\n";
-			var_dump($data);
-			die();
+			//echo 'Something went wrong when running $main->getWanIp()... $data dump follows:' . "<br />\n";
+			//var_dump($data);
+			//die();
+			return $_SERVER['SERVER_ADDR'];
 		}
 		if($detailed) {
 			return $xml;

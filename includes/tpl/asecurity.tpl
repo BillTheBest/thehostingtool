@@ -2,7 +2,7 @@
 <form id="edit" name="edit" method="post" action="">
 <table width="100%" border="0" cellspacing="2" cellpadding="0">
   <tr>
-  <td><strong>Show THT version in copyright?</strong></td>
+  <td width = "55%"><strong>Show THT version in copyright?</strong></td>
     <td>%SHOW_VERSION_ID%
      <a title="Do you want to show the THT Version you're running in the Copyright?" class="tooltip"><img src="<URL>themes/icons/information.png" /></a>
     </td>
@@ -24,19 +24,27 @@
   <tr>
     <td><strong>Show Footer Server Information?</strong></td>
     <td>%SHOW_FOOTER%
-     <a title="Show system information in the footer. We highly reccomend you turn this off on production servers." class="tooltip">
+     <a title="Show system information in the footer. It's reccomended that you turn this off on production servers." class="tooltip">
      <img src="<URL>themes/icons/information.png" /></a>
     </td>
-    </tr>
-    <tr>
+  </tr>
+  <tr>
     <td><strong>Connect to WHM via SSL?</strong></td>
     <td>%SHOW_WHM_SSL%
-    <a title="Connect to WHM over a secure connection. If you are not using WHM
-    you can ignore this option." class="tooltip"><img src="<URL>themes/icons/information.png" /></a>
+    <a title="Connect to WHM over a secure connection. If you are not using WHM you can ignore this option." class="tooltip"><img src="<URL>themes/icons/information.png" /></a>
     </td>
-    </tr>
+  </tr>
   <tr>
-    <td align="center"><input type="submit" name="add" id="add" value="Edit Security Settings" /></td>
-    </tr>
-    </table>
+    <td><strong>Send an Email to All Staff Members on Cron Output?</strong></td>
+    <td>%EMAIL_ON_CRON%
+    <a title="Should an email be sent to every staff member whenever the cron.php file gives any kind of output?" class="tooltip"><img src="<URL>themes/icons/information.png" /></a>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" colspan = "3" height = "10"></td>
+  </tr>
+  <tr>
+    <td align="center" colspan = "3"><input type="submit" name="add" id="add" value="Edit Security Settings" /></td>
+  </tr>
+</table>
 </form>

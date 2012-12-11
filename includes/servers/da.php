@@ -29,7 +29,7 @@ class da {
 			$array['Error'] = "That server doesn't exist!";
 			$array['Server ID'] = $id;
 			$main->error($array);
-			return;	
+			return;
 		}
 		else {
 			return $db->fetch_array($query);
@@ -102,7 +102,7 @@ class da {
 					"&passwd=". $pass ."".
 					"&passwd2=". $pass ."".
 					"&domain=". $main->getvar['fdom'] ."".
-					"&package=". $main->getvar['fplan'] ."".
+					"&package=". str_replace(" ", "%20", $main->getvar['fplan']) ."".
 					"&notify=no".
 					"&email=".$email."";
 		if($reseller) {
@@ -116,10 +116,10 @@ class da {
 		//echo $action."<br />". $reseller;
 		$command = $this->remote($define,$string);
 		if($command['error']) {
-			echo "<strong>".$command['text']."</strong><br />". $command['details'];	
+			echo "DA Error: <strong>".$command['text']."</strong><br />". $command['details'];
 		}
 		else {
-			return true;	
+			return true;
 		}
 	}
 	

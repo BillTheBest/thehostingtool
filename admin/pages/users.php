@@ -29,7 +29,7 @@ class page {
 			$newest = $main->sub("Latest Signup:", $data['user']);
 		}
 		return "<strong>Clients</strong><br />
-		This is the area where you can manage all your clients that have signed up for your service. You can perform a variety of tasks like suspend, terminate, email and also check up on their requirements and stats.". $newest;	
+		This is the area where you can manage all your clients that have signed up for your service. You can perform a variety of tasks like suspend, terminate, email and also check up on their requirements and stats.". $newest;
 	}
 	
 	public function content() { # Displays the page 
@@ -54,7 +54,7 @@ class page {
 								$command = $server->suspend($pack['id']);
                             }
 							if($command === true) {
-								$main->errors("User has been suspended!");	
+								$main->errors("User has been suspended!");
 							}
 							else {
 								$main->errors($command);
@@ -64,7 +64,7 @@ class page {
 						case "unsus":
 							$command = $server->unsuspend($pack['id']);
 							if($command == true) {
-								$main->errors("User has been unsuspended!");	
+								$main->errors("User has been unsuspended!");
 							}
 							else {
 								$main->errors($command);
@@ -117,33 +117,33 @@ class page {
 					}
 					elseif($pack['status'] == "1") {
 						$array['SUS'] = "Suspend";
-						$array['FUNC'] = "sus";	
+						$array['FUNC'] = "sus";
 						$array['IMG'] = "exclamation.png";
 					}
 					elseif($pack['status'] == "3") {
 						$array['SUS'] = "<a href='?page=users&sub=validate'>Validate</a>";
-						$array['FUNC'] = "none";	
+						$array['FUNC'] = "none";
 						$array['IMG'] = "user_suit.png";
 					}
 					elseif($pack['status'] == "4") {
 						$array['SUS'] = "Awaiting Payment";
-						$array['FUNC'] = "none";	
+						$array['FUNC'] = "none";
 						$array['IMG'] = "money.png";
 					}
 					elseif($pack['status'] == "9") {
 						$array['SUS'] = "No Action";
-						$array['FUNC'] = "none";	
+						$array['FUNC'] = "none";
 						$array['IMG'] = "cancel.png";
 					}
 					else {
 						$array['SUS'] = "Other Status";
-						$array['FUNC'] = "none";	
-						$array['IMG'] = "help.png";	
+						$array['FUNC'] = "none";
+						$array['IMG'] = "help.png";
 					}
 					$array['ID'] = $main->getvar['do'];
 					switch($main->getvar['func']) {
 						default:
-							$array2['DATE'] = strftime("%D", $client['signup']);
+							$array2['DATE'] = $main->convertdate("n/d/Y", $client['signup']);
 							$array2['EMAIL'] = $client['email'];
 							$query = $db->query("SELECT * FROM `<PRE>packages` WHERE `id` = '{$db->strip($pack['pid'])}'");
 							$data2 = $db->fetch_array($query);
@@ -190,11 +190,11 @@ class page {
 							$class = $type->determineType($pack['pid']);
 							$phptype = $type->classes[$class];
 							if($phptype->acpBox) {
-								$box = $phptype->acpBox();	
+								$box = $phptype->acpBox();
 								$array['BOX'] = $main->sub($box[0], $box[1]);
 							}
 							else {
-								$array['BOX'] = "";	
+								$array['BOX'] = "";
 							}
 							$array['CONTENT'] = $style->replaceVar("tpl/clientdetails.tpl", $array2);
 							break;
@@ -214,11 +214,12 @@ class page {
 							$array['CONTENT'] = $style->replaceVar("tpl/emailclient.tpl");
 							break;
 						case "passwd":
+							$array['MSG'] = "This will change the user's password in ALL accounts.  (THT, WHM/DirectAdmin, and cPanel, FTP, etc.)<br><br>";
 							if($_POST) {
 								if(empty($main->postvar['passwd'])) {
 									$main->errors('A password was not provided.');
 									$array['BOX'] = "";
-									$array['CONTENT'] = $style->replaceVar("tpl/clientpwd.tpl");
+									$array['CONTENT'] = $style->replaceVar("tpl/clientpwd.tpl", $array);
 								}
 								else {
 									$command = $main->changeClientPassword($pack['id'], $main->postvar['passwd']);
@@ -231,7 +232,7 @@ class page {
 								}
 							}
 							$array['BOX'] = "";
-							$array['CONTENT'] = $style->replaceVar("tpl/clientpwd.tpl");
+							$array['CONTENT'] = $style->replaceVar("tpl/clientpwd.tpl", $array);
 							break;
 					}
 					$array["URL"] = URL;
@@ -241,7 +242,7 @@ class page {
 				else {
 					$array['NAME'] = $db->config("name");
 					$array['URL'] = $db->config("url");
-					$values[] = array("Admin Area", "admin");
+					$values[] = array("Admin Area", ADMINDIR);
 					$values[] = array("Order Form", "order");
 					$values[] = array("Client Area", "client");
 					$array['DROPDOWN'] = $main->dropDown("default", $values, $db->config("default"));
@@ -309,7 +310,7 @@ class page {
 						$array['ID'] = $data['id'];
 						$array['USER'] = $data['user'];
 						$array['EMAIL'] = $data['email'];
-						$array['DATE'] = strftime("%m/%d/%Y", $data['signup']);
+						$array['DATE'] = $main->convertdate("n/d/Y", $data['signup']);
 					echo $style->replaceVar("tpl/clientlist.tpl", $array);
 					}
 				}
@@ -370,18 +371,18 @@ class page {
 						$client = $db->client($data['userid']);
 						if($server->decline($main->getvar['do'])) {
 							$main->errors("Account declined!");
-						}	
+						}
 					}
 				}
 				$query = $db->query("SELECT * FROM `<PRE>user_packs` WHERE `status` = '3'");
 				if($db->num_rows($query) == 0) {
-					echo "No clients are awaiting validation!";	
+					echo "No clients are awaiting validation!";
 				}
 				else {
 					$tpl .= "<ERRORS>";
 					while($data = $db->fetch_array($query)) {
 						$client = $db->client($data['userid']);
-						$array['USER'] = $client['user'];	
+						$array['USER'] = $client['user'];
 						$array['EMAIL'] = $client['email'];
 						$array['DOMAIN'] = $data['domain'];
 						$array['ID'] = $data['id'];

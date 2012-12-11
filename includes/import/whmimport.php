@@ -22,10 +22,10 @@ class whmimport {
 		if(!$_POST) {
 			$query = $db->query("SELECT * FROM `<PRE>servers` WHERE `type` = 'whm'");
 			while($data = $db->fetch_array($query)) {
-				$values[] = array($data['name'], $data['id']);	
+				$values[] = array($data['name'], $data['id']);
 			}
 			$array['DROPDOWN'] = $main->dropdown("server", $values);
-			echo $style->replaceVar("tpl/whmimport/step1.tpl", $array);	
+			echo $style->replaceVar("tpl/whmimport/step1.tpl", $array);
 		}
 		elseif($_POST) {
 			foreach($main->postvar as $key => $value) {
@@ -43,7 +43,6 @@ class whmimport {
 					$usercheck = $db->query("SELECT * FROM `<PRE>users` WHERE `user` = '{$data['user']}'");
 					if($db->num_rows($usercheck) == 0) {
 						if($db->num_rows($pselect) == 0) {
-							echo "hey!";
 							$db->query("INSERT INTO `<PRE>packages` (name,backend,description,type,server,admin) 
 																	   VALUES('{$data['package']}',
 																			  '{$data['package']}',
@@ -57,14 +56,15 @@ class whmimport {
 						$finalpackid = $piddata['id'];
 						$checkquery = $db->query("SELECT * FROM `<PRE>users` WHERE `user` = '{$data['user']}'");
 						if($db->num_rows($checkquery) == 0) {
-							$db->query("INSERT INTO `<PRE>users` (user,email,password,salt,signup,ip) 
-																	 VALUES(
-																			'{$data['user']}',
-																			'{$data['email']}',
-																			'',
-																			'saltme',
-																			'{$data['start_date']}',
-																			'')");
+							$db->query("INSERT INTO `<PRE>users` (user,email,password,salt,signup,ip,status) VALUES(
+								'{$data['user']}',
+								'{$data['email']}',
+								'',
+								'saltme',
+								'{$data['start_date']}',
+								'',
+								'1')"
+							);
 							$checkquery = $db->query("SELECT * FROM `<PRE>users` WHERE `user` = '{$data['user']}'");
 							$datanewuser = $db->fetch_array($checkquery);
 							$db->query("INSERT INTO `<PRE>user_packs` (userid,domain,pid,signup,status,additional) 

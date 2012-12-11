@@ -35,7 +35,7 @@ elseif($_SESSION['clogged']) {
 	$maincontent = $main->table("Unable to sign-up!", "One package per account!");
 }
 else {
-	$_SESSION['orderform'] = true;	
+	$_SESSION['orderform'] = true;
 }
 
 echo '<div id="ajaxwrapper">'; #Ajax wrapper, for steps
@@ -53,18 +53,18 @@ if($db->num_rows($packages2) == 0) {
 else {
 	while($data = $db->fetch_array($packages2)) {
 		if(!$n) {
-			$array['PACKAGES'] .= "<tr>";	
+			$array['PACKAGES'] .= "<tr>";
 		}
 		$array2['NAME'] = $data['name'];
 		$array2['DESCRIPTION'] = $data['description'];
 		$array2['ID'] = $data['id'];
-		$array['PACKAGES'] .= $style->replaceVar("tpl/orderpackages.tpl", $array2);	
+		$array['PACKAGES'] .= $style->replaceVar("tpl/orderpackages.tpl", $array2);
 		$n++;
 		if($n == 1) {
-			$array['PACKAGES'] .= '<td width="2%"></td>';	
+			$array['PACKAGES'] .= '<td width="2%"></td>';
 		}
 		if($n == 2) {
-			$array['PACKAGES'] .= "</tr>";	
+			$array['PACKAGES'] .= "</tr>";
 			$n = 0;	
 		}
 	}
@@ -72,15 +72,17 @@ else {
 	$array['USER'] = "";
 	$array['DOMAIN'] = '<input name="cdom" id="cdom" type="text" />';
 	$sub = $db->query("SELECT * FROM `<PRE>subdomains`");
-	if($db->num_rows($sub) == 0) {
+	$tldonly = $db->config("tldonly");
+	if($db->num_rows($sub) == 0 || $tldonly == "1") {
 		$array["CANHASSUBDOMAIN"] = "";
 	}
 	else {
 		$array["CANHASSUBDOMAIN"] = '<option value="sub">Subdomain</option>';
 	}
 	while($sub2 = $db->fetch_array($sub)) {
-		$values2[] = array($sub2['subdomain'], $sub2['subdomain']);	
+		$values2[] = array($sub2['subdomain'], $sub2['subdomain']);
 	}
+	$array['TZADJUST'] = $main->tzlist($data['tzadjust']);
 	
 	//Determine what to show in Client box
 	if(!$_SESSION['clogged']) {

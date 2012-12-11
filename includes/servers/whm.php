@@ -29,7 +29,7 @@ class whm {
 			$array['Error'] = "That server doesn't exist!";
 			$array['Server ID'] = $id;
 			$main->error($array);
-			return;	
+			return;
 		}
 		else {
 			return $db->fetch_array($query);
@@ -118,19 +118,19 @@ class whm {
 					"?username=". $user . "".
 					"&password=". $pass ."".
 					"&domain=". $main->getvar['fdom'] ."".
-					"&plan=". $main->getvar['fplan'] ."".
+					"&plan=". str_replace(" ", "%20", $main->getvar['fplan']) ."".
 					"&contactemail=". $email ."";
 		if($reseller) {
-			$action .= "&reseller=1";	
+			$action .= "&reseller=1";
 		}
-		//echo $action."<br />". $reseller;
+		//echo $action."<br />". $reseller."<br>";
 		$command = $this->remote($action);
 		
 		if($command->result->status == 1) {
-			return true;	
+			return true;
 		}
 		else {
-			echo "Error: ". $command->result->statusmsg;	
+			echo "WHM Error: ". $command->result->statusmsg;
 		}
 	}
 	

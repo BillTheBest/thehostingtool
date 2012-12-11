@@ -18,90 +18,118 @@ class page {
 		global $db;
 		global $main;
 		
-		echo "<div class=\"subborder\"><form id=\"filter\" name=\"filter\" method=\"post\" action=\"\"><select size=\"1\" name=\"show\"><option value=\"all\">ALL</option><option value=\"Registered\">Registered</option><option value=\"Package created\">Package created</option><option value=\"Approved\">Approved</option><option value=\"Declined\">Declined</option><option value=\"Suspended\">Suspended</option><option value=\"Unsuspended\">Unsuspended</option><option value=\"Cancelled\">Cancelled</option><option value=\"Terminated\">Terminated</option><option value=\"cPanel password\">cPanel password change</option><option value=\"Login\">Client Logins (Success/Fail)</option><option value=\"Login successful\">Client Logins (Success)</option><option value=\"Login failed\">Client Logins (Fail)</option><option value=\"STAFF\">Staff Logins (Success/Fail)</option><option value=\"STAFF LOGIN SUCCESSFUL\">Staff Logins (Success)</option><option value=\"STAFF LOGIN FAILED\">Staff Logins (Fail)</option></select><input type=\"submit\" name=\"filter\" id=\"filter\" value=\"Filter Log\" /></form><table width=\"100%\" cellspacing=\"2\" cellpadding=\"2\" border=\"1\" style=\"border-collapse: collapse\" bordercolor=\"#000000\"><tr bgcolor=\"#EEEEEE\">";
-		echo "<td width=\"75\" align=\"center\" style=\"border-collapse: collapse\" bordercolor=\"#000000\">DATE</td><td width=\"60\" align=\"center\" style=\"border-collapse: collapse\" bordercolor=\"#000000\">TIME</td><td width=\"75\" align=\"center\" style=\"border-collapse: collapse\" bordercolor=\"#000000\">USERNAME</td><td align=\"center\" style=\"border-collapse: collapse\" bordercolor=\"#000000\">MESSAGE</td></tr>";
-		$l = $main->getvar['l'];
-		$p = $main->getvar['p'];
-		if (!$main->postvar['show'] && !$main->getvar['show']) {
-			$show = "all";
+		if(is_numeric($main->getvar['dellogid'])){
+			echo "<font color = '#FF0000'>Log entry deleted!</font>";
+			$db->query("DELETE FROM `<PRE>logs` WHERE `id` = '".$main->getvar['dellogid']."'");
 		}
-		if (!$main->postvar['show']) {
-			$show = $main->getvar['show'];
+
+		if(is_numeric($main->getvar['removeall'])){
+			if($main->getvar['confirm'] != '1'){
+				echo "<font color = '#FF0000'>Are you sure you wish to remove ALL log entries? &nbsp;&nbsp;<a href = '?page=logs&removeall=".$main->getvar['removeall']."&confirm=1'>Yes</a>&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;<a href = '?page=logs'>No</a></font>";
+			}else{
+				echo "<font color = '#FF0000'>All log entries have been removed!</font>";
+				$db->query("DELETE FROM `<PRE>logs`");
+			}
 		}
-		else {
-			$show = $main->postvar['show'];
-			$p = 0;
-		}
-		if (!($l)) {
-			$l = 10;
-		}
-		if (!($p)) {
-			$p = 0;
-		}
-		if ($show != all) {
-			$query = $db->query("SELECT * FROM `<PRE>logs` WHERE `message` LIKE '$show%'");
-		}
-		else {
-			$query = $db->query("SELECT * FROM `<PRE>logs`");
-		}
-		$pages = intval($db->num_rows($query)/$l);
-				if ($db->num_rows($query)%$l) {
-					$pages++;
+
+		if(is_numeric($main->getvar['logid'])){
+			$query = $db->query("SELECT * FROM `<PRE>logs` WHERE `id` = '".$main->getvar['logid']."'");
+			$loginfo = $db->fetch_array($query);
+
+			$array['MESSAGE'] = $loginfo['message'];
+			echo $style->replaceVar("tpl/adminlogview.tpl", $array);
+		}else{
+			echo $style->replaceVar("tpl/adminlogstop.tpl", $array);
+			$l = $main->getvar['l'];
+			$p = $main->getvar['p'];
+			if (!$main->postvar['show'] && !$main->getvar['show']) {
+				$show = "all";
+			}
+			if (!$main->postvar['show']) {
+				$show = $main->getvar['show'];
+			}
+			else {
+				$show = $main->postvar['show'];
+				$p = 0;
+			}
+			if (!($l)) {
+				$l = 10;
+			}
+			if (!($p)) {
+				$p = 0;
+			}
+			if ($show != all) {
+				//I have no idea why the logs search the message instead of putting another entry in the DB, but this is the quick way to patch
+				//PayPal into the search system without having to rewrite the logging system.
+				if($show == "PayPal"){
+					$paypal_wildcard = "%";
 				}
-				$current = ($p/$l) + 1;
-				if (($pages < 1) || ($pages == 0)) {
-					$total = 1;
-				}
-				else {
-					$total = $pages;
-				}
-				$first = $p + 1;
-				if (!((($p + $l) / $l) >= $pages) && $pages != 1) {
-					$last = $p + $l;
-				}
-				else{
-					$last = $db->num_rows($query);
-				}
-				if ($db->num_rows($query) == 0) {
-					echo "No logs found.";
-				}
-				else {
-					if ($show != all) {
-						$query2 = $db->query("SELECT * FROM `<PRE>logs` WHERE `message` LIKE '$show%' ORDER BY `id` DESC LIMIT $p, $l");
+				$query = $db->query("SELECT * FROM `<PRE>logs` WHERE `message` LIKE '".$paypal_wildcard."$show%'");
+			}
+			else {
+				$query = $db->query("SELECT * FROM `<PRE>logs`");
+			}
+			$pages = intval($db->num_rows($query)/$l);
+					if ($db->num_rows($query)%$l) {
+						$pages++;
+					}
+					$current = ($p/$l) + 1;
+					if (($pages < 1) || ($pages == 0)) {
+						$total = 1;
 					}
 					else {
-						$query2 = $db->query("SELECT * FROM `<PRE>logs` ORDER BY `id` DESC LIMIT $p, $l");
+						$total = $pages;
 					}
-					while($data = $db->fetch_array($query2)) {
-						$array['USER'] = $data['loguser'];
-						$array['DATE'] = strftime("%m/%d/%Y", $data['logtime']);
-						$array['TIME'] = strftime("%T", $data['logtime']);
-						$array['MESSAGE'] = $data['message'];
-					echo $style->replaceVar("tpl/adminlogs.tpl", $array);
+					$first = $p + 1;
+					if (!((($p + $l) / $l) >= $pages) && $pages != 1) {
+						$last = $p + $l;
 					}
+					else{
+						$last = $db->num_rows($query);
+					}
+					if ($db->num_rows($query) == 0) {
+						echo "No logs found.";
+					}
+					else {
+						if ($show != all) {
+							$query2 = $db->query("SELECT * FROM `<PRE>logs` WHERE `message` LIKE '".$paypal_wildcard."$show%' ORDER BY `id` DESC LIMIT $p, $l");
+						}
+						else {
+							$query2 = $db->query("SELECT * FROM `<PRE>logs` ORDER BY `id` DESC LIMIT $p, $l");
+						}
+						while($data = $db->fetch_array($query2)) {
+							$message_data = explode("<", substr($data['message'], 0, 100));
+							$array['USER'] = $data['loguser'];
+							$array['DATE'] = $main->convertdate("n/d/Y", $data['logtime']);
+							$array['TIME'] = $main->convertdate("g:i A", $data['logtime']);
+							$array['MESSAGE'] = $message_data[0];
+							$array['LOGID'] = $data['id'];
+						echo $style->replaceVar("tpl/adminlogs.tpl", $array);
+						}
+					}
+			echo "</table></div>";
+			echo "<center>";
+			if ($p != 0) {
+				$back_page = $p - $l;
+				echo("<a href=\"$PHP_SELF?page=logs&show=$show&p=$back_page&l=$l\">BACK</a>    \n");
+			}
+
+			for ($i=1; $i <= $pages; $i++) {
+				$ppage = $l*($i - 1);
+				if ($ppage == $p){
+					echo("<b>$i</b>\n");
 				}
-		echo "</table></div>";
-		echo "<center>";
-		if ($p != 0) {
-			$back_page = $p - $l;
-			echo("<a href=\"$PHP_SELF?page=logs&show=$show&p=$back_page&l=$l\">BACK</a>    \n");
-		}
-
-		for ($i=1; $i <= $pages; $i++) {
-			$ppage = $l*($i - 1);
-			if ($ppage == $p){
-				echo("<b>$i</b>\n");
+				else{
+					echo("<a href=\"$PHP_SELF?page=logs&show=$show&p=$ppage&l=$l\">$i</a> \n");
+				}
 			}
-			else{
-				echo("<a href=\"$PHP_SELF?page=logs&show=$show&p=$ppage&l=$l\">$i</a> \n");
-			}
-		}
 
-		if (!((($p+$l) / $l) >= $pages) && $pages != 1) {
-			$next_page = $p + $l;
-			echo("    <a href=\"$PHP_SELF?page=logs&show=$show&p=$next_page&l=$l\">NEXT</a>");
+			if (!((($p+$l) / $l) >= $pages) && $pages != 1) {
+				$next_page = $p + $l;
+				echo("    <a href=\"$PHP_SELF?page=logs&show=$show&p=$next_page&l=$l\">NEXT</a>");
+			}
+			echo "</center>";
 		}
-		echo "</center>";
 	}
 }
 ?>

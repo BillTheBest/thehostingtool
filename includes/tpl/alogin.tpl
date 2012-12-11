@@ -14,5 +14,5 @@
 </form>
 
 <div class="subborder">
-	<div class="sub"><a href="<URL>admin/?page=forgotpass">Forgotten your password?</a></div>
+	<div class="sub"><a href="<URL><ADMINDIR>/?page=forgotpass">Forgotten your password?</a></div>
 </div>

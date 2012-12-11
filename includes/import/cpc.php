@@ -20,7 +20,7 @@ class cpc {
 		global $type;
 		
 		if(!$_POST) {
-			echo $style->replaceVar("tpl/cpc_step1.tpl");	
+			echo $style->replaceVar("tpl/cpc_step1.tpl");
 		}
 		elseif($_POST) {
 			foreach($main->postvar as $key => $value) {
@@ -37,7 +37,7 @@ class cpc {
 				else {
 					$select = @mysql_select_db($main->postvar['database'], $cpccon);
 					if(!$select) {
-						echo "Couldn't select database!";	
+						echo "Couldn't select database!";
 					}
 					else {
 						$pre = $main->postvar['prefix'];
@@ -103,7 +103,7 @@ class cpc {
 							}
 						}
 						if(mysql_num_rows($query) == 0) {
-							echo "There are no clients to import!";	
+							echo "There are no clients to import!";
 						}
 						else {
 							while($data = mysql_fetch_array($query)) {
@@ -137,14 +137,15 @@ class cpc {
 									$newpass = md5($client['pass'] . md5($salt));
 									$checkquery = $db->query("SELECT * FROM `<PRE>users` WHERE `user` = '{$data['packuser']}'");
 									if($db->num_rows($checkquery) == 0) {
-										$db->query("INSERT INTO `<PRE>users` (user,email,password,salt,signup,ip) 
-																				 VALUES(
-																						'{$data['packuser']}',
-																						'{$client['email']}',
-																						'{$newpass}',
-																						'{$salt}',
-																						'{$client['signup']}',
-																						'{$client['ip']}')");
+										$db->query("INSERT INTO `<PRE>users` (user,email,password,salt,signup,ip,status) VALUES(
+											'{$data['packuser']}',
+											'{$client['email']}',
+											'{$newpass}',
+											'{$salt}',
+											'{$client['signup']}',
+											'{$client['ip']}',
+											'1')"
+										);
 										$checkquery = $db->query("SELECT * FROM `<PRE>users` WHERE `user` = '{$data['packuser']}'");
 										$datanewuser = $db->fetch_array($checkquery);
 										$db->query("INSERT INTO `<PRE>user_packs` (userid,domain,pid,signup,status,additional) 
@@ -163,7 +164,7 @@ class cpc {
 						}
 					}
 				}
-			}	
+			}
 		}
 	}
 	private function queryForums($name = 0) { # Returns the query for the forums in config table

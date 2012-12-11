@@ -20,6 +20,8 @@ function client() {
 	global $style;
 	global $type;
 	global $email;
+        global $server;
+        global $invoice;
 	ob_start(); # Stop the output buffer
 		
 	if(!$main->getvar['page']) { 
@@ -30,7 +32,7 @@ function client() {
 	$header = $page['visual'];
 	$link = "pages/". $main->getvar['page'] .".php";
 	if(!file_exists($link)) {
-		$html = "Seems like the .php is non existant. Is it deleted?";	
+		$html = "That page doesn't exist.";
 	}
 	else {
 		//If deleting something
@@ -60,7 +62,7 @@ function client() {
 					$array2['IMGURL'] = $value[2];
 					$array2['LINK'] = "?page=type&type=".$type->determineType($navdata['pid'])."&sub=".$value[1];
 					$array2['VISUAL'] = $value[0];
-					$array['LINKS'] .= $style->replaceVar("tpl/sidebarlink.tpl", $array2);	
+					$array['LINKS'] .= $style->replaceVar("tpl/sidebarlink.tpl", $array2);
 					if($main->getvar['page'] == "type" && $main->getvar['type'] == $type->determineType($navdata['pid']) && $main->getvar['sub'] == $value[1]) {
 						define("SUB", $value[3]);
 						$header = $value[3];
@@ -93,16 +95,16 @@ function client() {
 					$array['HIDDEN'] .= '<input name="'.$key.'" type="hidden" value="'.$value.'" />';
 				}
 				$array['HIDDEN'] .= " ";
-				$html = $style->replaceVar("tpl/warning.tpl", $array);	
+				$html = $style->replaceVar("tpl/warning.tpl", $array);
 			}
 			elseif($main->getvar['sub'] == "delete" && isset($main->getvar['do']) && $_POST && !$main->getvar['confirm']) {
 				if($main->postvar['yes']) {
 					foreach($main->getvar as $key => $value) {
 					  if($i) {
-						  $i = "&";	
+						  $i = "&";
 					  }
 					  else {
-						  $i = "?";	
+						  $i = "?";
 					  }
 					  $url .= $i . $key . "=" . $value;
 					}
@@ -110,7 +112,7 @@ function client() {
 					$main->redirect($url);
 				}
 				elseif($main->postvar['no']) {
-					$main->done();	
+					$main->done();
 				}
 			}
 			else {
@@ -121,19 +123,18 @@ function client() {
 					ob_clean(); # Flush the HTML
 				}
 				elseif($content->navlist) {
-					$html = "Select a sub-page from the sidebar.";
+					if($content->description()){
+						$html = $content->description()."<br><br>";
+					}
+					$html .= "Select a sub-page from the sidebar.";
 				}
 				else {
 					ob_start();
 					$content->content();
 					$html = ob_get_contents(); # Retrieve the HTML
-					ob_clean(); # Flush the HTML	
+					ob_clean(); # Flush the HTML
 				}
 			}
-		}
-		else {
-			$html = "You trying to hack me? You've been warned. An email has been sent.. May I say, Owned?";
-			$email->staff("Possible Hacking Attempt", "A user has been logged trying to hack your copy of THT, their IP is: ". $_SERVER['REMOTE_ADDR']);
 		}
 	}
 	
@@ -193,6 +194,7 @@ if(!$_SESSION['clogged']) {
 					$cmd = $main->changeClientPassword($client['id'], $password);
 					$main->errors("Password reset!");
 					$array['PASS'] = $password;
+					$array['LINK'] = $db->config("url")."/client";
 					$emaildata = $db->emailTemplate("reset");
 					$email->send($email2, $emaildata['subject'], $emaildata['content'], $array);
 				}
@@ -204,13 +206,13 @@ if(!$_SESSION['clogged']) {
 	}
 	else {
 		define("SUB", "Login");
-		define("INFO", " ");
+		define("INFO", "<b>Welcome to <NAME></b><br>".SUB);
 		if($_POST) { # If user submitts form
 			if($main->clientLogin($main->postvar['user'], $main->postvar['pass'])) {
-				$main->redirect("?page=home");	
+				$main->redirect("?page=home");
 			}
 			else {
-				$main->errors("Incorrect username or password!");
+				$main->errors("Incorrect username or password or account not active!");
 			}
 		}
 		
@@ -226,6 +228,29 @@ if(!$_SESSION['clogged']) {
 		}
 		echo $style->get("footer.tpl");
 	}
+	if($_GET['invoiceID']){
+		require_once("../includes/paypal/paypal.class.php");
+		$paypal = new paypal_class;
+		if($db->config("paypalmode") == "sandbox"){
+			$paypal->paypal_url = 'https://www.sandbox.paypal.com/cgi-bin/webscr';
+		}else{
+			$paypal->paypal_url = 'https://www.paypal.com/cgi-bin/webscr';
+		}
+		if($paypal->validate_ipn()){
+			$user_data = $db->fetch_array($db->query("SELECT * FROM `<PRE>users` WHERE `id` = '{$_SESSION['cuser']}'"));
+			$signup_date = date("m-d-Y", $user_data['signup']);
+
+			if($signup_date == date("m-d-Y")){
+				$noemail = "1";
+			}
+
+			$invoice->set_paid(mysql_real_escape_string($_GET['invoiceID']), $noemail);
+			$main->errors("Your invoice has been paid!");
+		}
+		else {
+			$main->errors("Your invoice hasn't been paid!");
+		}
+	}
 }
 elseif($_SESSION['clogged']) {
 	if(!$main->getvar['page']) {
@@ -233,7 +258,7 @@ elseif($_SESSION['clogged']) {
 	}
 	elseif($main->getvar['page'] == "logout") {
 		session_destroy();
-		$main->redirect("?page=home");
+		$main->redirect("./");
 	}
 	if(!$db->config("cenabled")) {
 		define("SUB", "Disabled");

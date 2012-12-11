@@ -1,3 +1,4 @@
+%MSG%
 <form action="" method="post" name="email" id="email">
 <table width="100%" border="0" cellspacing="2" cellpadding="0">
   <tr>

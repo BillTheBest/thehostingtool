@@ -47,6 +47,14 @@ Wiki Team:
 	zzbomb <zzbomb@thehostingtool.com> @zzbomb
 Quality Assurance:
 	If you're interested in QA, give Nick an email or PM on the forums.
+Past Contributors:
+	asiansaga
+	Jimmie
+	mghq2
+	Oloty
+
+This release was bug fixed and enhanced by:
+	Na'ven Enigma (http://thelifemaster.com)
 
 
 INSTALLATION
@@ -76,5 +84,5 @@ channel on irc.expertec.co.uk
 COPYRIGHT INFORMATION
 -----------------------------------
 
-Copyright © 2008-2011 TheHostingTool Development Team and Contributors
+Copyright Â© 2008-2011 TheHostingTool Development Team and Contributors
 TheHostingTool is licensed under the GNU-GPLv3. See COPYING.txt for license details.

@@ -47,6 +47,13 @@ class AJAX {
 			echo 0;
 			return;
 		}
+		else {
+			//If the first character is a number, then complain.
+			if(is_numeric(substr($main->getvar['user'], 0, 1))) {
+				echo 0;
+				return;
+			}
+		}
 		
 		if(!$main->getvar['user']) {
 			$_SESSION['check']['user'] = false;

@@ -206,6 +206,18 @@ class whm {
 		//return the result array
 		return $result;
 	}
+	public function changePwd($acct, $newpwd, $server)
+	{
+		$this->server = $server;
+		$action = '/xml-api/passwd?user=' . $acct . '&pass=' . $newpwd;
+		$command = $this->remote($action);
+		if($command->passwd->status == 1) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 }
 
 ?>

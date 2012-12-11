@@ -2,13 +2,13 @@
 //////////////////////////////
 // The Hosting Tool
 // Install Script
-// By Jonny H
+// By Jonny H and Kevin M
 // Released under the GNU-GPL
 //////////////////////////////
 
-//INSTAL GLOBALS
-define("CVER", "1.1.2");
-define("NVER", "1.2");
+//INSTALL GLOBALS
+define("CVER", "1.2");
+define("NVER", "1.2.1");
 
 define("LINK", "../includes/"); # Set link
 include(LINK."compiler.php"); # Get compiler

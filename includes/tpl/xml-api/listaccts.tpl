@@ -1,3 +1,0 @@
-<listaccts>
-%ACCOUNTS%
-</listaccts>

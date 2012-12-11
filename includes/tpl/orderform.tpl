@@ -225,7 +225,7 @@ function previousstep() {
               <tr>
                 <td width="25%">Username:</td>
                 <td width="10%"><input type="text" name="username" id="username" /></td>
-                <td width="1%" align="left"><a title="The username is your unique identity to your account. This is both your client account and control panel username." class="tooltip"><img src="<URL>themes/icons/information.png" /></a></td>
+                <td width="1%" align="left"><a title="The username is your unique identity to your account. This is both your client account and control panel username. Please keep it under 8 characters." class="tooltip"><img src="<URL>themes/icons/information.png" /></a></td>
                 <td width="62%" align="left" id="usercheck">&nbsp;</td>
               </tr>
               <tr>

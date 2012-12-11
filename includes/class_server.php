@@ -7,7 +7,7 @@
 //////////////////////////////
 
 class server {
-
+	
 	private $servers = array(); # All the servers in a array
 	
 	# Start the Functions #
@@ -286,6 +286,36 @@ class server {
 				$db->query("UPDATE `<PRE>user_packs` SET `status` = '2' WHERE `id` = '{$data['id']}'");
 				$emaildata = $db->emailTemplate("suspendacc");
 				$email->send($data2['email'], $emaildata['subject'], $emaildata['content']);
+				return true;
+			}
+			else {
+				return false;	
+			}
+		}
+	}
+	public function changePwd($id, $newpwd) { # Suspends a user account from the package ID
+		global $db, $main, $type, $email;
+		$query = $db->query("SELECT * FROM `<PRE>user_packs` WHERE `id` = '{$db->strip($id)}'");
+		if($db->num_rows($query) == 0) {
+			$array['Error'] = "That package doesn't exist!";
+			$array['User PID'] = $id;
+			$main->error($array);
+			return;
+		}
+		else {
+			$data = $db->fetch_array($query);
+			$query2 = $db->query("SELECT * FROM `<PRE>users` WHERE `id` = '{$db->strip($data['userid'])}'");
+			$data2 = $db->fetch_array($query2);
+			$server = $type->determineServer($data['pid']);
+			global $serverphp;
+			if(!is_object($this->servers[$server]) && !$serverphp) {
+				$this->servers[$server] = $this->createServer($data['pid']); # Create server class
+				$donestuff = $this->servers[$server]->changePwd($data2['user'], $newpwd, $server);
+			}
+			else {
+				$donestuff = $serverphp->changePwd($data2['user'], $newpwd, $server);
+			}
+			if($donestuff == true) {
 				return true;
 			}
 			else {

@@ -55,6 +55,10 @@ function kthx() {
         <td width="1%" align="center"><img src="<URL>themes/icons/email.png" /></td>
         <td align="left"><a href="?page=users&amp;sub=search&amp;do=%ID%&amp;func=email">Email User</a></td>
       </tr>
+      <tr>
+        <td width="1%" align="center"><img src="<URL>themes/icons/user_edit.png" /></td>
+        <td align="left"><a href="?page=users&amp;sub=search&amp;do=%ID%&amp;func=passwd">Change Password</a></td>
+      </tr>
     </table>
     </div>
     </td>

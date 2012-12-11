@@ -38,63 +38,63 @@ class Ajax {
 		}
 	}
 	
-	public function usercheck() {
+	public function usernamecheck() {
 		global $main;
 		global $db;
 		
 		//If it's over 8 characters then complain.
-		if(strlen($main->getvar['user']) > 8) {
+		if(strlen($main->getvar['username']) > 8) {
 			echo 0;
 			return;
 		}
 		//If it's less than 4 characters then complain.
-		if(strlen($main->getvar['user']) < 4) {
+		if(strlen($main->getvar['username']) < 4) {
 			echo 0;
 			return;
 		}
 		else {
 			//If the first character is a number, then complain.
-			if(is_numeric(substr($main->getvar['user'], 0, 1))) {
+			if(is_numeric(substr($main->getvar['username'], 0, 1))) {
 				echo 0;
 				return;
 			}
 		}
 		// Alphanumeric only plz.
-		if(!preg_match("/^([0-9a-zA-Z])+$/",$main->getvar['user'])) {
+		if(!preg_match("/^([0-9a-zA-Z])+$/",$main->getvar['username'])) {
 			echo 0;
 			return;
 		}
-		if(!$main->getvar['user']) {
-			$_SESSION['check']['user'] = false;
+		if(!$main->getvar['username']) {
+			$_SESSION['check']['username'] = false;
 		   echo 0;
 		}
 		else {
 			$query = $db->query("SELECT * FROM `<PRE>users` WHERE `user` = '{$main->getvar['user']}'");
 			if($db->num_rows($query) == 0) {
-				$_SESSION['check']['user'] = true;
+				$_SESSION['check']['username'] = true;
 				echo 1;	
 			}
 			else {
-				$_SESSION['check']['user'] = false;
+				$_SESSION['check']['username'] = false;
 				echo 0;	
 			}
 		}
 	}
-	public function passcheck() {
+	public function passwordcheck() {
 		global $main;
-		if($main->getvar['pass'] == ":") {
-			$_SESSION['check']['pass'] = false;
+		if($main->getvar['password'] == ":") {
+			$_SESSION['check']['password'] = false;
 		   echo 0;
 		   return;
 		}
 		else {
-			$pass = explode(":", $main->getvar['pass']);
+			$pass = explode(":", $main->getvar['password']);
 			if($pass[0] == $pass[1]) {
-				$_SESSION['check']['pass'] = true;
+				$_SESSION['check']['password'] = true;
 				echo 1;	
 			}
 			else {
-				$_SESSION['check']['pass'] = false;
+				$_SESSION['check']['password'] = false;
 				echo 0;	
 			}
 		}
@@ -233,7 +233,7 @@ class Ajax {
 	}
 	
 	public function clientcheck() {
-		if($_SESSION['check']['email'] == true && $_SESSION['check']['user'] == true && $_SESSION['check']['pass'] == true && $_SESSION['check']['human'] == true && $_SESSION['check']['address'] == true && $_SESSION['check']['state'] == true && $_SESSION['check']['zip'] == true && $_SESSION['check']['phone'] == true) {
+		if($_SESSION['check']['email'] == true && $_SESSION['check']['username'] == true && $_SESSION['check']['password'] == true && $_SESSION['check']['human'] == true && $_SESSION['check']['address'] == true && $_SESSION['check']['state'] == true && $_SESSION['check']['zip'] == true && $_SESSION['check']['phone'] == true) {
 			echo 1;	
 		}
 		else {
@@ -389,7 +389,6 @@ class Ajax {
 							$array['IMG'] = "exclamation.png";
 						}
 						elseif($client['status'] == "3") {
-							//Fixes caption added by J.Montoya
 							$array['TEXT'] = "Validate";
 							$array['FUNC'] = "none";	
 							$array['IMG'] = "user_suit.png";
@@ -558,11 +557,13 @@ class Ajax {
 				}
 			}
 			else {
-				echo "Eh? Fatal Error Debug: ". $main->getvar['type'];
+				echo "Fatal Error Debug: ". $main->getvar['type'];
 			}
-			$ver = mysql_real_escape_string($_GET['version']);
-			$query = mysql_query("UPDATE `{$sql['pre']}config` SET `value` = '{$ver}' WHERE `name` = 'version'");
-			if(!$query) {
+			$vname = mysql_real_escape_string($_GET['vname']);
+			$vcode = mysql_real_escape_string($_GET['vcode']);
+			$query = mysql_query("UPDATE `{$sql['pre']}config` SET `value` = '{$vname}' WHERE `name` = 'vname'");
+			$query2 = mysql_query("UPDATE `{$sql['pre']}config` SET `value` = '{$vcode}' WHERE `name` = 'vcode'");
+			if(!$query || !$query2) {
 				echo '<div class="errors">There was a problem editing your script version!</div>';
 			}
 			if($main->getvar['type'] == "install") {
@@ -593,7 +594,6 @@ class Ajax {
 	private function installsql($data, $pre, $con = 0) {
 		global $style, $db;
 		$array['PRE'] = $pre;
-                $array['API-KEY'] = hash('sha512', $this->randomString());
 		$sContents = $style->replaceVar($data, $array);
 		// replace slash quotes so they don't get in the way during parse
 		// tried a replacement array for this but it didn't work
@@ -838,24 +838,8 @@ class Ajax {
                     //We have to do some special stuff for the footer.
                     //This gets complex. But it works. I might simplify it sometime.
                     if($file == "footer") {
-                        $foundcopy = false;
-                        $diemsg = 'Trying to remove the copyright? No thanks.';
-                        if(!strstr($contents, '<COPYRIGHT>')) {
-                            $slash = str_replace("&lt;COPYRIGHT&gt;", "<COPYRIGHT>", $slash);
-                            if(!strstr($slash, '<COPYRIGHT>')) {
-                                die($diemsg);
-                            }
-                            else {
-                                $foundcopy = true;
-                            }
-                        }
-                        else {
-                            $foundcopy = true;
-                        }
-                        if($foundcopy == true) {
-                            $slash = stripslashes(str_replace("&lt;PAGEGEN&gt;", "<PAGEGEN>", $slash)); # Yay, strip it
-                            //$slash = str_replace("&lt;COPYRIGHT&gt;", "<COPYRIGHT>", $slash);
-                        }
+						$slash = str_replace("&lt;COPYRIGHT&gt;", "<COPYRIGHT>", $slash);
+						$slash = stripslashes(str_replace("&lt;PAGEGEN&gt;", "<PAGEGEN>", $slash));
                     }
                     $slash = stripslashes(str_replace("&lt;THT TITLE&gt;", "<THT TITLE>", $slash)); # Yay, strip it
                     $slash = str_replace("&lt;JAVASCRIPT&gt;", "<JAVASCRIPT>", $slash); #jav
@@ -1108,7 +1092,7 @@ if(isset($_REQUEST['function']) and $_REQUEST['function'] != "") {
 	$Ajax = new Ajax();
 	if(method_exists($Ajax, $_REQUEST['function'])) {
 		$Ajax->{$_REQUEST['function']}();
-		include(LINK."output.php");
+		require(LINK."output.php");
 	}
 }
 

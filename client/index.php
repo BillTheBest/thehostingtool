@@ -40,10 +40,10 @@ function client() {
 			// Main Side Bar HTML
 			$nav = "Sidebar";
 			if(!$db->config("delacc")) {
-				$sub = $db->query("SELECT * FROM `<PRE>clientnav` WHERE `link` != 'delete'");
+				$sub = $db->query("SELECT * FROM `<PRE>clientnav` WHERE `link` != 'delete' ORDER BY `weight` ASC");
 			}
 			else {
-				$sub = $db->query("SELECT * FROM `<PRE>clientnav`");
+				$sub = $db->query("SELECT * FROM `<PRE>clientnav` ORDER BY `weight` ASC");
 			}
 			while($row = $db->fetch_array($sub)) {
 				$array2['IMGURL'] = $row['icon'];
@@ -114,13 +114,7 @@ function client() {
 				}
 			}
 			else {
-				if(isset($main->getvar['sub'])) {
-					ob_start();
-					$content->content();
-					$html = ob_get_contents(); # Retrieve the HTML
-					ob_clean(); # Flush the HTML
-				}
-				elseif($content->navlist) {
+				if($content->navlist && !isset($main->getvar['sub'])) {
 					$html = "Select a sub-page from the sidebar.";
 				}
 				else {
@@ -228,6 +222,14 @@ if(!$_SESSION['clogged']) {
 	}
 }
 elseif($_SESSION['clogged']) {
+	// Check if user still exists
+	$user = $db->fetch_array($db->query("SELECT COUNT(*) FROM `<PRE>users` WHERE `id` = '{$db->strip($_SESSION['cuser'])}'"));
+	if((int)$user[0] === 0) {
+		// Oh dear.
+		session_destroy();
+		$main->redirect("?page=home");
+	}
+	unset($user);
 	if(!$main->getvar['page']) {
 		$main->getvar['page'] = "home";
 	}

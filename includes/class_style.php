@@ -1,7 +1,7 @@
 <?php
 //////////////////////////////
 // The Hosting Tool
-// Database (mySQL) Class
+// Database (MySQL) Class
 // By Jonny H
 // Released under the GNU-GPL
 //////////////////////////////
@@ -66,7 +66,7 @@ class style {
 		$css .= $this->prepareCSS($this->getFile("style.css", 0, 0));
 		$css .= '</style>' . "\n";
 		if(FOLDER != "install" && FOLDER != "includes") {
-	        $css .= '<link rel="stylesheet" href="'.URL.'includes/css/'.$db->config('ui-theme').'/jquery-ui.css" type="text/css" />';
+	        $css .= '<link rel="stylesheet" href="'.URL.'includes/css/'.(INSTALL?$db->config('ui-theme'):'cupertino').'/jquery-ui.css" type="text/css" />';
 		}
 		return $css;
 	}
@@ -88,7 +88,7 @@ class style {
 			while (false !== ($file = readdir($handle))) { # Read the files
 				if($file != "." && $file != ".." && $file != "jquery.js" && $file != "simpletip.js") { # Check aren't these names
 					$base = explode(".", $file); # Explode the file name, for checking
-					if($base[1] == "js") { # Is it a JS?
+					if($base[count($base)-1] == "js") { # Is it a JS?
 						$html .= "<script type=\"text/javascript\" src='".URL."includes/javascript/{$file}'></script>\n"; # Creates the HTML
 					}
 				}
@@ -113,6 +113,33 @@ class style {
             $notice .= '</em></strong>';
             return $notice;
         }
+        
+        // Returns a form input element according to the parameters given
+        public function createInput($type, $name, $value = "", $extra = array(), $options = array()) {
+			$type = strtolower(trim($type));
+			$extraHtml = "";
+			foreach($extra as $k => $v) {
+				$extraHtml .= $k.'="'.$v.'" ';
+			}
+			switch($type) {
+				case "textarea":
+					return '<textarea name="'.$name.'" '.$extraHtml.'>'.htmlspecialchars($value).'</textarea>';
+					break;
+				case "select":
+					$return = '<select name="'.$name.'" '.$extraHtml.'>';
+					foreach($options as $o) {
+						if(array_key_exists("disabled", $o) && $o["disabled"]) { $d = " disabled"; } else { $d = ""; }
+						if(array_key_exists("selected", $o) && $o["selected"]) { $s = " selected"; } else { $s = ""; }
+						$return .= '<option value="'.$o["value"].'"'.$d.$s.'>'.$o["text"].'</option>';
+					}
+					$return .= '</select>';
+					return $return;
+					break;
+				default:
+					return '<input type="'.$type.'" name="'.$name.'" value="'.$value.'" '.$extraHtml.'/>';
+					break;
+			}
+		}
 
 	//Obsolete Functions...
 

@@ -7,14 +7,14 @@
 //////////////////////////////
 
 //Are we being called by the script?
-if(THT != 1){die("FATAL: Trying to hack?");}
+if(THT != 1){die();}
 
 //MAIN SQL CONFIG - Change values accordingly
-$sql['host'] = "%HOST%"; #The mySQL Host, usually default - localhost
-$sql['user'] = "%USER%"; #The mySQL Username
-$sql['pass'] = "%PASS%"; #The mySQL Password
-$sql['db'] = "%DB%"; #The mySQL DB, remember to have your username prefix
-$sql['pre'] = "%PRE%"; #The mySQL Prefix, usually default unless otherwise
+$sql['host'] = '%HOST%'; #The MySQL Host, usually default - localhost
+$sql['user'] = '%USER%'; #The MySQL Username
+$sql['pass'] = '%PASS%'; #The MySQL Password
+$sql['db'] = '%DB%'; #The MySQL DB, remember to have your username prefix
+$sql['pre'] = '%PRE%'; #The MySQL Prefix, usually default unless otherwise
 
 //LEAVE
 $sql['install'] = %TRUE%;

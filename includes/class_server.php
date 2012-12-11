@@ -8,12 +8,12 @@
 
 class server {
 	
-	private $servers = array(); # All the servers in a array
+	private $servers = array(); // All the servers in a array
 	
-	# Start the Functions #
-	private function createServer($package) { # Returns the server class for the desired package
+	// Start the Functions #
+	private function createServer($package) { // Returns the server class for the desired package
 		global $type, $main;
-		$server = $type->determineServerType($type->determineServer($package)); # Determine server
+		$server = $type->determineServerType($type->determineServer($package)); // Determine server
 		if($this->servers[$server]) {
 			return;	
 		}
@@ -26,24 +26,24 @@ class server {
 			return;	
 		}
 		else {
-			include($link); # Get the server
+			include($link); // Get the server
 			$serverphp = new $server;
 			return $serverphp;
 		}
 	}
 	
-	public function signup() { # Echos the result of signup for ajax
+	public function signup() { // Echos the result of signup for ajax
 		global $main;
 		global $db;
 		global $type;
 			
 		//Check details
-		$query = $db->query("SELECT * FROM `<PRE>packages` WHERE `id` = '{$main->getvar['package']}' AND `is_disabled` = 0"); # Package disabled?
+		$query = $db->query("SELECT * FROM `<PRE>packages` WHERE `id` = '{$main->getvar['package']}' AND `is_disabled` = 0"); // Package disabled?
 		if($db->num_rows($query) != 1) {
 			echo "Package is disabled.!";
 			return;
 		}
-		if($main->getvar['domain'] == "dom") { # If Domain
+		if($main->getvar['domain'] == "dom") { // If Domain
 			if(!$main->getvar['cdom']) {
 				echo "Please fill in the domain field!";
 				return;
@@ -54,7 +54,7 @@ class server {
 					echo "Your domain is the wrong format!";	
 					return;
 				}
-				if ($db->config("tldonly")) { # Are we alowing TLD's Only?
+				if ($db->config("tldonly")) { // Are we alowing TLD's Only?
 					$ttlparts = count($data);
 					if ($ttlparts > 2)
 					{
@@ -63,12 +63,12 @@ class server {
 							echo "We only allow Top Level Domains (.com/.net/.org, etc)";
 							return;
 						}
-					} # If we get past this, its a top level domain :D yay
+					} // If we get past this, its a top level domain :D yay
 				}
 			}
 			$main->getvar['fdom'] = $main->getvar['cdom'];
 		}
-		if($main->getvar['domain'] == "sub") { # If Subdomain
+		if($main->getvar['domain'] == "sub") { // If Subdomain
 			if(!$main->getvar['csub']) {
 				echo "Please fill in the subdomain field!";
 				return;
@@ -196,6 +196,7 @@ class server {
 		foreach($main->getvar as $key => $value) {
 			$data = explode("_", $key);
 			if($data[0] == "type") {
+                $additional = "";
 				if($n) {
 					$additional .= ",";	
 				}
@@ -204,11 +205,11 @@ class server {
 			}
 		}
 		$main->getvar['fplan'] = $type->determineBackend($main->getvar['package']);
-		$serverphp = $this->createServer($main->getvar['package']); # Create server class
+		$serverphp = $this->createServer($main->getvar['package']); // Create server class
 		$pquery2 = $db->query("SELECT * FROM `<PRE>packages` WHERE `id` = '{$main->getvar['package']}'");
 		$pname2 = $db->fetch_array($pquery2);
 		$done = $serverphp->signup($type->determineServer($main->getvar['package']), $pname2['reseller']);
-		if($done == true) { # Did the signup pass?
+		if($done == true) { // Did the signup pass?
 			$date = time();
 			$ip = $_SERVER['REMOTE_ADDR'];
 			$salt = md5(rand(0,9999999));
@@ -230,7 +231,7 @@ class server {
 													  '{$main->getvar['zip']}',
 													  '{$main->getvar['country']}',
 													  '{$main->getvar['phone']}',
-													  '3')");
+													  '1')");
 			$db->query("INSERT INTO `<PRE>users_bak` (user, email, password, salt, signup, ip, firstname, lastname, address, city, state, zip, country, phone) VALUES(
 													  '{$main->getvar['username']}',
 													  '{$main->getvar['email']}',
@@ -282,7 +283,13 @@ class server {
 				$array['PASS'] = $main->getvar['password']; 
 				$array['EMAIL'] = $main->getvar['email'];
 				$array['DOMAIN'] = $main->getvar['fdom'];
-				$array['CONFIRM'] = $url . "client/confirm.php?u=" . $newusername . "&c=" . $date;
+				$emailval = (bool)$db->config("emailval");
+				if($emailval) {
+					$id = $data['id'];
+					$code = sha1($id.mt_rand(0,99999).$newusername.microtime().$main->getvar['email']);
+					$db->query("UPDATE `<PRE>users` SET `confirmcode` = '{$code}' WHERE `id` = '{$id}'");
+					$array['CONFIRM'] = $url . "client/confirm.php?i={$id}&u={$newusername}&c={$code}";
+				}
 				
 				//Get plan email friendly name
 				$pquery = $db->query("SELECT * FROM `<PRE>packages` WHERE `id` = '{$main->getvar['package']}'");
@@ -292,8 +299,8 @@ class server {
 				$puser = $db->query("SELECT * FROM `<PRE>user_packs` WHERE `userid` = '{$data['id']}'");
 				$puser2 = $db->fetch_array($puser);
 				if($pname['admin'] == 0) {
-					$emaildata = $db->emailTemplate("newacc");
-					echo "<strong>Your account has been completed!</strong><br />You may now use the client login bar to see your client area or proceed to your control panel. An email has been dispatched to the address on file.";
+					$emaildata = $db->emailTemplate($emailval?"newaccval":"newacc");
+					echo "<strong>Your account has been created!</strong><br />You may now use the client login bar to see your client area or proceed to your control panel. An email has been dispatched to the address on file.";
 					if($type->determineType($main->getvar['package']) == "paid") {
 						echo " This will apply only when you've made payment.";	
 						$_SESSION['clogged'] = 1;
@@ -302,9 +309,9 @@ class server {
 					$donecorrectly = true;
 				}
 				elseif($pname['admin'] == 1) {
-					if($serverphp->suspend($main->getvar['username'], $type->determineServer($main->getvar['package'])) == true) {
+					if($serverphp->suspend($main->getvar['username'], $type->determineServer($main->getvar['package']), 'TheHostingTool: Awaiting Admin Validation') == true) {
 						$db->query("UPDATE `<PRE>user_packs` SET `status` = '3' WHERE `id` = '{$puser2['id']}'");
-						$emaildata = $db->emailTemplate("newaccadmin");
+						$emaildata = $db->emailTemplate($emailval?"newaccadminval":"newaccadmin");
 						$emaildata2 = $db->emailTemplate("adminval");
 						$email->staff($emaildata2['subject'], $emaildata2['content']);
 						echo "<strong>Your account is awaiting admin validation!</strong><br />An email has been dispatched to the address on file. You will recieve another email when the admin has overlooked your account.";
@@ -337,7 +344,7 @@ class server {
 			}
 		}
 	}
-	public function terminate($id, $reason = false) { # Deletes a user account from the package ID
+	public function terminate($id, $reason = false) { // Deletes a user account from the package ID
 		global $db, $main, $type, $email;
 		$query = $db->query("SELECT * FROM `<PRE>user_packs` WHERE `id` = '{$db->strip($id)}'");
 		if($db->num_rows($query) == 0) {
@@ -352,7 +359,7 @@ class server {
 			$data2 = $db->fetch_array($query2);
 			$server = $type->determineServer($data['pid']);
 			if(!is_object($this->servers[$server])) {
-				$this->servers[$server] = $this->createServer($data['pid']); # Create server class
+				$this->servers[$server] = $this->createServer($data['pid']); // Create server class
 			}
 			if($this->servers[$server]->terminate($data2['user'], $server) == true) {
 				$date = time();
@@ -373,7 +380,7 @@ class server {
 			}
 		}
 	}
-	public function cancel($id, $reason = false) { # Deletes a user account from the package ID
+	public function cancel($id, $reason = false) { // Deletes a user account from the package ID
 		global $db, $main, $type, $email;
 		$query = $db->query("SELECT * FROM `<PRE>user_packs` WHERE `id` = '{$db->strip($id)}' AND `status` != '9'");
 		if($db->num_rows($query) == 0) {
@@ -388,7 +395,7 @@ class server {
 			$data2 = $db->fetch_array($query2);
 			$server = $type->determineServer($data['pid']);
 			if(!is_object($this->servers[$server])) {
-				$this->servers[$server] = $this->createServer($data['pid']); # Create server class
+				$this->servers[$server] = $this->createServer($data['pid']); // Create server class
 			}
 			if($this->servers[$server]->terminate($data2['user'], $server) == true) {
 				$date = time();
@@ -409,7 +416,7 @@ class server {
 			}
 		}
 	}
-	public function decline($id) { # Deletes a user account from the package ID
+	public function decline($id) { // Deletes a user account from the package ID
 		global $db, $main, $type, $email;
 		$query = $db->query("SELECT * FROM `<PRE>user_packs` WHERE `id` = '{$db->strip($id)}' AND `status` != '9'");
 		if($db->num_rows($query) == 0) {
@@ -424,15 +431,15 @@ class server {
 			$data2 = $db->fetch_array($query2);
 			$server = $type->determineServer($data['pid']);
 			if(!is_object($this->servers[$server])) {
-				$this->servers[$server] = $this->createServer($data['pid']); # Create server class
+				$this->servers[$server] = $this->createServer($data['pid']); // Create server class
 			}
 			if($this->servers[$server]->terminate($data2['user'], $server) == true) {
 				$date = time();
 				$emaildata = $db->emailTemplate("cancelacc");
 				$array['REASON'] = "Account Declined.";
 				$email->send($data2['email'], $emaildata['subject'], $emaildata['content'], $array);
-				$db->query("UPDATE `<PRE>user_packs` SET `status` = '9' WHERE `id` = '{$data['id']}'");
-				$db->query("UPDATE `<PRE>users` SET `status` = '9' WHERE `id` = '{$db->strip($data['userid'])}'");
+				$db->query("DELETE FROM `<PRE>user_packs` WHERE `id` = '{$data['id']}'");
+				$db->query("DELETE FROM `<PRE>users` WHERE `id` = '{$db->strip($data['userid'])}'");
 				$db->query("INSERT INTO `<PRE>logs` (uid, loguser, logtime, message) VALUES(
 													  '{$db->strip($data['userid'])}',
 													  '{$data2['user']}',
@@ -445,7 +452,7 @@ class server {
 			}
 		}
 	}
-	public function suspend($id, $reason = false) { # Suspends a user account from the package ID
+	public function suspend($id, $reason = false) { // Suspends a user account from the package ID
 		global $db, $main, $type, $email;
 		$query = $db->query("SELECT * FROM `<PRE>user_packs` WHERE `id` = '{$db->strip($id)}' AND `status` = '1'");
 		if($db->num_rows($query) == 0) {
@@ -460,13 +467,14 @@ class server {
 			$data2 = $db->fetch_array($query2);
 			$server = $type->determineServer($data['pid']);
 			global $serverphp;
-			if(!is_object($this->servers[$server]) && !$serverphp) {
-				$this->servers[$server] = $this->createServer($data['pid']); # Create server class
-				$donestuff = $this->servers[$server]->suspend($data2['user'], $server, $reason);
+			$activeserv = $serverphp;
+			if(is_object($this->servers[$server])) {
+				$activeserv = $this->servers[$server];
 			}
-			else {
-				$donestuff = $serverphp->suspend($data2['user'], $server, $reason);
+			elseif(!$serverphp) {
+				$activeserv = $this->servers[$server] = $this->createServer($data['pid']); // Create server class
 			}
+			$donestuff = $activeserv->suspend($data2['user'], $server, $reason);
 			if($donestuff == true) {
 				$date = time();
 				$db->query("UPDATE `<PRE>user_packs` SET `status` = '2' WHERE `id` = '{$data['id']}'");
@@ -485,7 +493,7 @@ class server {
 			}
 		}
 	}
-	public function changePwd($id, $newpwd) { # Changes user's password.
+	public function changePwd($id, $newpwd) { // Changes user's password.
 		global $db, $main, $type, $email;
 		$query = $db->query("SELECT * FROM `<PRE>user_packs` WHERE `id` = '{$db->strip($id)}'");
 		if($db->num_rows($query) == 0) {
@@ -501,13 +509,13 @@ class server {
 			$server = $type->determineServer($data['pid']);
 			global $serverphp;
 			if(!is_object($this->servers[$server]) && !$serverphp) {
-				$this->servers[$server] = $this->createServer($data['pid']); # Create server class
+				$this->servers[$server] = $this->createServer($data['pid']); // Create server class
 				$donestuff = $this->servers[$server]->changePwd($data2['user'], $newpwd, $server);
 			}
 			else {
 				$donestuff = $serverphp->changePwd($data2['user'], $newpwd, $server);
 			}
-			if($donestuff == true) {
+			if($donestuff === true) {
 				$date = time();
 				$db->query("INSERT INTO `<PRE>logs` (uid, loguser, logtime, message) VALUES(
 													  '{$db->strip($data['userid'])}',
@@ -516,13 +524,11 @@ class server {
 													  'cPanel password updated.')");
 				return true;
 			}
-			else {
-				return false;	
-			}
+            return $donestuff;
 		}
 	}
 	
-	public function unsuspend($id) { # Unsuspends a user account from the package ID
+	public function unsuspend($id) { // Unsuspends a user account from the package ID
 		global $db, $main, $type, $email;
 		$query = $db->query("SELECT * FROM `<PRE>user_packs` WHERE `id` = '{$db->strip($id)}' AND (`status` = '2' OR `status` = '3' OR `status` = '4')");
 		if($db->num_rows($query) == 0) {
@@ -537,7 +543,7 @@ class server {
 			$data2 = $db->fetch_array($query2);
 			$server = $type->determineServer($data['pid']);
 			if(!is_object($this->servers[$server])) {
-				$this->servers[$server] = $this->createServer($data['pid']); # Create server class
+				$this->servers[$server] = $this->createServer($data['pid']); // Create server class
 			}
 			if($this->servers[$server]->unsuspend($data2['user'], $server) == true) {
 				$date = time();
@@ -558,12 +564,12 @@ class server {
 		}
 	}
 	
-	public function approve($id) { # Approves a user's account (Admin Validation).
+	public function approve($id) { // Approves a user's account (Admin Validation).
 		global $db, $main, $type, $email;
 		$query = $db->query("SELECT * FROM `<PRE>user_packs` WHERE `id` = '{$db->strip($id)}' AND (`status` = '2' OR `status` = '3' OR `status` = '4')");
 		$uquery = $db->query("SELECT * FROM `<PRE>users` WHERE `id` = '{$query['userid']}' AND (`status` = '1')");
 		if($db->num_rows($query) == 0 AND $db->num_rows($uquery) == 0) {
-			$array['Error'] = "That package doesn't exist or cannot be approved! (Did they confirm their e-mail?)";
+			$array['Error'] = "That package doesn't exist or cannot be approved!";
 			$array['User PID'] = $id;
 			$main->error($array);
 			return;	
@@ -574,7 +580,7 @@ class server {
 			$data2 = $db->fetch_array($query2);
 			$server = $type->determineServer($data['pid']);
 			if(!is_object($this->servers[$server])) {
-				$this->servers[$server] = $this->createServer($data['pid']); # Create server class
+				$this->servers[$server] = $this->createServer($data['pid']); // Create server class
 			}
 			if($this->servers[$server]->unsuspend($data2['user'], $server) == true) {
 				$date = time();
@@ -592,24 +598,51 @@ class server {
 		}
 	}
 	
-	public function confirm($username, $confirm) { # Set's user's account to Active when the unique link is visited.
-		global $db, $main, $type, $email;
-		$query = $db->query("SELECT * FROM `<PRE>users` WHERE `user` = '{$username}' AND `signup` = {$confirm} AND `status` = '3'");
+	// Confirms an email
+	public function confirm($id, $confirm, $user = null, $force = false) {
+		global $db, $main, $type;
+		$id = (int)$db->strip($id);
+		$confirm = $force?'':$db->strip($confirm);
+		if($user !== null) {
+			$user = $db->strip($user);
+		}
+		$query = $db->query("SELECT * FROM `<PRE>users` WHERE `id` = '{$id}' ".($force?'':"AND `confirmcode` = '{$confirm}'").($user!==null?" AND `user` = '{$user}'":''));
 		if($db->num_rows($query) == 0) {
-			$array['Error'] = "That package doesn't exist or cannot be confirmed!";
-			$main->error($array);
-			return false;	
+			return false;
+		}
+		$data = $db->fetch_array($query);
+		//$db->query("UPDATE `<PRE>users` SET `status` = '1' WHERE `user` = '{$username}'");
+		$add = "";
+		if($data['newemail'] !== null) {
+			$add = "`email` = '".$db->strip($data['newemail'])."', ";
+		}
+		$db->query("UPDATE `<PRE>users` SET {$add}`emailval` = 1, `confirmcode` = NULL, `newemail` = NULL WHERE `id` = {$id}");
+		$db->query("INSERT INTO `<PRE>logs` (uid, loguser, logtime, message) VALUES(
+											  '{$db->strip($data['userid'])}',
+											  '{$data['user']}',
+											  '".time()."',
+											  'Account/E-mail Confirmed ({$data['email']})')");
+		return true;
+	}
+	
+	public function testConnection($serverId) {
+		global $db;
+		$query = $db->query("SELECT `type` FROM `<PRE>servers` WHERE `id` = {$serverId}");
+		if($db->num_rows($query) == 0) {
+			return "There is no server with an id of {$serverId}";
 		}
 		else {
-			$data = $db->fetch_array($query);
-			$date = time();
-			$db->query("UPDATE `<PRE>users` SET `status` = '1' WHERE `user` = '{$username}'");
-			$db->query("INSERT INTO `<PRE>logs` (uid, loguser, logtime, message) VALUES(
-												  '{$db->strip($data['userid'])}',
-												  '{$data['user']}',
-												  '{$date}',
-												  'Account/E-mail Confirmed.')");
-			return true;
+				$data = $db->fetch_array($query);
+				$type = $data["type"];
+				$link = LINK."servers/".$type.".php";
+				if(!file_exists($link)) {
+					return "The server {$type}.php doesn't exist!";
+				}
+				else {
+					require_once($link);
+					$server = new $type($serverId);
+					return $server->testConnection();
+				}
 		}
 	}
 }

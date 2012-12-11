@@ -20,10 +20,10 @@ class db {
 		$this->sql = $sql; # Assign the settings to DB Class
 		$this->con = @mysql_connect($this->sql['host'], $this->sql['user'], $this->sql['pass']); #Connect to SQL
 		if(!$this->con) { # If SQL didn't connect
-			die("Fatal: Coudn't connect to mySQL, please check your details!");
+			die("Fatal: Coudn't connect to MySQL, please check your details!");
 		}
 		else {
-			$this->db = @mysql_select_db($this->sql['db'], $this->con); # Select the mySQL DB
+			$this->db = @mysql_select_db($this->sql['db'], $this->con); # Select the MySQL DB
 			if(!$this->db) {
 				die("Fatal: Couldn't select the database, check your db setting!");
 			}
@@ -36,7 +36,7 @@ class db {
 	private function error($name, $mysqlerror, $func) { #Shows a SQL error from main class
 		$error['Error'] = $name;
 		$error['Function'] = $func;
-		$error['mySQL Error'] = $mysqlerror;
+		$error['MySQL Error'] = $mysqlerror;
 		global $main;
 		$main->error($error);
 	}
@@ -45,9 +45,14 @@ class db {
 		$sql = preg_replace("/<PRE>/si", $this->prefix, $sql); #Replace prefix variable with right value
 		$sql = @mysql_query($sql, $this->con); # Run query
 		if(!$sql) {
-			$this->error("mySQL Query Failed", mysql_error(), __FUNCTION__); # Call Error
+			$this->error("MySQL Query Failed", mysql_error(), __FUNCTION__); # Call Error
 		}
 		return $sql; # Return SQL
+	}
+
+	// mysql_insert_id
+	public function insert_id() {
+		return @mysql_insert_id($sql);
 	}
 	
 	public function num_rows($sql) { # Runs a query and returns the rows
@@ -100,6 +105,10 @@ class db {
 	public function config($name) { # Returns a value of a config variable
 		$query = $this->query("SELECT * FROM `<PRE>config` WHERE `name` = '{$name}'");
 		if($this->num_rows($query) == 0) {
+			// Legacy version support
+			if(strtolower($name) == "vname") {
+				return $this->config("version");
+			}
 			$error['Error'] = "Couldn't Retrieve config value!";
 			$error['Config Name'] = $name;
 			global $main;

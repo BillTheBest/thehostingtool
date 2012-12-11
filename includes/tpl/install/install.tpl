@@ -32,7 +32,7 @@ function change() {
 			case 2:
 				document.getElementById("button3").disabled = true;
 				document.getElementById("button3").value = "Working...";
-				$.get("<AJAX>?function=sqlcheck&host="+document.getElementById("hostname").value+"&user="+document.getElementById("username").value+"&pass="+document.getElementById("password").value+"&db="+document.getElementById("database").value+"&pre="+document.getElementById("prefix").value, function(mydata) {
+				$.get("<AJAX>?function=sqlcheck&host="+encodeURIComponent(document.getElementById("hostname").value)+"&user="+encodeURIComponent(document.getElementById("username").value)+"&pass="+encodeURIComponent(document.getElementById("password").value)+"&db="+encodeURIComponent(document.getElementById("database").value)+"&pre="+encodeURIComponent(document.getElementById("prefix").value), function(mydata) {
 				document.getElementById("button3").disabled = false;
 				document.getElementById("button3").value = "Next Step";
 				//This if statement isn't really a big deal, but it adds some polish.
@@ -69,7 +69,7 @@ function change() {
 			case 4:
 				document.getElementById("button5").disabled = true;
 				document.getElementById("button5").value = "Working...";
-				$.get("<AJAX>?function=installfinal&user="+document.getElementById("staffusername").value+"&pass="+document.getElementById("staffpassword").value+"&email="+document.getElementById("email").value+"&name="+document.getElementById("name").value+"&url="+document.getElementById("url").value,
+				$.get("<AJAX>?function=installfinal&user="+encodeURIComponent(document.getElementById("staffusername").value)+"&pass="+encodeURIComponent(document.getElementById("staffpassword").value)+"&email="+encodeURIComponent(document.getElementById("email").value)+"&name="+encodeURIComponent(document.getElementById("name").value)+"&url="+encodeURIComponent(document.getElementById("url").value),
 					  function(finisheddata) {
 							document.getElementById("button5").disabled = false;
 							document.getElementById("button5").value = "Next Step";
@@ -119,7 +119,7 @@ function installstuff() {
 	else {
 		etc = "&type=install";	
 	}
-	$.get("<AJAX>?function=install&version=%VERSION%"+etc, function(myinstall) {
+	$.get("<AJAX>?function=install&vname="+encodeURIComponent('%VERSION%')+"&vcode="+encodeURIComponent('%VCODE%')+etc, function(myinstall) {
 		document.getElementById("step3").innerHTML = myinstall;
 	});	
 }
@@ -148,6 +148,7 @@ $(window).load(function () {
       </tr>
     </table></td>
     <td valign="top"><div class="table" style="margin-top:7px;">
+        <div class="cat">Welcome to TheHostingTool v%VERSION%</div>
         <div class="text" id="main">
         	<div id="step1" style="display:none;">
             <span class="errors">%ANYTHING%</span>
@@ -163,7 +164,7 @@ $(window).load(function () {
                     </label>
                     </td>
                     <td valign="middle" align="left">
-                    <a class="tooltip" title="Choose if you want to upgrade or install the script.<br /><b>Install:</b> This is for people who haven't installed the script prior to this. Or using different mySQL details.<br /><b>Upgrade:</b> This for people who have installed THT and are upgrading to a new version."><img src="<ICONDIR>information.png"></a>
+                    <a class="tooltip" title="Choose if you want to upgrade or install the script.<br /><b>Install:</b> This is for people who haven't installed the script prior to this. Or using different MySQL details.<br /><b>Upgrade:</b> This for people who have installed THT and are upgrading to a new version."><img src="<ICONDIR>information.png"></a>
                     </td>
                   </tr>
                   <tr>
@@ -184,22 +185,22 @@ $(window).load(function () {
                     <td width="20%">Hostname:</td>
                     <td><label>
                       <input name="hostname" type="text" id="hostname" value="localhost" />
-                    </label><a class="tooltip" title="This is the server url for mySQL. Usually localhost unless you want to use a external mySQL server."><img src="<ICONDIR>information.png"></a></td>
+                    </label><a class="tooltip" title="This is the server url for MySQL. Usually localhost unless you want to use a external MySQL server."><img src="<ICONDIR>information.png"></a></td>
                   </tr>
                    <tr>
-                    <td width="20%">mySQL Username:</td>
+                    <td width="20%">MySQL Username:</td>
                     <td><label>
                       <input name="username" type="text" id="username" />
-                    </label><a class="tooltip" title="This is your mySQL username. You can create these in your control panel."><img src="<ICONDIR>information.png"></a></td>
+                    </label><a class="tooltip" title="This is your MySQL username. You can create these in your control panel."><img src="<ICONDIR>information.png"></a></td>
                   </tr>
                   <tr>
-                    <td width="20%">mySQL Password:</td>
+                    <td width="20%">MySQL Password:</td>
                     <td><label>
                       <input name="password" type="password" id="password" />
-                    </label><a class="tooltip" title="This is the password for your mySQL account. This was entered on username creation."><img src="<ICONDIR>information.png"></a></td>
+                    </label><a class="tooltip" title="This is the password for your MySQL account. This was entered on username creation."><img src="<ICONDIR>information.png"></a></td>
                   </tr>
                      <tr>
-                    <td width="20%">mySQL Database:</td>
+                    <td width="20%">MySQL Database:</td>
                     <td><label>
                       <input name="database" type="text" id="database" />
                     </label><a class="tooltip" title="The database where the THT SQL will be inside. Includes your control panel username."><img src="<ICONDIR>information.png"></a></td>

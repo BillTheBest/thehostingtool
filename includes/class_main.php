@@ -12,6 +12,7 @@ if(THT != 1){die();}
 class main {
 	
 	public $postvar = array(), $getvar = array(), $requestvar = array(); # All post/get/request strings
+	public $cache = array(); // A place to cache the results (in memory) of time-consuming functions
 	
 	public function cleaninteger($var){ # Transforms an Integer Value (1/0) to a Friendly version (Yes/No)
 	     $patterns[0] = '/0/';
@@ -52,11 +53,13 @@ class main {
 	public function errors($error = 0) { # Shows error default, sets error if $error set
 		if(!$error) {
 			if($_SESSION['errors']) {
-				return $_SESSION['errors'];
+                return implode(unserialize($_SESSION['errors']));
 			}
 		}
 		else {
-			$_SESSION['errors'] = $error;
+            $errors = unserialize($_SESSION['errors']);
+            $errors[] = $error;
+			$_SESSION['errors'] = serialize($errors);
 		}
 	}
 	
@@ -105,6 +108,8 @@ class main {
 	
 	public function done() { # Redirects the user to the right part
 		global $main;
+        $url = "";
+        $i = false;
 		foreach($main->getvar as $key => $value) {
 			if($key != "do") {
 				if($i) {
@@ -120,15 +125,11 @@ class main {
 	}
 	
 	public function check_email($email) {
-		if($this->validEmail($email)) {
-			return true;
-		}
-		else {
-			return false;
-		}
+        return $this->validEmail($email);
 	}
 	
 	public function dropDown($name, $values, $default = 0, $top = 1, $class = "") { # Returns HTML for a drop down menu with all values and selected
+        $html = "";
 		if($top) {
 			$html .= '<select name="'.$name.'" id="'.$name.'" class="'.$class.'">';
 		}
@@ -313,79 +314,10 @@ class main {
 		
 		return mktime(0,0,0,$endMonth,$day,$year);
 	}
-	
-	/**
-	* Validate an email address.
-	* Provide email address (raw input)
-	* Returns true if the email address has the email 
-	* address format and the domain exists.
-	* Thank you, Linux Journal!
-	* http://www.linuxjournal.com/article/9585
-	*/
+
 	public function validEmail($email)
 	{
-	   $isValid = true;
-	   $atIndex = strrpos($email, "@");
-	   if (is_bool($atIndex) && !$atIndex)
-	   {
-		  $isValid = false;
-	   }
-	   else
-	   {
-		  $domain = substr($email, $atIndex+1);
-		  $local = substr($email, 0, $atIndex);
-		  $localLen = strlen($local);
-		  $domainLen = strlen($domain);
-		  if ($localLen < 1 || $localLen > 64)
-		  {
-			 // local part length exceeded
-			 $isValid = false;
-		  }
-		  else if ($domainLen < 1 || $domainLen > 255)
-		  {
-			 // domain part length exceeded
-			 $isValid = false;
-		  }
-		  else if ($local[0] == '.' || $local[$localLen-1] == '.')
-		  {
-			 // local part starts or ends with '.'
-			 $isValid = false;
-		  }
-		  else if (preg_match('/\\.\\./', $local))
-		  {
-			 // local part has two consecutive dots
-			 $isValid = false;
-		  }
-		  else if (!preg_match('/^[A-Za-z0-9\\-\\.]+$/', $domain))
-		  {
-			 // character not valid in domain part
-			 $isValid = false;
-		  }
-		  else if (preg_match('/\\.\\./', $domain))
-		  {
-			 // domain part has two consecutive dots
-			 $isValid = false;
-		  }
-		  else if
-	(!preg_match('/^(\\\\.|[A-Za-z0-9!#%&`_=\\/$\'*+?^{}|~.-])+$/',
-					 str_replace("\\\\","",$local)))
-		  {
-			 // character not valid in local part unless 
-			 // local part is quoted
-			 if (!preg_match('/^"(\\\\"|[^"])+"$/',
-				 str_replace("\\\\","",$local)))
-			 {
-				$isValid = false;
-			 }
-		  }
-		  if ($isValid && !(checkdnsrr($domain,"MX") || 
-	 checkdnsrr($domain,"A")))
-		  {
-			 // domain not found in DNS
-			 $isValid = false;
-		  }
-	   }
-	   return $isValid;
+       return (bool)preg_match('/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i', $email);
 	}
 	
 	/*
@@ -428,14 +360,14 @@ class main {
 	}
 	
         /*
-        * Converts two-letter country codes to their full names.
-        * This will probably come in handy considering we use the two-letter
-        * country code format to store countries in the database.
-        * I had to compress this code a bit so it wouldn't be too lengthy.
-        * Original Snippet: http://snipplr.com/view/36868/php-country-code--to-country-name-list/
-        */
+         * Converts two-letter country codes to their full names.
+         * This will probably come in handy considering we use the two-letter
+         * country code format to store countries in the database.
+         * I had to compress this code a bit so it wouldn't be too lengthy.
+         * Adapted from http://snipplr.com/view/36868/php-country-code--to-country-name-list/
+         */
 	public function country_code_to_country($code) {
-		$country = '';
+		$country = ''; $code = strtoupper($code);
 		if($code=='AF')$country='Afghanistan';if($code=='AX')$country='Aland Islands';if($code=='AL')$country='Albania';if($code=='DZ')$country='Algeria';if($code=='AS')$country='American Samoa';if($code=='AD')$country='Andorra';if($code=='AO')$country='Angola';if($code=='AI')$country='Anguilla';if($code=='AQ')$country='Antarctica';if($code=='AG')$country='Antigua and Barbuda';if($code=='AR')$country='Argentina';if($code=='AM')$country='Armenia';if($code=='AW')$country='Aruba';if($code=='AU')$country='Australia';if($code=='AT')$country='Austria';if($code=='AZ')$country='Azerbaijan';if($code=='BS')$country='Bahamas the';if($code=='BH')$country='Bahrain';if($code=='BD')$country='Bangladesh';if($code=='BB')$country='Barbados';if($code=='BY')$country='Belarus';if($code=='BE')$country='Belgium';if($code=='BZ')$country='Belize';if($code=='BJ')$country='Benin';if($code=='BM')$country='Bermuda';if($code=='BT')$country='Bhutan';if($code=='BO')$country='Bolivia';if($code=='BA')$country='Bosnia and Herzegovina';if($code=='BW')$country='Botswana';if($code=='BV')$country='Bouvet Island (Bouvetoya)';if($code=='BR')$country='Brazil';if($code=='IO')$country='British Indian Ocean Territory (Chagos Archipelago)';if($code=='VG')$country='British Virgin Islands';if($code=='BN')$country='Brunei Darussalam';if($code=='BG')$country='Bulgaria';if($code=='BF')$country='Burkina Faso';if($code=='BI')$country='Burundi';if($code=='KH')$country='Cambodia';if($code=='CM')$country='Cameroon';if($code=='CA')$country='Canada';
 		if($code=='CV')$country='Cape Verde';if($code=='KY')$country='Cayman Islands';if($code=='CF')$country='Central African Republic';if($code=='TD')$country='Chad';if($code=='CL')$country='Chile';if($code=='CN')$country='China';if($code=='CX')$country='Christmas Island';if($code=='CC')$country='Cocos (Keeling) Islands';if($code=='CO')$country='Colombia';if($code=='KM')$country='Comoros the';if($code=='CD')$country='Congo';if($code=='CG')$country='Congo the';if($code=='CK')$country='Cook Islands';if($code=='CR')$country='Costa Rica';if($code=='CI')$country='Cote d\'Ivoire';if($code=='HR')$country='Croatia';if($code=='CU')$country='Cuba';if($code=='CY')$country='Cyprus';if($code=='CZ')$country='Czech Republic';if($code=='DK')$country='Denmark';if($code=='DJ')$country='Djibouti';if($code=='DM')$country='Dominica';if($code=='DO')$country='Dominican Republic';if($code=='EC')$country='Ecuador';if($code=='EG')$country='Egypt';if($code=='SV')$country='El Salvador';if($code=='GQ')$country='Equatorial Guinea';if($code=='ER')$country='Eritrea';if($code=='EE')$country='Estonia';if($code=='ET')$country='Ethiopia';if($code=='FO')$country='Faroe Islands';if($code=='FK')$country='Falkland Islands (Malvinas)';if($code=='FJ')$country='Fiji the Fiji Islands';if($code=='FI')$country='Finland';if($code=='FR')$country='France, French Republic';if($code=='GF')$country='French Guiana';if($code=='PF')$country='French Polynesia';if($code=='TF')$country='French Southern Territories';if($code=='GA')$country='Gabon';
 		if($code=='GM')$country='Gambia the';if($code=='GE')$country='Georgia';if($code=='DE')$country='Germany';if($code=='GH')$country='Ghana';if($code=='GI')$country='Gibraltar';if($code=='GR')$country='Greece';if($code=='GL')$country='Greenland';if($code=='GD')$country='Grenada';if($code=='GP')$country='Guadeloupe';if($code=='GU')$country='Guam';if($code=='GT')$country='Guatemala';if($code=='GG')$country='Guernsey';if($code=='GN')$country='Guinea';if($code=='GW')$country='Guinea-Bissau';if($code=='GY')$country='Guyana';if($code=='HT')$country='Haiti';if($code=='HM')$country='Heard Island and McDonald Islands';if($code=='VA')$country='Holy See (Vatican City State)';if($code=='HN')$country='Honduras';if($code=='HK')$country='Hong Kong';if($code=='HU')$country='Hungary';if($code=='IS')$country='Iceland';if($code=='IN')$country='India';if($code=='ID')$country='Indonesia';if($code=='IR')$country='Iran';if($code=='IQ')$country='Iraq';if($code=='IE')$country='Ireland';if($code=='IM')$country='Isle of Man';if($code=='IL')$country='Israel';if($code=='IT')$country='Italy';if($code=='JM')$country='Jamaica';if($code=='JP')$country='Japan';if($code=='JE')$country='Jersey';if($code=='JO')$country='Jordan';if($code=='KZ')$country='Kazakhstan';if($code=='KE')$country='Kenya';if($code=='KI')$country='Kiribati';if($code=='KP')$country='Korea';if($code=='KR')$country='Korea';if($code=='KW')$country='Kuwait';if($code=='KG')$country='Kyrgyz Republic';if($code=='LA')$country='Lao';if($code=='LV')$country='Latvia';
@@ -445,5 +377,127 @@ class main {
 		if($code=='VU')$country='Vanuatu';if($code=='VE')$country='Venezuela';if($code=='VN')$country='Vietnam';if($code=='WF')$country='Wallis and Futuna';if($code=='EH')$country='Western Sahara';if($code=='YE')$country='Yemen';if($code=='ZM')$country='Zambia';if($code=='ZW')$country='Zimbabwe';if( $country == '') $country = $code;
 		return $country;
 	}
+	
+	/*
+	 * Returns the IP address of this server the way external devices will see it.
+	 */
+	public function getWanIp($cache = true) {
+		if($cache && isset($this->cache['getWanIp'])) {
+			return $this->cache['getWanIp'];
+		}
+		$ch = curl_init("http://checkip.dyndns.org/");
+		curl_setopt($ch, CURLOPT_HEADER, 0);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		$data = curl_exec($ch);
+		if($data === false) {
+			$this->error(array('$main->getWanIp() Failed' => curl_error($ch)));
+			$this->cache['getWanIp'] = false;
+			return false;
+		}
+		curl_close($ch);
+		$edata = explode('ss: ', $data);
+		$this->cache['getWanIp'] = substr(trim($edata[1]), 0, -14);
+		return $this->cache['getWanIp'];
+	}
+	
+	/*
+	 * Returns true if it's safe to run a function, false otherwise.
+	 */
+	public function canRun($function, $cache = true) {
+		if($cache && isset($this->cache['canRun'][$function])) {
+			return $this->cache['canRun'][$function];
+		}
+		$this->cache['canRun'][$function] = (function_exists($function) and stripos(ini_get('disable_functions'), $function) === false);
+		return $this->cache['canRun'][$function];
+	}
+	
+	/*
+	 * Checks the current version against the version returned from the update server to determine update availability.
+	 */
+	public function checkVersion($cache = true) {
+		if($cache && isset($this->cache['checkVersion'])) {
+			return $this->cache['checkVersion'];
+		}
+        global $db;
+        $cv = array('name' => $db->config("vname"), 'code' => (int)$db->config("vcode"));
+		$ch = curl_init("http://thehostingtool.com/updates/check.php");
+		curl_setopt($ch, CURLOPT_HEADER, 0);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		$svn = $this->getSubversionRevision();
+		$cv['rev'] = $svn?$svn:null;
+		curl_setopt($ch, CURLOPT_USERAGENT, 'TheHostingTool/'.$cv['name'].' ('.$cv['code'].($svn?",$svn":'').')');
+		$data = curl_exec($ch);
+		if($data === false) {
+			$this->error(array('$main->checkVersion() Failed' => curl_error($ch)));
+			$this->cache['checkVersion'] = false;
+			return false;
+		}
+		curl_close($ch);
+		$nv = json_decode($data);
+        $return = array('nv' => (array)$nv, 'cv' => $cv);
+        $return['updateAvailable'] = ($nv->code > $cv['code']);
+        $return["devTime"] = ($cv['code'] > $nv->code);
+        $this->cache['checkVersion'] = $return;
+        return $return;
+	}
+
+    public function getSubversionRevision($cache = true) {
+    	if($cache && isset($this->cache['getSubversionRevision'])) {
+    		return $this->cache['getSubversionRevision'];
+    	}
+    	// This will work for Subverson 1.6 clients and below
+        if(file_exists("../.svn/entries")) {
+            $svn = File("../.svn/entries");
+            $this->cache['getSubversionRevision'] = (int)$svn[3];
+            return $this->cache['getSubversionRevision'];
+        }
+		// Check the previous directories recursively looking for wc.db (Subversion 1.7)
+		$searchDepth = 3; // Max search depth. 3 should handle 99% of checkouts.
+		// Do we have PDO? And do we have the SQLite PDO driver?
+		if(!extension_loaded('PDO') || !extension_loaded('pdo_sqlite')) {
+			$searchDepth = 0; // Don't even bother...
+		}
+		for($i = 1; $i <= $searchDepth; $i++) {
+			$dotdot .= '../';
+			if(!file_exists("$dotdot.svn/wc.db")) {
+				continue;
+			}
+			$wcdb = new PDO("sqlite:$dotdot.svn/wc.db");
+			$result = $wcdb->query('SELECT "revision" FROM "NODES" WHERE "repos_path" = "'.basename(realpath('..')).'"');
+			$this->cache['getSubversionRevision'] = (int)$result->fetchColumn();
+		    return $this->cache['getSubversionRevision'];
+		}
+        if($this->canRun('exec')) {
+        	exec('svnversion ' . realpath('..'), $out, $return);
+        	// For this to work, svnversion must be in your PHP's PATH enviroment variable
+        	if($return === 0 && $out[0] != "Unversioned directory") {
+        		$this->cache['getSubversionRevision'] = (int)$out[0];
+        		return $this->cache['getSubversionRevision'];
+        	}
+        }
+        $this->cache['getSubversionRevision'] = false;
+        return false;
+    }
+
+    // Make sure you use === with this!
+    // 0 = Confirmed
+    // 1 = Accepted (not confirmed but email confirmation is not required)
+    // 2 = Unconfirmed
+    // 3 = Unconfirmed New Email
+    public function getEmailStatus($id) {
+    	global $db;
+		$emailval = (bool)$db->config('emailval');
+		$client = $db->client($id);
+		$status = 0;
+		if($client['newemail'] !== null) {
+			$status = 3;
+		} elseif($emailval && !(bool)$client['emailval']) {
+			$status = 2;
+
+		} elseif(!$emailval && !(bool)$client['emailval']) {
+			$status = 1;
+		}
+		return $status;
+    }
 }
 ?>

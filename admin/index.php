@@ -28,7 +28,20 @@ function acp() {
 	}
 	$query = $db->query("SELECT * FROM `<PRE>acpnav` WHERE `link` = '{$main->getvar['page']}'");
 	$page = $db->fetch_array($query);
-	$header = $page['visual'];
+	// "Hack" to get the credits and tickets page looking nicer
+	switch($main->getvar["page"]) {
+		case "credits":
+			$header = "Credits";
+			break;
+		
+		case "ticketsall":
+			$header = "All Tickets";
+			break;
+		
+		default:
+			$header = $page['visual'];
+			break;
+	}
 	$link = "pages/". $main->getvar['page'] .".php";
 	if(!file_exists($link)) {
 		$html = "<strong>THT Fatal Error:</strong> Seems like the .php is non existant. Is it deleted?";	
@@ -161,8 +174,7 @@ function acp() {
 			}
 		}
 		else {
-			$html = "You trying to hack me? You've been warned. An email has been sent.. May I say, Owned?";
-			$email->staff("Possible Hacking Attempt", "A user has been logged trying to hack your copy of THT, their IP is: ". $_SERVER['REMOTE_ADDR']);
+			$html = "No.";
 		}
 	}
 	$staffuser = $db->staff($_SESSION['user']);
@@ -228,7 +240,11 @@ if(!$_SESSION['logged']) {
 		define("INFO", " ");
 		if($_POST) { # If user submitts form
 		if($main->staffLogin($main->postvar['user'], $main->postvar['pass'])) {
-			$main->redirect("?page=home");	
+			$queryString = $_SERVER["QUERY_STRING"];
+			if($queryString == "") {
+				$queryString = "page=home";
+			}
+			$main->redirect(URL . "admin/?" . $queryString);	
 		}
 		else {
 			$main->errors("Incorrect username or password!");

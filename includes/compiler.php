@@ -50,9 +50,12 @@ else {
 	define("NOCONFIG", true);
 }
 if($sql['install']) {
-	define("INSTALL", 1);
+	define("INSTALL", true);
 	$db = new db; # Create the class
 	global $db; # Globalise it
+}
+else {
+    define("INSTALL", false);
 }
 
 $folder = LINK;
@@ -74,9 +77,52 @@ if ($handle = opendir($folder)) { # Open the folder
 closedir($handle); #Close the folder
 
 if(INSTALL == 1) {
-	define("THEME", $db->config("theme")); # Set the default theme
-	define("URL", $db->config("url")); # Sets the URL THT is located at
-	define("NAME", $db->config("name")); # Sets the name of the website
+    date_default_timezone_set($db->config("timezone")); // Sets the default timezone
+	define("THEME", $db->config("theme")); // Set the default theme
+	// Sets the URL THT is located at
+	$url = $db->config("url");
+	$wwwInUrl = preg_match('%^(http(?:s)?://)(www\.)?(.*)%', $url, $urlregout);
+	$wwwInUrl = ($urlregout[2]=='www.'?true:false);
+	$wwwInCurrent = preg_match('%^(www\.)?(.+)%', $_SERVER['HTTP_HOST'], $currentregout);
+	$wwwInCurrent = ($currentregout[1]=='www.'?true:false);
+	switch ($db->config("wwwsubdomain")) {
+		case 'both':
+			if($wwwInUrl && !$wwwInCurrent) {
+				// Remove WWW
+				$url = $urlregout[1] . $urlregout[3];
+			}
+			elseif(!$wwwInUrl && $wwwInCurrent) {
+				// Add WWW
+				$url = $urlregout[1] . 'www.' . $urlregout[3];
+			}
+			break;
+		case 'nowww':
+			if($wwwInCurrent) {
+				// Remove WWW
+				header('Location: http'.($_SERVER['HTTPS']?'s':'').'://'.$currentregout[2].$_SERVER['REQUEST_URI']);
+				exit();
+			}
+			break;
+		case 'www':
+			if(!$wwwInCurrent) {
+				header('Location: http'.($_SERVER['HTTPS']?'s':'').'://www.'.$currentregout[2].$_SERVER['REQUEST_URI']);
+				exit();
+			}
+			break;
+	}
+	if($_SERVER["HTTPS"] && ($urlregout[1] != "https://")) {
+		// HTTPS support
+		$url = str_replace("http://", "https://", $url);
+	}
+	elseif(!$_SERVER["HTTPS"] && ($urlregout[1] != "http://")) {
+		// HTTP support (if URL is using HTTPS)
+		$url = str_replace("https://", "http://", $url);
+	}
+	define('URL', $url);
+	define("NAME", $db->config("name")); // Sets the name of the website
+}
+else {
+	define("THEME", "Reloaded2");
 }
 // Converts the $_POST global array into $main->postvar - DB Friendly.
 if(isset($_POST)) {
@@ -150,8 +196,7 @@ function checkForDependencies() {
 	// Here, we're going to see if we have the functions that we need. :D
 	$needed = array();
 	// First things first:
-	$version = explode(".", phpversion());
-	if($version[0] < 5) {
+	if(version_compare(PHP_VERSION, '5.0.0', '<')) {
 		die("PHP Version 5 or greater is required! You're currently running: " . phpversion());
 	}
 	if(!function_exists("curl_init")) {

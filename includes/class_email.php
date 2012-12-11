@@ -66,6 +66,8 @@ class email {
 		$body = $this->email['content'];
 		
 		$host = $this->details['smtp_host'];
+		$secure = (bool)$this->details['smtp_secure'];
+		$port = $this->details['smtp_port'];
 		$username = $this->details['smtp_user'];
 		$password = $this->details['smtp_password'];
 		
@@ -73,9 +75,10 @@ class email {
 		  'To' => $this->email['to'],
 		  'Subject' => $this->email['subject']);
 		$smtp = Mail::factory('smtp',
-		  array ('host' => $host,
+		  array ('host' => ($secure?'ssl://':'').$host,
 			'auth' => true,
 			'username' => $username,
+			'port' => $port,
 			'password' => $password));
 		$mail = $smtp->send($to, $headers, $body);
 		
@@ -121,6 +124,28 @@ class email {
 		while($data = $db->fetch_array($query)) {
 			$this->send($data['email'], $subject, $content, $array);	
 		}
+	}
+
+	// Send an email confirmation
+	public function sendConfirmEmail($id) {
+		global $db;
+		$id = (int)$id;	
+		$query = $db->query("SELECT `user`,`email`,`newemail`,`confirmcode` FROM `<PRE>users` WHERE `id` = {$id}");
+		if($db->num_rows($query) == 0) {
+			return false;
+		}
+		$data = $db->fetch_array($query);
+		if($data['confirmcode'] === null) {
+			$data['confirmcode'] = sha1($id.mt_rand(0,99999).$data['user'].microtime().$data['email']);
+			$db->query("UPDATE `<PRE>users` SET `confirmcode` = '".$data['confirmcode']."' WHERE `id` = {$id}");
+		}
+		$to = $data['newemail'] === null ? $data['email'] : $data['newemail'];
+		$template = $db->emailTemplate('emailconfirm');
+		$confirm = $db->config('url') . 'client/confirm.php?i=' . $id . "&u=".$data['user']."&c=" . $data['confirmcode'];
+		if($this->send($to, $template['subject'], $template['content'], array('USER' => $data['user'], 'CONFIRM' => $confirm))) {
+			return array($data['user'], $to);
+		}
+		return false;
 	}
 	
 	private function parseEmail($content, $array) { # Retrieves the array and replaces all the email variables with the content

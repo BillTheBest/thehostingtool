@@ -36,11 +36,7 @@ class server {
 		global $main;
 		global $db;
 		global $type;
-		
-		// Rich here - This is a new variable for the 
-		// muliple orders thingy :D
-		$newuser = true;
-		
+			
 		//Check details
 		$query = $db->query("SELECT * FROM `<PRE>packages` WHERE `id` = '{$main->getvar['package']}' AND `is_disabled` = 0"); # Package disabled?
 		if($db->num_rows($query) != 1) {
@@ -80,12 +76,7 @@ class server {
 			$main->getvar['fdom'] = $main->getvar['csub'].".".$main->getvar['csub2'];
 		}
 		
-		if($_SESSION['clogged']) {
-			$cdata = $db->client($_SESSION['cuser']);
-			$newuser = false;
-		}
-		
-		if((!$main->getvar['username']) && ($newuser==true)) {
+		if((!$main->getvar['username'])) {
 			echo "Please enter a username!";
 			return;
 		}
@@ -96,7 +87,7 @@ class server {
 				return;
 			}
 		}
-		if((!$main->getvar['password']) && ($newuser==true)) {
+		if((!$main->getvar['password'])) {
 		   echo "Please enter a password!";
 		   return;
 		}
@@ -106,11 +97,11 @@ class server {
 				return;
 			}
 		}
-		if((!$main->getvar['email']) && ($newuser==true)) {
+		if((!$main->getvar['email'])) {
 		   echo "Please enter a email!";
 		   return;
 		}
-		if((!$main->check_email($main->getvar['email'])) && ($newuser==true)) {
+		if((!$main->check_email($main->getvar['email']))) {
 				echo "Your email is the wrong format!";	
 				return;
 		}
@@ -121,75 +112,75 @@ class server {
 				return;
 			}
 		}
-		if(($main->getvar['human'] != $_SESSION["pass"]) && ($newuser==true)) {
+		if(($main->getvar['human'] != $_SESSION["pass"])) {
 		   echo "Human test failed!";
 		   return;
 		}
-		if((!$main->getvar['firstname']) && ($newuser==true)) {
+		if((!$main->getvar['firstname'])) {
 		   echo "Please enter a valid first name!";
 		   return;
 		}
-		if((!$main->getvar['lastname']) && ($newuser==true)) {
+		if((!$main->getvar['lastname'])) {
 		   echo "Please enter a valid last name!";
 		   return;
 		}
-		if((!$main->getvar['address']) && ($newuser==true)) {
+		if((!$main->getvar['address'])) {
 		   echo "Please enter a valid address!";
 		   return;
 		}
-		if((!$main->getvar['city']) && ($newuser==true)) {
+		if((!$main->getvar['city'])) {
 		   echo "Please enter a valid city!";
 		   return;
 		}
-		if((!$main->getvar['zip']) && ($newuser==true)) {
+		if((!$main->getvar['zip'])) {
 		   echo "Please enter a valid zip code!";
 		   return;
 		}
-		if((!$main->getvar['state']) && ($newuser==true)) {
+		if((!$main->getvar['state'])) {
 		   echo "Please enter a valid state!";
 		   return;
 		}
-		if((!$main->getvar['state']) && ($newuser==true)) {
+		if((!$main->getvar['state'])) {
 		   echo "Please enter a valid state!";
 		   return;
 		}
-		if((!$main->getvar['country']) && ($newuser==true)) {
+		if((!$main->getvar['country'])) {
 		   echo "Please select a country!";
 		   return;
 		}
-		if ((!preg_match("/^([a-zA-Z\.\'\ \-])+$/",$main->getvar['firstname'])) && ($newuser==true)) {
+		if ((!preg_match("/^([a-zA-Z\.\'\ \-])+$/",$main->getvar['firstname']))) {
 			echo "Please enter a valid first name!";
 			return;			
 		}
-		if ((!preg_match("/^([a-zA-Z\.\'\ \-])+$/",$main->getvar['lastname'])) && ($newuser==true)) {
+		if ((!preg_match("/^([a-zA-Z\.\'\ \-])+$/",$main->getvar['lastname']))) {
 			echo "Please enter a valid last name!";
 			return;			
 		}
-		if ((!preg_match("/^([0-9a-zA-Z\.\ \-])+$/",$main->getvar['address'])) && ($newuser==true)) {
+		if ((!preg_match("/^([0-9a-zA-Z\.\ \-])+$/",$main->getvar['address']))) {
 			echo "Please enter a valid address!";
 			return;
 		}
-		if ((!preg_match("/^([a-zA-Z ])+$/",$main->getvar['city'])) && ($newuser==true)) {
+		if ((!preg_match("/^([a-zA-Z ])+$/",$main->getvar['city']))) {
 			echo "Please enter a valid city!";
 			return;			
 		}
-		if ((!preg_match("/^([a-zA-Z\.\ -])+$/",$main->getvar['state'])) && ($newuser==true)) {
+		if ((!preg_match("/^([a-zA-Z\.\ -])+$/",$main->getvar['state']))) {
 			echo "Please enter a valid state!";
 			return;
 		}
-		if((strlen($main->getvar['zip']) > 7) && ($newuser==true)) {
+		if((strlen($main->getvar['zip']) > 7)) {
 			echo "Please enter a valid zip/postal code!";
 			return;
 		}
-		if ((!preg_match("/^([0-9a-zA-Z\ \-])+$/",$main->getvar['zip'])) && ($newuser==true)) {
+		if ((!preg_match("/^([0-9a-zA-Z\ \-])+$/",$main->getvar['zip']))) {
 			echo "Please enter a valid zip/postal code!";
 			return;
 		}
-		if((strlen($main->getvar['phone']) > 15) && ($newuser==true)) {
+		if((strlen($main->getvar['phone']) > 15)) {
 			echo "Please enter a valid phone number!";
 			return;
 		}
-		if ((!preg_match("/^([0-9\-])+$/",$main->getvar['phone'])) && ($newuser==true)) {
+		if ((!preg_match("/^([0-9\-])+$/",$main->getvar['phone']))) {
 			echo "Please enter a valid phone number!";
 			return;
 		}
@@ -216,24 +207,15 @@ class server {
 		$serverphp = $this->createServer($main->getvar['package']); # Create server class
 		$pquery2 = $db->query("SELECT * FROM `<PRE>packages` WHERE `id` = '{$main->getvar['package']}'");
 		$pname2 = $db->fetch_array($pquery2);
-		if ($newuser == false) {
-			$newusername = $serverphp->GenUsername();
-			$newpass = $serverphp->GenPassword();
-			$done = $serverphp->signup($type->determineServer($main->getvar['package']), $pname2['reseller'], $newusername, $cdata['email'], $newpass);
-		} 
-		else {
-			$done = $serverphp->signup($type->determineServer($main->getvar['package']), $pname2['reseller']);
-		}
+		$done = $serverphp->signup($type->determineServer($main->getvar['package']), $pname2['reseller']);
 		if($done == true) { # Did the signup pass?
 			$date = time();
 			$ip = $_SERVER['REMOTE_ADDR'];
-			if ($newuser == true) {
-				$salt = md5(rand(0,9999999));
-				$password = md5(md5($main->getvar['password']).md5($salt));
-				$UsrName = $main->getvar['username'];
-				$newusername = $main->getvar['username'];
-				
-				$db->query("INSERT INTO `<PRE>users` (user, email, password, salt, signup, ip, firstname, lastname, address, city, state, zip, country, phone) VALUES(
+			$salt = md5(rand(0,9999999));
+			$password = md5(md5($main->getvar['password']).md5($salt));
+			$UsrName = $main->getvar['username'];
+			$newusername = $main->getvar['username'];	
+			$db->query("INSERT INTO `<PRE>users` (user, email, password, salt, signup, ip, firstname, lastname, address, city, state, zip, country, phone) VALUES(
 													  '{$main->getvar['username']}',
 													  '{$main->getvar['email']}',
 													  '{$password}',
@@ -248,7 +230,7 @@ class server {
 													  '{$main->getvar['zip']}',
 													  '{$main->getvar['country']}',
 													  '{$main->getvar['phone']}')");
-				$db->query("INSERT INTO `<PRE>users_bak` (user, email, password, salt, signup, ip, firstname, lastname, address, city, state, zip, country, phone) VALUES(
+			$db->query("INSERT INTO `<PRE>users_bak` (user, email, password, salt, signup, ip, firstname, lastname, address, city, state, zip, country, phone) VALUES(
 													  '{$main->getvar['username']}',
 													  '{$main->getvar['email']}',
 													  '{$password}',
@@ -263,17 +245,13 @@ class server {
 													  '{$main->getvar['zip']}',
 													  '{$main->getvar['country']}',
 													  '{$main->getvar['phone']}')");
-				$rquery = "SELECT * FROM `<PRE>users` WHERE `user` = '{$UsrName}' LIMIT 1;";
-				$rdata = $db->query($rquery);
-				$db->query("INSERT INTO `<PRE>logs` (uid, loguser, logtime, message) VALUES(
+			$rquery = "SELECT * FROM `<PRE>users` WHERE `user` = '{$UsrName}' LIMIT 1;";
+			$rdata = $db->query($rquery);
+			$db->query("INSERT INTO `<PRE>logs` (uid, loguser, logtime, message) VALUES(
 													  '{$rquery['userid']}',
 													  '{$main->getvar['username']}',
 													  '{$date}',
 													  'Registered.')");
-			}
-			else {
-				$UsrName = $cdata['user'];
-			}
 			$newSQL = "SELECT * FROM `<PRE>users` WHERE `user` = '{$UsrName}' LIMIT 1;";
 			$query = $db->query($newSQL);
 			if($db->num_rows($query) == 1) {
@@ -299,8 +277,7 @@ class server {
 													  'Package created ({$main->getvar['fdom']})')");
 				global $email;
 				$array['USER'] = $newusername;
-				if ($newuser == true) { $array['PASS'] = $main->getvar['password']; $array['EMAIL'] = $main->getvar['email']; }
-				else { $array['PASS'] = $newpass; $array['EMAIL'] = $cdata['email']; }
+				$array['PASS'] = $main->getvar['password']; $array['EMAIL'] = $main->getvar['email'];
 				$array['DOMAIN'] = $main->getvar['fdom'];
 				
 				//Get plan email friendly name
@@ -349,6 +326,7 @@ class server {
 				$notes = "Your current hosting package monthly invoice. Package: ". $pname['name'];
 				$invoice->create($data['id'], $amount, $due, $notes);
 				$serverphp->suspend($main->getvar['username'], $type->determineServer($main->getvar['package']));
+				$db->query("UPDATE `<PRE>user_packs` SET `status` = '4' WHERE `id` = '{$data['id']}'");
 				$iquery = $db->query("SELECT * FROM `<PRE>invoices` WHERE `uid` = '{$data['id']}' AND `due` = '{$due}'");
 				$idata = $db->fetch_array($iquery);
 				echo '<div class="errors"><b>You are being redirected to payment! It will load in a couple of seconds..</b></div>';
@@ -542,7 +520,7 @@ class server {
 	
 	public function unsuspend($id) { # Unsuspends a user account from the package ID
 		global $db, $main, $type, $email;
-		$query = $db->query("SELECT * FROM `<PRE>user_packs` WHERE `id` = '{$db->strip($id)}' AND (`status` = '2' OR `status` = '3')");
+		$query = $db->query("SELECT * FROM `<PRE>user_packs` WHERE `id` = '{$db->strip($id)}' AND (`status` = '2' OR `status` = '3' OR `status` = '4')");
 		if($db->num_rows($query) == 0) {
 			$array['Error'] = "That package doesn't exist or cannot be unsuspended!";
 			$array['User PID'] = $id;
@@ -578,7 +556,7 @@ class server {
 	
 	public function approve($id) { # Unsuspends a user account from the package ID
 		global $db, $main, $type, $email;
-		$query = $db->query("SELECT * FROM `<PRE>user_packs` WHERE `id` = '{$db->strip($id)}' AND (`status` = '2' OR `status` = '3')");
+		$query = $db->query("SELECT * FROM `<PRE>user_packs` WHERE `id` = '{$db->strip($id)}' AND (`status` = '2' OR `status` = '3' OR `status` = '4')");
 		if($db->num_rows($query) == 0) {
 			$array['Error'] = "That package doesn't exist or cannot be approved!";
 			$array['User PID'] = $id;

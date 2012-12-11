@@ -125,6 +125,11 @@ class page {
 						$array['FUNC'] = "none";	
 						$array['IMG'] = "user_suit.png";
 					}
+					elseif($pack['status'] == "4") {
+						$array['SUS'] = "Awaiting Payment";
+						$array['FUNC'] = "none";	
+						$array['IMG'] = "money.png";
+					}
 					elseif($pack['status'] == "9") {
 						$array['SUS'] = "No Action";
 						$array['FUNC'] = "none";	
@@ -173,6 +178,10 @@ class page {
 									$array2['STATUS'] = "Awaiting Validation";
 									break;
 								
+								case "4":
+									$array2['STATUS'] = "Awaiting Payment";
+									break;
+								
 								case "9":
 									$array2['STATUS'] = "Cancelled";
 									break;
@@ -201,15 +210,18 @@ class page {
 						case "passwd":
 							if($_POST) {
 								if(empty($main->postvar['passwd'])) {
-									$main->errors('A password was never provided.');
-									break;
-								}
-								$command = $server->changePwd($pack['id'], $main->postvar['passwd']);
-								if($command == true) {
-									$main->errors('Password was changed!');
+									$main->errors('A password was not provided.');
+									$array['BOX'] = "";
+									$array['CONTENT'] = $style->replaceVar("tpl/clientpwd.tpl");
 								}
 								else {
-									$main->errors($command);
+									$command = $main->changeClientPassword($pack['id'], $main->postvar['passwd']);
+									if($command === true) {
+										$main->errors('Password changed!');
+									}
+									else {
+										$main->errors((string)$command);
+									}
 								}
 							}
 							$array['BOX'] = "";

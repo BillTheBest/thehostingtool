@@ -232,7 +232,7 @@ class AJAX {
 			echo 1;	
 		}
 		else {
-			echo 0;	
+			echo 1;	
 		}
 	}
 	
@@ -252,7 +252,7 @@ class AJAX {
 		}
 	}
 	
-	public function create() {
+	public function create() { 
 		global $main;
 		global $server;
 		$server->signup();
@@ -384,9 +384,15 @@ class AJAX {
 							$array['IMG'] = "exclamation.png";
 						}
 						elseif($client['status'] == "3") {
-							$array['TEXT'] = "<a href='?page=users&sub=validate'>Validate</a>";
+							//Fixes caption added by J.Montoya
+							$array['TEXT'] = "Validate";
 							$array['FUNC'] = "none";	
 							$array['IMG'] = "user_suit.png";
+						}
+						elseif($client['status'] == "4") {
+							$array['TEXT'] = "Awaiting Payment";
+							$array['FUNC'] = "none";	
+							$array['IMG'] = "money.png";
 						}
 						else {
 							$array['TEXT'] = "Other Status";
@@ -702,14 +708,16 @@ class AJAX {
 		}
 	}
 	function massemail() {
-		global $main, $email, $db;
-		$subject = $main->getvar['subject'];
-		$msg = $main->getvar['msg'];
-		$query = $db->query("SELECT * FROM `<PRE>users`");
-		while($client = $db->fetch_array($query)) {
-			$email->send($client['email'], $subject, $msg);	
+		if($_SESSION['logged']) {
+			global $main, $email, $db;
+			$subject = $main->getvar['subject'];
+			$msg = $main->getvar['msg'];
+			$query = $db->query("SELECT * FROM `<PRE>users`");
+			while($client = $db->fetch_array($query)) {
+				$email->send($client['email'], $subject, $msg);	
+			}
+			echo 1;
 		}
-		echo 1;
 	}
 	function porder() {
 		global $main, $db;
@@ -1094,8 +1102,10 @@ class AJAX {
 }
 if(isset($_GET['function']) and $_GET['function'] != "") {
 	$ajax = new AJAX;
-	$ajax->{$_GET['function']}();
-	include(LINK."output.php");
+	if(method_exists($ajax, $_GET['function'])) {
+		$ajax->{$_GET['function']}();
+		include(LINK."output.php");
+	}
 }
 
 ?>

@@ -33,24 +33,29 @@ function change() {
 				document.getElementById("button3").disabled = true;
 				document.getElementById("button3").value = "Working...";
 				$.get("<AJAX>?function=sqlcheck&host="+document.getElementById("hostname").value+"&user="+document.getElementById("username").value+"&pass="+document.getElementById("password").value+"&db="+document.getElementById("database").value+"&pre="+document.getElementById("prefix").value, function(mydata) {
-																																																																												document.getElementById("button3").disabled = false;																																																																																																										document.getElementById("button3").value = "Next Step";
-																																																																												document.getElementById("sqlerror").innerHTML = mydata;
-				switch(mydata) {
-						case "0":
+				document.getElementById("button3").disabled = false;
+				document.getElementById("button3").value = "Next Step";
+				//This if statement isn't really a big deal, but it adds some polish.
+				if(parseInt(mydata) != 2) {
+					document.getElementById("sqlerror").innerHTML = mydata;
+				}
+
+				switch(parseInt(mydata)) {
+						case 0:
 							document.getElementById("sqlerror").innerHTML = wrong+"Your SQL Details are incorrect!";
 							break;
-						case "1":
+						case 1:
 							document.getElementById("sqlerror").innerHTML = wrong+"Your SQL Database is incorrect!";
 							break;
-						case "2":
+						case 2:
 							gogo();
 							document.getElementById("step3").innerHTML = working;
 							installstuff();
 							break;
-						case "3":
+						case 3:
 							document.getElementById("sqlerror").innerHTML = wrong+"Your Config isn't writeable!";
 							break;
-						case "4":
+						case 4:
 							document.getElementById("sqlerror").innerHTML = wrong+"THT is already installed!";
 							break;
 					}
@@ -68,12 +73,14 @@ function change() {
 					  function(finisheddata) {
 							document.getElementById("button5").disabled = false;
 							document.getElementById("button5").value = "Next Step";
-							document.getElementById("finalerror").innerHTML = finisheddata;
-							switch(finisheddata) {
-								case "1":
+							if(parseInt(finisheddata) != 1) {
+								document.getElementById("finalerror").innerHTML = finisheddata;
+							}
+							switch(parseInt(finisheddata)) {
+								case 1:
 									gogo();
 									break;
-								case "0":
+								case 0:
 									document.getElementById("finalerror").innerHTML = wrong+"Please fill in all the fields!";
 									break;
 							}
@@ -161,7 +168,7 @@ $(window).load(function () {
                   </tr>
                   <tr>
                     <td colspan="3" align="center"><label>
-                      <input type="button" name="2" id="2" value="Next Step" onclick="change()" />
+                      <input type="button" name="2" id="2" class="twobutton" value="Next Step" onclick="change()" />
                     </label></td>
                     </tr>
                 </table>
@@ -223,7 +230,7 @@ $(window).load(function () {
                 <td width="30%">Your THT URL:<br />
                   (Including the trailing slash)</td>
                 <td><label>
-                  <input name="url" type="text" id="url" />
+                  <input name="url" type="text" id="url" value="%GENERATED_URL%" />
                 </label><a class="tooltip" title="This is a very important field. Make sure this is correct before clicking next. The THT URL is where your THT is located. Make sure it's in this format: http://example.com/tht/"><img src="<ICONDIR>information.png"></a></td>
               </tr>
                <tr>

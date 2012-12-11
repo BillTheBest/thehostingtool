@@ -33,34 +33,12 @@ if(INSTALL == 1) {
 				$output = shell_exec('mysql -V');
 				preg_match('@[0-9]+\.[0-9]+\.[0-9]+@', $output, $version);
 			}
-			$na = false;
-			$obd = ini_get('open_basedir');
-			if(empty($obd)) {
-				if(stristr(PHP_OS, 'Win')) {
-					//Let's just take a guess
-					$diskfreespace = disk_free_space('C:') / 1073741824;
-					$disktotalspace = disk_total_space('C:') / 1073741824;
-				}
-				else {
-					$diskfreespace = disk_free_space('/') / 1073741824;
-					$disktotalspace = disk_total_space('/') / 1073741824;
-				}
-			}
-			else {
-				$na = true;
-			}
 			global $style;
-			$array2['OS'] = getenv(SERVER_SOFTWARE);
+			$array2['OS'] = PHP_OS;
+			$array2['SOFTWARE'] = $_SERVER["SERVER_SOFTWARE"];
 			$array2['PHP_VERSION'] = phpversion();
 			$array2['MYSQL_VERSION'] = $version[0];
-			if($na) {
-				$array2['DISK_FREE_SPACE'] = "Unknown ";
-				$array2['DISK_TOTAL_SPACE'] = "Unknown ";
-			}
-			else {
-				$array2['DISK_FREE_SPACE'] = substr($diskfreespace,0,4);
-				$array2['DISK_TOTAL_SPACE'] = substr($disktotalspace,0,4);
-			}
+			$array2["SERVER"] = $_SERVER["HTTP_HOST"];
 			$array['TITLE'] = $style->replaceVar('tpl/aserverstatus.tpl',$array2);
 			$pagegen .= $style->replaceVar('tpl/footerdebug.tpl',$array);
 		}

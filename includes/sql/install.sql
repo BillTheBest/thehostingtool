@@ -1,18 +1,4 @@
--- phpMyAdmin SQL Dump
--- version 3.2.4
--- http://www.phpmyadmin.net
---
--- Host: localhost
--- Generation Time: Mar 21, 2010 at 10:29 PM
--- Server version: 5.0.89
--- PHP Version: 5.2.6
-
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
-
---
--- Database: `%PRE%testtrunk`
---
-
 -- --------------------------------------------------------
 
 --
@@ -25,7 +11,7 @@ CREATE TABLE IF NOT EXISTS `%PRE%acpnav` (
   `icon` varchar(50) NOT NULL,
   `link` varchar(20) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=20 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=20 ;
 
 --
 -- Dumping data for table `%PRE%acpnav`
@@ -45,9 +31,8 @@ INSERT INTO `%PRE%acpnav` (`id`, `visual`, `icon`, `link`) VALUES
 (12, 'Client Importer', 'user_orange.png', 'import'),
 (13, 'Tickets', 'page_white_text.png', 'tickets'),
 (14, 'Knowledge Base', 'folder.png', 'kb'),
-(17, 'API', 'brick.png', 'api'),
 (15, 'Look & Feel', 'rainbow.png', 'lof'),
-(19, 'Invoice Management', 'script.png', 'invoices');
+(19, 'Invoice Management', 'script.png', 'invoices'),
 (20, 'Logs', 'report.png', 'logs');
 
 -- --------------------------------------------------------
@@ -62,7 +47,7 @@ CREATE TABLE IF NOT EXISTS `%PRE%articles` (
   `name` varchar(100) NOT NULL,
   `content` text NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
 -- Dumping data for table `%PRE%articles`
@@ -80,7 +65,7 @@ CREATE TABLE IF NOT EXISTS `%PRE%cats` (
   `name` varchar(50) NOT NULL,
   `description` text NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
 -- Dumping data for table `%PRE%cats`
@@ -99,7 +84,7 @@ CREATE TABLE IF NOT EXISTS `%PRE%clientnav` (
   `icon` varchar(50) NOT NULL,
   `link` varchar(20) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=8 ;
 
 --
 -- Dumping data for table `%PRE%clientnav`
@@ -124,7 +109,7 @@ INSERT INTO `%PRE%clientnav` (`id`, `visual`, `icon`, `link`) VALUES
 CREATE TABLE IF NOT EXISTS `%PRE%config` (
   `name` varchar(50) NOT NULL,
   `value` text NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `%PRE%config`
@@ -135,7 +120,6 @@ INSERT INTO `%PRE%config` (`name`, `value`) VALUES
 ('version', '1.2.1'),
 ('smtp_user', 'user'),
 ('senabled', '1'),
-('api-key', '%API-KEY%'),
 ('whm-ssl', '0'),
 ('paypalemail', 'your@email.com'),
 ('default', 'order'),
@@ -184,7 +168,7 @@ CREATE TABLE IF NOT EXISTS `%PRE%invoices` (
   `notes` text NOT NULL,
   `uniqueid` varchar(255) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
 -- Dumping data for table `%PRE%invoices`
@@ -204,7 +188,7 @@ CREATE TABLE IF NOT EXISTS `%PRE%navbar` (
   `link` varchar(20) NOT NULL,
   `order` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=17 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=17 ;
 
 --
 -- Dumping data for table `%PRE%navbar`
@@ -224,7 +208,7 @@ INSERT INTO `%PRE%navbar` (`id`, `icon`, `visual`, `link`, `order`) VALUES
 
 CREATE TABLE IF NOT EXISTS `%PRE%packages` (
   `id` mediumint(9) NOT NULL auto_increment,
-  `name` varchar(20) NOT NULL,
+  `name` varchar(255) NOT NULL,
   `backend` varchar(50) NOT NULL,
   `description` text NOT NULL,
   `type` varchar(10) NOT NULL,
@@ -236,7 +220,7 @@ CREATE TABLE IF NOT EXISTS `%PRE%packages` (
   `is_hidden` int(1) NOT NULL,
   `is_disabled` int(1) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
 -- Dumping data for table `%PRE%packages`
@@ -252,7 +236,7 @@ CREATE TABLE IF NOT EXISTS `%PRE%packages` (
 CREATE TABLE IF NOT EXISTS `%PRE%resources` (
   `resource_name` varchar(20) NOT NULL,
   `resource_value` text NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `%PRE%resources`
@@ -275,7 +259,7 @@ CREATE TABLE IF NOT EXISTS `%PRE%servers` (
   `accesshash` text NOT NULL,
   `type` varchar(10) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
 -- Dumping data for table `%PRE%servers`
@@ -297,7 +281,7 @@ CREATE TABLE IF NOT EXISTS `%PRE%staff` (
   `salt` text NOT NULL,
   `perms` text NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
 -- Dumping data for table `%PRE%staff`
@@ -315,7 +299,7 @@ CREATE TABLE IF NOT EXISTS `%PRE%subdomains` (
   `subdomain` varchar(20) NOT NULL,
   `server` varchar(5) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
 -- Dumping data for table `%PRE%subdomains`
@@ -334,7 +318,7 @@ CREATE TABLE IF NOT EXISTS `%PRE%supportnav` (
   `icon` varchar(20) NOT NULL,
   `link` varchar(20) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
 
 --
 -- Dumping data for table `%PRE%supportnav`
@@ -359,7 +343,7 @@ CREATE TABLE IF NOT EXISTS `%PRE%templates` (
   `content` text NOT NULL,
   `description` text NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=17 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=17 ;
 
 --
 -- Dumping data for table `%PRE%templates`
@@ -367,11 +351,11 @@ CREATE TABLE IF NOT EXISTS `%PRE%templates` (
 
 INSERT INTO `%PRE%templates` (`id`, `name`, `acpvisual`, `subject`, `content`, `description`) VALUES
 (1, 'reset', 'Client Reset Password', 'New Password', '<p><span style="font-weight: bold;">Your password has been reset!<br /><span style="font-weight: normal;">New Password: %PASS%<br /><br /><span style="font-weight: bold;"><span style="color: #ff0000;">Notice!<br /><span style="color: #000000;"><span style="font-weight: normal;">If you didn''t use the forgot password feature, we suggest you log into client area with your new password and use a different email.</span></span></span></span></span></span></p>', 'This is the email a user recieves when they reset their password.<br /><br />\r\n\r\nTemplate Variables:<br />\r\n%PASS% = Their new password'),
-(3, 'newacc', 'New Hosting Account', 'Your Hosting Account', '<p><span style="font-weight: bold;">Your account has been created!<br /><span style="font-weight: normal;">Your account has been successfully created and you''re now able to log into your client control panel and your web hosting control panel. Your details are as follows:</span></span></p>\r\n<p><span style="font-weight: bold;">Username: </span>%USER%<br /><span style="font-weight: bold;">Password: </span>%PASS%<br /><span style="font-weight: bold;">Email: </span>%EMAIL%<br /><span style="font-weight: bold;">Domain/Subdomain: </span>%DOMAIN%<br /><span style="font-weight: bold;">Package: </span>%PACKAGE%</p>', 'This is the email a client gets when they first go though the order form and complete it. This email should contain all they''re details.<br /><br />\r\n\r\nTemplate Variables:<br />\r\n%USER% - Client Username<br />\r\n%PASSWORD% - Client Password<br />\r\n%EMAIL% - Client Email<br />\r\n%DOMAIN% - The clients package url<br />\r\n%PACKAGE% - The package the client signed up for'),
+(3, 'newacc', 'New Hosting Account', 'Your Hosting Account', '<p><span style="font-weight: bold;">Your account has been created!<br /><span style="font-weight: normal;">Your account has been successfully created and you''re now able to log into your client control panel and your web hosting control panel. Your details are as follows:</span></span></p>\r\n<p><span style="font-weight: bold;">Username: </span>%USER%<br /><span style="font-weight: bold;">Password: </span>%PASS%<br /><span style="font-weight: bold;">Email: </span>%EMAIL%<br /><span style="font-weight: bold;">Domain/Subdomain: </span>%DOMAIN%<br /><span style="font-weight: bold;">Package: </span>%PACKAGE%</p>', 'This is the email a client gets when they first go though the order form and complete it. This email should contain all they''re details.<br /><br />\r\n\r\nTemplate Variables:<br />\r\n%USER% - Client Username<br />\r\n%PASS% - Client Password<br />\r\n%EMAIL% - Client Email<br />\r\n%DOMAIN% - The clients package url<br />\r\n%PACKAGE% - The package the client signed up for'),
 (4, 'termacc', 'Client Terminated', 'Termination', '<p><span style="font-weight: bold;">Your account has been terminated!<br /><span style="font-weight: normal;">This now means that your client username and password no longer exists. This is the same with your web hosting panel. All your files, databases, records have been removed and aren''t retrievable.<br /><br /><span style="font-weight: bold;">Reason for termination: </span>%REASON%</span></span></p>', 'This is the email the client recives when their account has been terminated by admin or when they manually deleted it in the client control panel.<br /><br />\r\n\r\nEmail Variables:<br />\r\n%REASON% - The reason why their account has been terminated'),
 (5, 'suspendacc', 'Suspended Account', 'Suspended', '<p><span style="font-weight: bold;">Your Account Has Been Suspended!<br /><span style="font-weight: normal;">This means that your site on control panel is no longer accessable. Your website and all its content still remain intact. Contact your host for further details.</span></span></p>', 'This is the email the client recieves when they''re account has been suspended. '),
 (6, 'unsusacc', 'Unsuspended Account', 'Unsuspended', '<p><span style="font-family: ''Times New Roman''; font-size: 16px;">\r\n<div style="color: #000000; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10px; background-image: initial; background-repeat: initial; background-attachment: initial; -webkit-background-clip: initial; -webkit-background-origin: initial; background-color: #ffffff; background-position: initial initial; margin: 8px;">\r\n<p><span style="font-weight: bold;">Your Account Has Been Unsuspended!<br /><span style="font-weight: normal;">This means that your site on control panel is now accessable. Your website and all its content still remain intact and can be accessed.</span></span></p>\r\n</div>\r\n</span></p>', 'This is the email a client recieves when their account has been unsuspended.'),
-(7, 'newaccadmin', 'Awaiting Validation', 'Awaiting Admin', '<p><span style="font-family: ''Times New Roman''; font-size: 16px;">\r\n<div style="color: #000000; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10px; background-image: initial; background-repeat: initial; background-attachment: initial; -webkit-background-clip: initial; -webkit-background-origin: initial; background-color: #ffffff; background-position: initial initial; margin: 8px;">\r\n<p><span style="font-weight: bold;">Your account is awaiting admin validation!<br /><span style="font-weight: normal;">Your account has been successfully created but you need to wait for an admin to approve your account! You''re now able to log into your client control panel. Your details are as follows:</span></span></p>\r\n<p><span style="font-weight: bold;">Username:&nbsp;</span>%USER%<br /><span style="font-weight: bold;">Password:&nbsp;</span>%PASS%<br /><span style="font-weight: bold;">Email:&nbsp;</span>%EMAIL%<br /><span style="font-weight: bold;">Domain/Subdomain:&nbsp;</span>%DOMAIN%<br /><span style="font-weight: bold;">Package:&nbsp;</span>%PACKAGE%</p>\r\n</div>\r\n</span></p>', 'This is the email a client gets when they first go though the order form and complete it but are awaiting the admin. This email should contain all they''re details.<br /><br />\r\n\r\nTemplate Variables:<br />\r\n%USER% - Client Username<br />\r\n%PASSWORD% - Client Password<br />\r\n%EMAIL% - Client Email<br />\r\n%DOMAIN% - The clients package url<br />\r\n%PACKAGE% - The package the client signed up for'),
+(7, 'newaccadmin', 'Awaiting Validation', 'Awaiting Admin', '<p><span style="font-family: ''Times New Roman''; font-size: 16px;">\r\n<div style="color: #000000; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10px; background-image: initial; background-repeat: initial; background-attachment: initial; -webkit-background-clip: initial; -webkit-background-origin: initial; background-color: #ffffff; background-position: initial initial; margin: 8px;">\r\n<p><span style="font-weight: bold;">Your account is awaiting admin validation!<br /><span style="font-weight: normal;">Your account has been successfully created but you need to wait for an admin to approve your account! You''re now able to log into your client control panel. Your details are as follows:</span></span></p>\r\n<p><span style="font-weight: bold;">Username:&nbsp;</span>%USER%<br /><span style="font-weight: bold;">Password:&nbsp;</span>%PASS%<br /><span style="font-weight: bold;">Email:&nbsp;</span>%EMAIL%<br /><span style="font-weight: bold;">Domain/Subdomain:&nbsp;</span>%DOMAIN%<br /><span style="font-weight: bold;">Package:&nbsp;</span>%PACKAGE%</p>\r\n</div>\r\n</span></p>', 'This is the email a client gets when they first go though the order form and complete it but are awaiting the admin. This email should contain all they''re details.<br /><br />\r\n\r\nTemplate Variables:<br />\r\n%USER% - Client Username<br />\r\n%PASS% - Client Password<br />\r\n%EMAIL% - Client Email<br />\r\n%DOMAIN% - The clients package url<br />\r\n%PACKAGE% - The package the client signed up for'),
 (8, 'adminval', 'Admin - User Needs Validating', 'User Awaiting Validation', '<p><span style="font-weight: bold;">A Client Is Awaiting Admin Validation!<br /><span style="font-weight: normal;">Log into your ACP now to approve or decline that client.</span></span></p>', 'This the email you recieve when a user has signed up to a package requiring admin validation and is awaiting it.'),
 (9, 'approvedacc', 'Account Approved', 'Account Approved', '<p><span style="font-weight: bold;">Your account has now been approved!<br /><span style="font-weight: normal;">This means that your account is now active and the details that were sent in your previous email now work. You can proceed to your hosting control panel.</span></span></p>', 'This is the email the client recieves when they''re package has been validated by you.'),
 (10, 'declinedacc', 'Declined Account', 'Account Declined', '<p><span style="font-weight: bold;">Your account has been declined!<br /><span style="font-weight: normal;">An admin has declined your account. Your record has been deleted from the database. You may try and signup again.</span></span></p>', 'This is the email recieved when you decline a account that needs admin validation.'),
@@ -401,7 +385,7 @@ CREATE TABLE IF NOT EXISTS `%PRE%tickets` (
   `userid` mediumint(9) NOT NULL,
   `status` mediumint(9) NOT NULL default '1',
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=16 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=16 ;
 
 --
 -- Dumping data for table `%PRE%tickets`
@@ -419,7 +403,7 @@ CREATE TABLE IF NOT EXISTS `%PRE%types` (
   `name` varchar(15) NOT NULL,
   `visual` varchar(20) NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
 
 --
 -- Dumping data for table `%PRE%types`
@@ -454,7 +438,7 @@ CREATE TABLE IF NOT EXISTS `%PRE%users` (
   `phone` varchar(15) NOT NULL,
   `status` varchar(1) NOT NULL default '0',
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
 -- Dumping data for table `%PRE%users`
@@ -477,7 +461,7 @@ CREATE TABLE IF NOT EXISTS `%PRE%user_packs` (
   `status` varchar(1) NOT NULL,
   `additional` text NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
 -- Dumping data for table `%PRE%user_packs`
@@ -507,7 +491,7 @@ CREATE TABLE IF NOT EXISTS `%PRE%users_bak` (
   `phone` varchar(15) NOT NULL,
   `status` varchar(1) NOT NULL default '0',
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
 -- Dumping data for table `%PRE%users_bak`
@@ -529,7 +513,7 @@ CREATE TABLE IF NOT EXISTS `%PRE%user_packs_bak` (
   `status` varchar(1) NOT NULL,
   `additional` text NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
 -- Dumping data for table `%PRE%user_packs_bak`
@@ -548,7 +532,7 @@ CREATE TABLE IF NOT EXISTS `%PRE%logs` (
   `logtime` varchar(20) NOT NULL,
   `message` text NOT NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
 -- Dumping data for table `%PRE%user_packs_bak`

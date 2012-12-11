@@ -30,7 +30,7 @@ class page {
     
     public function checkDir($dir){
     	if (is_dir($dir)) { 
-    		return "<div class='warn'><img src='../themes/icons/cross.png' alt='' /> Warning: Your install directory still exists. Delete or rename it now!</div>";
+    		return "<div class='warn'><img src='../themes/icons/cross.png' alt='' /> Warning: Your install directory still exists. Please delete it!</div>";
 		}
 		else{
 			return "";
@@ -38,8 +38,7 @@ class page {
 	}
 	
 	public function checkPerms($file){
-		$filechk = substr(sprintf('%o', fileperms($file)), -3);
-		if ($filechk != 444){
+		if (is_writable($file)) {
 			return "<div class='warn'><img src='../themes/icons/error.png' alt='' /> Warning: Configuration file (conf.inc.php) is still writable, please chmod it to 444!</div>";
 		}
 		else{
@@ -65,7 +64,7 @@ class page {
 		}
 		elseif($current_version > $running_version){
 			$updatemsg = "<span style='color:red'>Upgrade Avaliable</span>";
-		    $upgrademsg = "<div class='warn'><img src='../themes/icons/error.png' alt='' /> There is a new version v$current_version avaliable! Please download and upgrade!</div>";
+		    $upgrademsg = "<div class='warn'><img src='../themes/icons/error.png' alt='' /> There is a new version (v$current_version) avaliable! Please download and upgrade!</div>";
 		}
 		elseif($current_version < $running_version){
 			$updatemsg = "<span style='color:green'>Dev Area Mode</span>";
@@ -99,8 +98,9 @@ class page {
 					$n++;
 				}
 			}
-			if(!$n) { 
-				foreach($main->postvar as $key => $value) {
+			if(!$n) {
+				foreach($_POST as $key => $value) {
+					// We can use $_POST here because updateResource cleans it.
 					$db->updateResource($key, $value);
 				}
 				$main->errors("Settings Updated!");

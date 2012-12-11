@@ -65,7 +65,7 @@ if(INSTALL == 1) {
 	if(FOLDER != "install") {
 		$navbar = $db->query("SELECT * FROM `<PRE>navbar` ORDER BY `order` ASC");
 		while($data2 = $db->fetch_array($navbar)) {
-			if(!$db->config("show_acp_menu") && $data2['name'] == "admin") {
+			if(!$db->config("show_acp_menu") && $data2['link'] == "admin") {
 				//Do something?
 			}
 			else {
@@ -103,4 +103,5 @@ $data = preg_replace("/<COPYRIGHT>/si", '<div id="footer">Powered by <a href="ht
 global $main;
 $data = preg_replace("/<ERRORS>/si", '<span class="errors">'.$main->errors().'</span>', $data);
 $data = preg_replace("/%INFO%/si", INFO, $data);
+$data = preg_replace("/<CSRF_NAME>/si", $GLOBALS['csrf']['input-name'], $data);
 ?>

@@ -1,7 +1,7 @@
 <?php
 //////////////////////////////
 // The Hosting Tool
-// AJAX Class
+// Ajax Class
 // By Jonny H and Kevin M
 // Released under the GNU-GPL
 //////////////////////////////
@@ -9,7 +9,7 @@
 define("LINK", "./");
 include("compiler.php");
 
-class AJAX {
+class Ajax {
 
 	public function orderIsUser()
 	{
@@ -44,6 +44,11 @@ class AJAX {
 		
 		//If it's over 8 characters then complain.
 		if(strlen($main->getvar['user']) > 8) {
+			echo 0;
+			return;
+		}
+		//If it's less than 4 characters then complain.
+		if(strlen($main->getvar['user']) < 4) {
 			echo 0;
 			return;
 		}
@@ -420,11 +425,11 @@ class AJAX {
 		global $main, $db, $type;
 		$pack = $main->getvar['pack'];
 		$server = $type->determineServer($pack);
-		$select = $db->query("SELECT * FROM `<PRE>subdomains` WHERE `server` = '{$server}'");
-		while($select = $db->fetch_array($select)) {
-			$values[] = array($select['subdomain'], $select['subdomain']);	
+		$select = $db->query("SELECT * FROM `<PRE>subdomains` WHERE `server` = '{$server}' ORDER BY `subdomain` ASC");
+		while($row = $db->fetch_array($select)) {
+			$values[] = array($row['subdomain'], $row['subdomain']);
 		}
-		echo $main->dropdown("csub2", $values);
+		echo $main->dropdown("csub2", $values, $values[0]['subdomain']);
 	}
 	
 	public function phpinfo() {
@@ -577,10 +582,11 @@ class AJAX {
 				echo '<div class="errors">Your upgrade is now complete! You can use the script as normal.</div>';	
 			}
 			if($errors['n']) {
-				echo "<strong>SQL Queries (Broke):</strong><br />";
+				echo "<strong>SQL Queries (Broke):</strong><br /><pre>";
 				foreach($errors['errors'] as $value) {
-					echo $value."<br />";	
+					echo nl2br(htmlentities($value))."<br /><br />";
 				}
+				echo "</pre>";
 			}
 		}
 	}
@@ -713,10 +719,20 @@ class AJAX {
 			$subject = $main->getvar['subject'];
 			$msg = $main->getvar['msg'];
 			$query = $db->query("SELECT * FROM `<PRE>users`");
+			$error = false;
 			while($client = $db->fetch_array($query)) {
-				$email->send($client['email'], $subject, $msg);	
+			$result = $email->send($client['email'], $subject, $msg);
+				if(!$result) {
+					// Using output buffering may have actually been a good idea after all... Haha.
+					echo ob_get_clean();
+					$error = true;
+					// Break out of the loop and stop here.
+					break;
+				}
 			}
-			echo 1;
+			if(!$error) {
+				echo 1;
+			}
 		}
 	}
 	function porder() {
@@ -793,19 +809,6 @@ class AJAX {
                     }
                 }
                 return $string;
-        }
-
-        function genkey() {
-            global $main, $db;
-            if($_SESSION['logged'] and $main->getvar['do'] == "it") {
-                $random = $this->randomString();
-                $key = hash('sha512', $random);
-                $db->updateConfig('api-key', $key);
-                echo '<span style="color:green;">API Key Generated!</span>'."\n".
-                '<br /> To get your new key go to the Get API Key page.';
-                echo "\n<br />";
-                return true;
-            }
         }
 
         function editcss() {
@@ -1070,8 +1073,9 @@ class AJAX {
        function uiThemeChange() {
            global $main, $db;
            if($_SESSION['logged']) {
-               if(isset($_GET['theme'])) {
-                   $db->updateConfig('ui-theme', $main->getvar['theme']);
+               if(isset($_POST['theme'])) {
+                   $db->updateConfig('ui-theme', $main->postvar['theme']);
+				   echo "true";
                }
            }
        }
@@ -1100,10 +1104,10 @@ class AJAX {
 		   }
 	   }
 }
-if(isset($_GET['function']) and $_GET['function'] != "") {
-	$ajax = new AJAX;
-	if(method_exists($ajax, $_GET['function'])) {
-		$ajax->{$_GET['function']}();
+if(isset($_REQUEST['function']) and $_REQUEST['function'] != "") {
+	$Ajax = new Ajax();
+	if(method_exists($Ajax, $_REQUEST['function'])) {
+		$Ajax->{$_REQUEST['function']}();
 		include(LINK."output.php");
 	}
 }

@@ -7,8 +7,17 @@
 //////////////////////////////
 error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE);
 
-#Define the main THT
+// Define the main THT
 define("THT", 1);
+
+// Helps prevent against CSRF attacks.
+require_once("csrf-magic.php");
+
+// We don't want this to be called directly.
+$compile = explode("/", $_SERVER["SCRIPT_FILENAME"]);
+if($compile[count($compile)-1] == "compiler.php") {
+	die("Please do not call \"compiler.php\" directly.");
+}
 
 #Page generated
 $starttime = explode(' ', microtime());
@@ -68,57 +77,82 @@ if(INSTALL == 1) {
 	define("THEME", $db->config("theme")); # Set the default theme
 	define("URL", $db->config("url")); # Sets the URL THT is located at
 	define("NAME", $db->config("name")); # Sets the name of the website
-	//Converts all POSTS into variable - DB Friendly.
-	if($_POST) {
-		foreach($_POST as $key => $value) {
+}
+// Converts the $_POST global array into $main->postvar - DB Friendly.
+if(isset($_POST)) {
+	foreach($_POST as $key => $value) {
+		if(INSTALL == 1) {
 			$main->postvar[$key] = $db->strip($value);
+		}
+		else {
+			$main->postvar[$key] = $value;
 		}
 	}
 }
-//Converts all GET into variable - DB Friendly.
-foreach($_GET as $key => $value) {
-	if(INSTALL == 1) {
-		$main->getvar[$key] = $db->strip($value);
-	}
-	else {
-		$main->getvar[$key] = $value;	
+// Converts the $_GET global array into $main->getvar - DB Friendly.
+if(isset($_GET)) {
+	foreach($_GET as $key => $value) {
+		if(INSTALL == 1) {
+			$main->getvar[$key] = $db->strip($value);
+		}
+		else {
+			$main->getvar[$key] = $value;	
+		}
 	}
 }
+// Converts the $_REQUEST global array into $main->requestvar - DB Friendly.
+if(isset($_REQUEST)) {
+	foreach($_REQUEST as $key => $value) {
+		if(INSTALL == 1) {
+			$main->requestvar[$key] = $db->strip($value);
+		}
+		else {
+			$main->requestvar[$key] = $value;
+		}
+	}
+}
+
 $path = dirname($_SERVER['PHP_SELF']);
 $position = strrpos($path,'/') + 1;
 define("FOLDER", substr($path,$position)); # Add current folder name to global
-if(FOLDER != "install" && FOLDER != "includes" && INSTALL != 1) { # Are we installing?	
-	$error['Error'] = "THT isn't Installed!";
-	$error['What to do'] = "Please run the install script @ <a href='".LINK."../install'>here</a>";
-	die($main->error($error));
+
+// Cheap. I know.
+if(!is_dir("../includes") && !is_dir("../themes") && !is_dir("../admin")) {
+	$check = explode("/", dirname($_SERVER["SCRIPT_NAME"]));
+	if($check[count($check)-1] == "install") {
+		die("Please change your THT directory's name from something else other than \"install\". Please?");
+	}
 }
 
-//Resets the error.
+if(FOLDER != "install" && FOLDER != "includes" && INSTALL != 1) { # Are we installing?  
+                // Old Method - Uncomment if having trouble installing
+        //$error['Error'] = "THT isn't Installed!";
+        //$error['What to do'] = "Please run the install script @ <a href='".LINK."../install'>here</a>";
+        //die($main->error($error));
+        
+                // Lets just redirect to the installer, shall we?
+        $installURL = LINK . "../install";
+        header("Location: $installURL");
+}
+
+
+// Resets the error.
 $_SESSION['ecount'] = 0;
 $_SESSION['errors'] = 0;
 
-//If payment..
+// If payment..
 if(FOLDER == "client" && $main->getvar['page'] == "invoices" && $main->getvar['iid'] && $_SESSION['clogged'] == 1) {
 	$invoice->pay($main->getvar['iid'], "client/index.php?page=invoices");
 	echo "You made it this far.. something went wrong.";
 }
 
-//SHHHH... SECRET
-if($main->getvar['devh4xx']) {
-	$array['VERSION'] = $db->config("version");
-	$array['THEME'] = $db->config("theme");
-	$array['P2H'] = $db->config("p2hcheck");
-	$array['URL'] = $db->config("url");
-	die($style->replacevar("tpl/info.tpl", $array));
-}
-
 function checkForDependencies() {
-	//Here, we're going to see if we have the functions that we need. :D
+	// Here, we're going to see if we have the functions that we need. :D
 	$needed = array();
-	//First things first:
+	// First things first:
 	$version = explode(".", phpversion());
 	if($version[0] < 5) {
-		die("PHP Version 5 or over is required! You're currently running: " . phpversion());
+		die("PHP Version 5 or greater is required! You're currently running: " . phpversion());
 	}
 	if(!function_exists("curl_init")) {
 		$needed[] = "cURL";
@@ -139,4 +173,5 @@ function checkForDependencies() {
 		return $output;
 	}
 }
+	
 ?>

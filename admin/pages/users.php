@@ -157,7 +157,8 @@ class page {
 							$array2['CITY'] = $client['city'];
 							$array2['STATE'] = $client['state'];
 							$array2['ZIP'] = $client['zip'];
-							$array2['COUNTRY'] = $client['country'];
+							$array2['COUNTRY'] = strtolower($client['country']);
+							$array2['FULLCOUNTRY'] = $main->country_code_to_country($client['country']);
 							$array2['PHONE'] = $client['phone'];
 							$invoicesq = $db->query("SELECT * FROM `<PRE>invoices` WHERE `uid` = '{$db->strip($client['id'])}' AND `is_paid` = '0'");
 							$array2['INVOICES'] = $db->num_rows($invoicesq);
@@ -201,8 +202,13 @@ class page {
 						case "email":
 							if($_POST) {
 								global $email;
-								$email->send($client['email'] ,$main->postvar['subject'], $main->postvar['content']);
-								$main->errors("Email sent!");
+								$result = $email->send($client['email'] ,$main->postvar['subject'], $main->postvar['content']);
+								if($result) {
+									$main->errors("Email sent!");
+								}
+								else {
+									$main->errors("Email was not sent out!");
+								}
 							}
 							$array['BOX'] = "";
 							$array['CONTENT'] = $style->replaceVar("tpl/emailclient.tpl");

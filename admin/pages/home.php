@@ -39,7 +39,7 @@ class page {
 	
 	public function checkPerms($file){
 		if (is_writable($file)){
-			return "<div class='warn'><img src='../themes/icons/error.png' alt='' /> Warning: Configuration file is still writable, please chmod it to 444!</div>";
+			return "<div class='warn'><img src='../themes/icons/error.png' alt='' /> Warning: Configuration file (conf.inc.php) is still writable, please chmod it to 444!</div>";
 		}
 		else{
 			return "";

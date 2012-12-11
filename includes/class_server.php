@@ -42,6 +42,11 @@ class server {
 		$newuser = true;
 		
 		//Check details
+		$query = $db->query("SELECT * FROM `<PRE>packages` WHERE `id` = '{$main->getvar['package']}' AND `is_disabled` = 0"); # Package disabled?
+		if($db->num_rows($query) != 1) {
+			echo "Package is disabled.!";
+			return;
+		}
 		if($main->getvar['domain'] == "dom") { # If Domain
 			if(!$main->getvar['cdom']) {
 				echo "Please fill in the domain field!";
@@ -105,12 +110,90 @@ class server {
 		   echo "Please enter a email!";
 		   return;
 		}
-		else {
-			if((!$main->check_email($main->getvar['email'])) && ($newuser==true)) {
+		if((!$main->check_email($main->getvar['email'])) && ($newuser==true)) {
 				echo "Your email is the wrong format!";	
+				return;
+		}
+		else {
+			$query = $db->query("SELECT * FROM `<PRE>users` WHERE `email` = '{$main->getvar['email']}'");
+			if($db->num_rows($query) != 0) {
+				echo "That e-mail address is already in use!";
 				return;
 			}
 		}
+		if(($main->getvar['human'] != $_SESSION["pass"]) && ($newuser==true)) {
+		   echo "Human test failed!";
+		   return;
+		}
+		if((!$main->getvar['firstname']) && ($newuser==true)) {
+		   echo "Please enter a valid first name!";
+		   return;
+		}
+		if((!$main->getvar['lastname']) && ($newuser==true)) {
+		   echo "Please enter a valid last name!";
+		   return;
+		}
+		if((!$main->getvar['address']) && ($newuser==true)) {
+		   echo "Please enter a valid address!";
+		   return;
+		}
+		if((!$main->getvar['city']) && ($newuser==true)) {
+		   echo "Please enter a valid city!";
+		   return;
+		}
+		if((!$main->getvar['zip']) && ($newuser==true)) {
+		   echo "Please enter a valid zip code!";
+		   return;
+		}
+		if((!$main->getvar['state']) && ($newuser==true)) {
+		   echo "Please enter a valid state!";
+		   return;
+		}
+		if((!$main->getvar['state']) && ($newuser==true)) {
+		   echo "Please enter a valid state!";
+		   return;
+		}
+		if((!$main->getvar['country']) && ($newuser==true)) {
+		   echo "Please select a country!";
+		   return;
+		}
+		if ((!preg_match("/^([a-zA-Z\.\'\ \-])+$/",$main->getvar['firstname'])) && ($newuser==true)) {
+			echo "Please enter a valid first name!";
+			return;			
+		}
+		if ((!preg_match("/^([a-zA-Z\.\'\ \-])+$/",$main->getvar['lastname'])) && ($newuser==true)) {
+			echo "Please enter a valid last name!";
+			return;			
+		}
+		if ((!preg_match("/^([0-9a-zA-Z\.\ \-])+$/",$main->getvar['address'])) && ($newuser==true)) {
+			echo "Please enter a valid address!";
+			return;
+		}
+		if ((!preg_match("/^([a-zA-Z ])+$/",$main->getvar['city'])) && ($newuser==true)) {
+			echo "Please enter a valid city!";
+			return;			
+		}
+		if ((!preg_match("/^([a-zA-Z\.\ -])+$/",$main->getvar['state'])) && ($newuser==true)) {
+			echo "Please enter a valid state!";
+			return;
+		}
+		if((strlen($main->getvar['zip']) > 7) && ($newuser==true)) {
+			echo "Please enter a valid zip/postal code!";
+			return;
+		}
+		if ((!preg_match("/^([0-9a-zA-Z\ \-])+$/",$main->getvar['zip'])) && ($newuser==true)) {
+			echo "Please enter a valid zip/postal code!";
+			return;
+		}
+		if((strlen($main->getvar['phone']) > 15) && ($newuser==true)) {
+			echo "Please enter a valid phone number!";
+			return;
+		}
+		if ((!preg_match("/^([0-9\-])+$/",$main->getvar['phone'])) && ($newuser==true)) {
+			echo "Please enter a valid phone number!";
+			return;
+		}
+		
 		$type2 = $type->createType($type->determineType($main->getvar['package']));
 		if($type2->signup) {
 			$pass = $type2->signup();
@@ -150,13 +233,43 @@ class server {
 				$UsrName = $main->getvar['username'];
 				$newusername = $main->getvar['username'];
 				
-				$db->query("INSERT INTO `<PRE>users` (user, email, password, salt, signup, ip) VALUES(
+				$db->query("INSERT INTO `<PRE>users` (user, email, password, salt, signup, ip, firstname, lastname, address, city, state, zip, country, phone) VALUES(
 													  '{$main->getvar['username']}',
 													  '{$main->getvar['email']}',
 													  '{$password}',
 													  '{$salt}',
 													  '{$date}',
-													  '{$ip}')");
+													  '{$ip}',
+													  '{$main->getvar['firstname']}',
+													  '{$main->getvar['lastname']}',
+													  '{$main->getvar['address']}',
+													  '{$main->getvar['city']}',
+													  '{$main->getvar['state']}',
+													  '{$main->getvar['zip']}',
+													  '{$main->getvar['country']}',
+													  '{$main->getvar['phone']}')");
+				$db->query("INSERT INTO `<PRE>users_bak` (user, email, password, salt, signup, ip, firstname, lastname, address, city, state, zip, country, phone) VALUES(
+													  '{$main->getvar['username']}',
+													  '{$main->getvar['email']}',
+													  '{$password}',
+													  '{$salt}',
+													  '{$date}',
+													  '{$ip}',
+													  '{$main->getvar['firstname']}',
+													  '{$main->getvar['lastname']}',
+													  '{$main->getvar['address']}',
+													  '{$main->getvar['city']}',
+													  '{$main->getvar['state']}',
+													  '{$main->getvar['zip']}',
+													  '{$main->getvar['country']}',
+													  '{$main->getvar['phone']}')");
+				$rquery = "SELECT * FROM `<PRE>users` WHERE `user` = '{$UsrName}' LIMIT 1;";
+				$rdata = $db->query($rquery);
+				$db->query("INSERT INTO `<PRE>logs` (uid, loguser, logtime, message) VALUES(
+													  '{$rquery['userid']}',
+													  '{$main->getvar['username']}',
+													  '{$date}',
+													  'Registered.')");
 			}
 			else {
 				$UsrName = $cdata['user'];
@@ -172,6 +285,18 @@ class server {
 													  '1',
 													  '{$date}',
 													  '{$additional}')");
+				$db->query("INSERT INTO `<PRE>user_packs_bak` (userid, pid, domain, status, signup, additional) VALUES(
+													  '{$data['id']}',
+													  '{$main->getvar['package']}',
+													  '{$main->getvar['fdom']}',
+													  '1',
+													  '{$date}',
+													  '{$additional}')");
+				$db->query("INSERT INTO `<PRE>logs` (uid, loguser, logtime, message) VALUES(
+													  '{$data['id']}',
+													  '{$main->getvar['username']}',
+													  '{$date}',
+													  'Package created ({$main->getvar['fdom']})')");
 				global $email;
 				$array['USER'] = $newusername;
 				if ($newuser == true) { $array['PASS'] = $main->getvar['password']; $array['EMAIL'] = $main->getvar['email']; }
@@ -201,15 +326,15 @@ class server {
 						$emaildata = $db->emailTemplate("newaccadmin");
 						$emaildata2 = $db->emailTemplate("adminval");
 						$email->staff($emaildata2['subject'], $emaildata2['content']);
-						echo "<strong>Your account is awaiting admin validation!</strong><br />You may now use the client login bar to see your client area. An email has been dispatched to the address on file. You will recieve another email when the admin has overlooked your account.";
+						echo "<strong>Your account is awaiting admin validation!</strong><br />An email has been dispatched to the address on file. You will recieve another email when the admin has overlooked your account.";
 						$donecorrectly = true;
 					}
 					else {
-						echo "Something with admin validation wen't wrong (suspend). Your account should be running but contact your host!";	
+						echo "Something with admin validation went wrong (suspend). Your account should be running but contact your host!";	
 					}
 				}
 				else {
-					echo "Something with admin validation wen't wrong. Your account should be running but contact your host!";	
+					echo "Something with admin validation went wrong. Your account should be running but contact your host!";	
 				}
 				$email->send($array['EMAIL'], $emaildata['subject'], $emaildata['content'], $array);
 			}
@@ -230,11 +355,11 @@ class server {
 			}
 		}
 	}
-	public function terminate($id) { # Deletes a user account from the package ID
+	public function terminate($id, $reason = false) { # Deletes a user account from the package ID
 		global $db, $main, $type, $email;
 		$query = $db->query("SELECT * FROM `<PRE>user_packs` WHERE `id` = '{$db->strip($id)}'");
 		if($db->num_rows($query) == 0) {
-			$array['Error'] = "That package doesn't exist!";
+			$array['Error'] = "That package doesn't exist or cannot be terminated!";
 			$array['User PID'] = $id;
 			$main->error($array);
 			return;	
@@ -248,9 +373,15 @@ class server {
 				$this->servers[$server] = $this->createServer($data['pid']); # Create server class
 			}
 			if($this->servers[$server]->terminate($data2['user'], $server) == true) {
+				$date = time();
 				$emaildata = $db->emailTemplate("termacc");
 				$array['REASON'] = "Admin termination.";
 				$email->send($data2['email'], $emaildata['subject'], $emaildata['content'], $array);
+				$db->query("INSERT INTO `<PRE>logs` (uid, loguser, logtime, message) VALUES(
+													  '{$db->strip($data['userid'])}',
+													  '{$data2['user']}',
+													  '{$date}',
+													  'Terminated ($reason)')");
 				$db->query("DELETE FROM `<PRE>user_packs` WHERE `id` = '{$data['id']}'");
 				$db->query("DELETE FROM `<PRE>users` WHERE `id` = '{$db->strip($data['userid'])}'");
 				return true;
@@ -260,11 +391,83 @@ class server {
 			}
 		}
 	}
+	public function cancel($id, $reason = false) { # Deletes a user account from the package ID
+		global $db, $main, $type, $email;
+		$query = $db->query("SELECT * FROM `<PRE>user_packs` WHERE `id` = '{$db->strip($id)}' AND `status` != '9'");
+		if($db->num_rows($query) == 0) {
+			$array['Error'] = "That package doesn't exist or cannot be cancelled! Are you trying to cancel an already cancelled account?";
+			$array['User PID'] = $id;
+			$main->error($array);
+			return;	
+		}
+		else {
+			$data = $db->fetch_array($query);
+			$query2 = $db->query("SELECT * FROM `<PRE>users` WHERE `id` = '{$db->strip($data['userid'])}'");
+			$data2 = $db->fetch_array($query2);
+			$server = $type->determineServer($data['pid']);
+			if(!is_object($this->servers[$server])) {
+				$this->servers[$server] = $this->createServer($data['pid']); # Create server class
+			}
+			if($this->servers[$server]->terminate($data2['user'], $server) == true) {
+				$date = time();
+				$emaildata = $db->emailTemplate("cancelacc");
+				$array['REASON'] = "Account Cancelled.";
+				$email->send($data2['email'], $emaildata['subject'], $emaildata['content'], $array);
+				$db->query("UPDATE `<PRE>user_packs` SET `status` = '9' WHERE `id` = '{$data['id']}'");
+				$db->query("UPDATE `<PRE>users` SET `status` = '9' WHERE `id` = '{$db->strip($data['userid'])}'");
+				$db->query("INSERT INTO `<PRE>logs` (uid, loguser, logtime, message) VALUES(
+													  '{$db->strip($data['userid'])}',
+													  '{$data2['user']}',
+													  '{$date}',
+													  'Cancelled  ($reason)')");
+				return true;
+			}
+			else {
+				return false;	
+			}
+		}
+	}
+	public function decline($id) { # Deletes a user account from the package ID
+		global $db, $main, $type, $email;
+		$query = $db->query("SELECT * FROM `<PRE>user_packs` WHERE `id` = '{$db->strip($id)}' AND `status` != '9'");
+		if($db->num_rows($query) == 0) {
+			$array['Error'] = "That package doesn't exist or cannot be cancelled! Are you trying to cancel an already cancelled account?";
+			$array['User PID'] = $id;
+			$main->error($array);
+			return;	
+		}
+		else {
+			$data = $db->fetch_array($query);
+			$query2 = $db->query("SELECT * FROM `<PRE>users` WHERE `id` = '{$db->strip($data['userid'])}'");
+			$data2 = $db->fetch_array($query2);
+			$server = $type->determineServer($data['pid']);
+			if(!is_object($this->servers[$server])) {
+				$this->servers[$server] = $this->createServer($data['pid']); # Create server class
+			}
+			if($this->servers[$server]->terminate($data2['user'], $server) == true) {
+				$date = time();
+				$emaildata = $db->emailTemplate("cancelacc");
+				$array['REASON'] = "Account Declined.";
+				$email->send($data2['email'], $emaildata['subject'], $emaildata['content'], $array);
+				$db->query("UPDATE `<PRE>user_packs` SET `status` = '9' WHERE `id` = '{$data['id']}'");
+				$db->query("UPDATE `<PRE>users` SET `status` = '9' WHERE `id` = '{$db->strip($data['userid'])}'");
+				$db->query("INSERT INTO `<PRE>logs` (uid, loguser, logtime, message) VALUES(
+													  '{$db->strip($data['userid'])}',
+													  '{$data2['user']}',
+													  '{$date}',
+													  'Declined  (Package ID $id)')");
+				return true;
+			}
+			else {
+				return false;	
+			}
+		}
+	}
 	public function suspend($id, $reason = false) { # Suspends a user account from the package ID
 		global $db, $main, $type, $email;
-		$query = $db->query("SELECT * FROM `<PRE>user_packs` WHERE `id` = '{$db->strip($id)}'");
+		$query = $db->query("SELECT * FROM `<PRE>user_packs` WHERE `id` = '{$db->strip($id)}' AND `status` = '1'");
 		if($db->num_rows($query) == 0) {
-			$array['Error'] = "That package doesn't exist!";
+			$array['Error'] = "That package doesn't exist or cannot be suspended!";
 			$array['User PID'] = $id;
 			$main->error($array);
 			return;	
@@ -283,7 +486,14 @@ class server {
 				$donestuff = $serverphp->suspend($data2['user'], $server, $reason);
 			}
 			if($donestuff == true) {
+				$date = time();
 				$db->query("UPDATE `<PRE>user_packs` SET `status` = '2' WHERE `id` = '{$data['id']}'");
+				$db->query("UPDATE `<PRE>users` SET `status` = '2' WHERE `id` = '{$db->strip($data['userid'])}'");
+				$db->query("INSERT INTO `<PRE>logs` (uid, loguser, logtime, message) VALUES(
+													  '{$db->strip($data['userid'])}',
+													  '{$data2['user']}',
+													  '{$date}',
+													  'Suspended ($reason)')");
 				$emaildata = $db->emailTemplate("suspendacc");
 				$email->send($data2['email'], $emaildata['subject'], $emaildata['content']);
 				return true;
@@ -293,7 +503,7 @@ class server {
 			}
 		}
 	}
-	public function changePwd($id, $newpwd) { # Suspends a user account from the package ID
+	public function changePwd($id, $newpwd) { # Changes user's password.
 		global $db, $main, $type, $email;
 		$query = $db->query("SELECT * FROM `<PRE>user_packs` WHERE `id` = '{$db->strip($id)}'");
 		if($db->num_rows($query) == 0) {
@@ -316,6 +526,12 @@ class server {
 				$donestuff = $serverphp->changePwd($data2['user'], $newpwd, $server);
 			}
 			if($donestuff == true) {
+				$date = time();
+				$db->query("INSERT INTO `<PRE>logs` (uid, loguser, logtime, message) VALUES(
+													  '{$db->strip($data['userid'])}',
+													  '{$data2['user']}',
+													  '{$date}',
+													  'cPanel password updated.')");
 				return true;
 			}
 			else {
@@ -326,9 +542,9 @@ class server {
 	
 	public function unsuspend($id) { # Unsuspends a user account from the package ID
 		global $db, $main, $type, $email;
-		$query = $db->query("SELECT * FROM `<PRE>user_packs` WHERE `id` = '{$db->strip($id)}'");
+		$query = $db->query("SELECT * FROM `<PRE>user_packs` WHERE `id` = '{$db->strip($id)}' AND (`status` = '2' OR `status` = '3')");
 		if($db->num_rows($query) == 0) {
-			$array['Error'] = "That package doesn't exist!";
+			$array['Error'] = "That package doesn't exist or cannot be unsuspended!";
 			$array['User PID'] = $id;
 			$main->error($array);
 			return;	
@@ -342,9 +558,49 @@ class server {
 				$this->servers[$server] = $this->createServer($data['pid']); # Create server class
 			}
 			if($this->servers[$server]->unsuspend($data2['user'], $server) == true) {
+				$date = time();
 				$db->query("UPDATE `<PRE>user_packs` SET `status` = '1' WHERE `id` = '{$data['id']}'");
+				$db->query("UPDATE `<PRE>users` SET `status` = '1' WHERE `id` = '{$db->strip($data['userid'])}'");
+				$db->query("INSERT INTO `<PRE>logs` (uid, loguser, logtime, message) VALUES(
+													  '{$db->strip($data['userid'])}',
+													  '{$data2['user']}',
+													  '{$date}',
+													  'Unsuspended.')");
 				$emaildata = $db->emailTemplate("unsusacc");
 				$email->send($data2['email'], $emaildata['subject'], $emaildata['content']);
+				return true;
+			}
+			else {
+				return false;	
+			}
+		}
+	}
+	
+	public function approve($id) { # Unsuspends a user account from the package ID
+		global $db, $main, $type, $email;
+		$query = $db->query("SELECT * FROM `<PRE>user_packs` WHERE `id` = '{$db->strip($id)}' AND (`status` = '2' OR `status` = '3')");
+		if($db->num_rows($query) == 0) {
+			$array['Error'] = "That package doesn't exist or cannot be approved!";
+			$array['User PID'] = $id;
+			$main->error($array);
+			return;	
+		}
+		else {
+			$data = $db->fetch_array($query);
+			$query2 = $db->query("SELECT * FROM `<PRE>users` WHERE `id` = '{$db->strip($data['userid'])}'");
+			$data2 = $db->fetch_array($query2);
+			$server = $type->determineServer($data['pid']);
+			if(!is_object($this->servers[$server])) {
+				$this->servers[$server] = $this->createServer($data['pid']); # Create server class
+			}
+			if($this->servers[$server]->unsuspend($data2['user'], $server) == true) {
+				$date = time();
+				$db->query("UPDATE `<PRE>user_packs` SET `status` = '1' WHERE `id` = '{$data['id']}'");
+				$db->query("INSERT INTO `<PRE>logs` (uid, loguser, logtime, message) VALUES(
+													  '{$db->strip($data['userid'])}',
+													  '{$data2['user']}',
+													  '{$date}',
+													  'Approved (Package ID $id)')");
 				return true;
 			}
 			else {

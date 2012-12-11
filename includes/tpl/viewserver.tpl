@@ -40,7 +40,7 @@ $(window).load(function () {
     <td width="20%">Host:</td>
     <td>
       <input name="host" type="text" id="host" value="%HOST%" />
-      <a title="The server's hostname." class="tooltip"><img src="<URL>themes/icons/information.png" /></a>
+      <a title="The server's hostname or IP." class="tooltip"><img src="<URL>themes/icons/information.png" /></a>
     </td>
   </tr>
   <tr>
@@ -61,3 +61,19 @@ $(window).load(function () {
   </tr>
 </table>
 </form>
+<table width="100%" border="0" cellspacing="2" cellpadding="0">
+<tr>
+<td align="center"><strong>HTTP</strong></td>
+<td align="center"><strong>FTP</strong></td>
+<td align="center"><strong>MySQL</strong></td>
+<td align="center"><strong>POP3</strong></td>
+<td align="center"><strong>SSH</strong></td>
+</tr>
+<tr>
+<td align="center"> <img src="../includes/status.php?link=%HOST%:80"></td>
+<td align="center"> <img src="../includes/status.php?link=%HOST%:21"></td>
+<td align="center"> <img src="../includes/status.php?link=%HOST%:3306"></td>
+<td align="center"> <img src="../includes/status.php?link=%HOST%:110"></td>
+<td align="center"> <img src="../includes/status.php?link=%HOST%:22"></td>
+</tr>
+</table>

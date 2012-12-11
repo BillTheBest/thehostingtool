@@ -167,7 +167,7 @@ class main {
 		$folder = $link;
 		if ($handle = opendir($folder)) { # Open the folder
 			while (false !== ($file = readdir($handle))) { # Read the files
-				if($file != "." && $file != ".." && $file != ".svn") { # Check aren't these names
+				if($file != "." && $file != ".." && $file != ".svn" && $file != "index.html") { # Check aren't these names
 					$values[] = $file;
 				}
 			}
@@ -214,18 +214,31 @@ class main {
 	public function clientLogin($user, $pass) { # Checks the credentails of the client and logs in, returns true or false
 		global $db, $main;
 		if($user && $pass) {
-			$query = $db->query("SELECT * FROM `<PRE>users` WHERE `user` = '{$main->postvar['user']}'");
+			$query = $db->query("SELECT * FROM `<PRE>users` WHERE `user` = '{$main->postvar['user']}' AND `status` <= '2'");
 			if($db->num_rows($query) == 0) {
 				return false;
 			}
 			else {
 				$data = $db->fetch_array($query);
+				$ip = $_SERVER['REMOTE_ADDR'];
 				if(md5(md5($main->postvar['pass']) . md5($data['salt'])) == $data['password']) {
 					$_SESSION['clogged'] = 1;
 					$_SESSION['cuser'] = $data['id'];
+					$date = time();
+					$db->query("INSERT INTO `<PRE>logs` (uid, loguser, logtime, message) VALUES(
+														'{$data['id']}',
+														'{$main->postvar['user']}',
+														'{$date}',
+														'Login successful ($ip)')");
 					return true;
 				}
 				else {
+					$date = time();
+					$db->query("INSERT INTO `<PRE>logs` (uid, loguser, logtime, message) VALUES(
+														'{$data['id']}',
+														'{$main->postvar['user']}',
+														'{$date}',
+														'Login failed ($ip)')");
 					return false;
 				}
 			}
@@ -247,9 +260,23 @@ class main {
 				if(md5(md5($main->postvar['pass']) . md5($data['salt'])) == $data['password']) {
 					$_SESSION['logged'] = 1;
 					$_SESSION['user'] = $data['id'];
+					$date = time();
+					$ip = $_SERVER['REMOTE_ADDR'];
+					$db->query("INSERT INTO `<PRE>logs` (uid, loguser, logtime, message) VALUES(
+														'{$data['id']}',
+														'{$main->postvar['user']}',
+														'{$date}',
+														'STAFF LOGIN SUCCESSFUL ($ip)')");
 					return true;
 				}
 				else {
+					$date = time();
+					$ip = $_SERVER['REMOTE_ADDR'];
+					$db->query("INSERT INTO `<PRE>logs` (uid, loguser, logtime, message) VALUES(
+														'{$data['id']}',
+														'{$main->postvar['user']}',
+														'{$date}',
+														'STAFF LOGIN FAILED ($ip)')");
 					return false;
 				}
 			}

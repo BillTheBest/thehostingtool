@@ -28,7 +28,7 @@ TabJour = new Array("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday",
 TabMois = new Array("January","February","March","April","May","June","July","August","September","October","November","December");
 messageDate = TabJour[jour] + ", " + TabMois[mois] + " " + numero + " " + annee;
    </script>
-	
+
 
 <JAVASCRIPT>
 <CSS>
@@ -60,7 +60,7 @@ document.write(messageDate);
 <div id="panel">
 <!-- start: header_welcomeblock_member -->
 <br/>%INFO%<br/>
-<a href="../order/"><strong>Order Form</strong></a> | <a href="../client/"><strong>Client Area</strong></a> | <a href="../support/"><strong>Support</strong></a>
+<a href="<URL>order"><strong>Order Form</strong></a> | <a href="<URL>client"><strong>Client Area</strong></a> | <a href="<URL>support"><strong>Support</strong></a>
 </div>
 
 <div class="logo"><a href="<URL>"><img src="<IMG>logo.png"/></a></div>
@@ -69,12 +69,11 @@ document.write(messageDate);
 </div>
 <div class="menu">
 <ul>
-<li><a href="<URL>">Home</a></li>
-<li><a href="../">Forums</a></li>
-<li><a href="../">Portal</a></li>
-
-<li><a href="<URL>">Members</a></li>
-<li><a href="<URL>">Billing</a></li>
+	<li><a href="../">Home</a></li>
+	<li><a href="<URL>forums">Forums</a></li>
+	<li><a href="<URL>support">Knowledgebase</a></li>
+	<li><a href="<URL>client">Members</a></li>
+	<li><a href="<URL>client/index.php?page=invoices">Billing</a></li>
 </ul>
 </div>
 
@@ -85,13 +84,13 @@ document.write(messageDate);
 		<br class="clear" />
 		<div id="content">
 
-			
-			
-			
+
+
+
 			<!-- ProfileComments -->
 			<!-- /ProfileComments -->
 			
 			<br />
 <!-- end: header -->
-	
+
 <div><div><div>

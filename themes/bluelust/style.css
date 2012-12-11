@@ -4,7 +4,7 @@ body {
 	font-family: sans-serif;
 	text-align: center;
 	line-height: 1.4;
-	
+
 	font-size: 13px;
 }
 
@@ -46,7 +46,7 @@ background: -webkit-gradient(linear, left top, left bottom, from(#e4e4e4), to(#c
 	border-bottom-right-radius: 8px;
 	-moz-border-bottomleft-radius: 8px;
 	-moz-border-bottomrightt-radius: 8px;
-	
+
 	font-family: sans-serif;
 }
 
@@ -59,7 +59,7 @@ background: -webkit-gradient(linear, left top, left bottom, from(#e4e4e4), to(#c
 	height: 130px;
 	border-left: 1px solid #797979;
 	border-right: 1px solid #797979;
-	
+
 	font-family: sans-serif;
 }
 
@@ -79,14 +79,14 @@ width: 1016px;
 	color: #000000;
 	text-align: center;
 	padding: 4px;
-	
+
 	font-family: sans-serif;
 	font-weight: bold;
 }
 
 .menu li {
 float: left;
-	margin: 0;	
+	margin: 0;
 	padding: 0 15px 0 0;
 	position: relative; /*--Declare X and Y axis base--*/
 }
@@ -808,7 +808,7 @@ div.error.ul {
 	margin: auto auto;
 	border-left: 1px solid #797979;
 	border-right: 1px solid #797979;
-	
+
 	font-family: sans-serif;
 }
 
@@ -867,7 +867,7 @@ padding-left: 4px;
 	color: #797979;
 	text-align: center;
 	padding: 2px;
-	
+
 	font-size: 11px;
 	font-style: italic;
 }
@@ -885,7 +885,7 @@ padding-left: 4px;
 }
 
 .postbit .showdetails {
-	
+
 	display: none;
 	width: auto;
 	padding: 4px;
@@ -898,7 +898,7 @@ padding-left: 4px;
 	-webkit-border-radius: 5px;
 }
 
-	
+
 
 /* THT integration - made by herolien */
 /* http://www.myheberg.com	      */
@@ -983,9 +983,9 @@ input, textarea, select {
 
 
 
- 
+
 #tht_navigation {
-	background: #ffffff; /* url(http://tht.monsite.tk/tht-apart/themes/apartsky/images/navigation_bg.gif) repeat-x;*/
+	background: #ffffff;
 	height: 31px;
 	padding-left: 10px;
 	font-size: 0.95em;
@@ -1003,7 +1003,7 @@ input, textarea, select {
 		padding: 8px 12px;
 		display: inline;
 	}
-	
+
 		#tht_navigation ul li:hover {
 			background: #CCC;
 			color: #FFF;
@@ -1023,17 +1023,17 @@ input, textarea, select {
          }
 		.active a{
             display:block;
-            
+
             color: #FFF;
             background: #CCC;
             font-weight: bold;
 		}
-		
+
 	#tht_navigation ul li a {
 		color: #333;
 		text-decoration: none;
 	}
-	
+
 
 #tht_footer {
 	clear: both;
@@ -1043,16 +1043,16 @@ input, textarea, select {
 	width:75%;
 	margin:auto auto;
 }
-		
+
 	#tht_footer p {
 		float: right;
 	}
-	
+
 	#tht_footer a {
 		color: #FFF;
 	}
 
-   
+
 .break {
 	height:1px;
 	border-bottom:1px dashed #CCC;
@@ -1077,8 +1077,8 @@ input, textarea, select {
 
 
 
- 
- 
+
+
 /*
 * Version Checks
 */
@@ -1115,7 +1115,7 @@ input, textarea, select {
  * No, really.
  */
  .catend{
-    
+
  }
 
 #left {width:26%;float:left;}
@@ -1125,4 +1125,4 @@ input, textarea, select {
 .info_blanc a{
 	color:grey;
 }
-.info_blanc {float:right;text-align:right;color:white; }	
+.info_blanc {float:right;text-align:right;color:white; }

@@ -157,7 +157,7 @@ img, img a {
 
  /****** HEADER AREA ******/
 #tht_navigation {
-	background: #ffffff url(<IMG>navigation_bg.gif) repeat-x;
+	background: #ffffff url(<IMG>grad.gif) repeat-x;
 	height: 31px;
 	border-bottom: 5px solid #bb423e;
 	padding-left: 10px;

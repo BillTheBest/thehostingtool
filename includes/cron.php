@@ -13,6 +13,8 @@ set_time_limit(0);
 
 // Stop the output
 ob_start(); // Damn, I swear I use too much of these. Their like crack. So fuckin addictive.
+//Upgrade all the users before we start processing the type crons.
+$navens_upgrade->cron();
 
 $type->createAll(); // Create all the types
 $classes = $type->classes; // Because I'm a tad lazy, I set the types to a shorter variable
@@ -26,7 +28,7 @@ foreach($classes as $key => $value) {
 	}
 }
 
-// 1.2 Run the Paid CronJob. 
+// 1.2 Run the Paid CronJob.
 $invoice->cron();
 
 // Now we get the data

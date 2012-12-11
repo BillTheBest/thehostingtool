@@ -10,8 +10,8 @@
 if(THT != 1){die();}
 
 class page {
-	
-	public function content() { # Displays the page 
+
+	public function content() { # Displays the page
 		global $style, $db, $main;
 		$data = $db->client($_SESSION['cuser']);
 		$array['USER'] = $data['user'];
@@ -103,13 +103,13 @@ class page {
 					echo $style->replaceVar("tpl/cedit.tpl", $array);
 					return;
 				}
-				if (!preg_match("/^([a-zA-Z\.\'\ \-])+$/",$main->postvar['firstname'])) {
+				if(!preg_match("/^([a-zA-Z\.\'\ \-])+$/",str_replace("\\", "", $main->postvar['firstname']))) {
 					$main->errors("Please enter a valid first name!");
 					echo $style->replaceVar("tpl/cedit.tpl", $array);
 					return;
 				}
-				if (!preg_match("/^([a-zA-Z\.\'\ \-])+$/",$main->postvar['lastname'])) {
-					$main->errors("Please enter a valid last name!");
+				if (!preg_match("/^([a-zA-Z\.\'\ \-])+$/",str_replace("\\", "", $main->postvar['lastname']))) {
+					$main->errors("Please enter a valid time last name!");
 					echo $style->replaceVar("tpl/cedit.tpl", $array);
 					return;
 				}

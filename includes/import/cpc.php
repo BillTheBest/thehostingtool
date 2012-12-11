@@ -10,15 +10,15 @@
 if(THT != 1){die();}
 
 class cpc {
-	
+
 	public $name = "cP Creator";
-	
+
 	public function import() { # Imports or displays. Whatever really..
 		global $style;
 		global $db;
 		global $main;
 		global $type;
-		
+
 		if(!$_POST) {
 			echo $style->replaceVar("tpl/cpc_step1.tpl");
 		}
@@ -64,27 +64,27 @@ class cpc {
 										case "ipb":
 											$prefix = "ibf_";
 											break;
-										
+
 										case "mybb":
 											$prefix = "mybb_";
 											break;
-										
+
 										case "phpbb":
 											$prefix = "phpbb_";
 											break;
-											
+
 										case "phpbb2":
 											$prefix = "phpbb_";
 											break;
-											
+
 										case "vb":
 											$prefix = "vb_";
 											break;
-											
+
 										case "smf":
 											$prefix = "smf_";
 											break;
-											
+
 										case "aef":
 											$prefix = "aef_";
 											break;
@@ -115,7 +115,7 @@ class cpc {
 									if($db->num_rows($pselect) == 0) {
 										$sselect = $db->query("SELECT * FROM `<PRE>servers`");
 										$server = $db->fetch_array($sselect);
-										$db->query("INSERT INTO `<PRE>packages` (name,backend,description,type,server,admin) 
+										$db->query("INSERT INTO `<PRE>packages` (name,backend,description,type,server,admin)
 																				   VALUES('{$data['plan']}',
 																						  '{$data['plan']}',
 																						  'Description Here',
@@ -144,11 +144,10 @@ class cpc {
 											'{$salt}',
 											'{$client['signup']}',
 											'{$client['ip']}',
-											'1')"
-										);
+											'1')");
 										$checkquery = $db->query("SELECT * FROM `<PRE>users` WHERE `user` = '{$data['packuser']}'");
 										$datanewuser = $db->fetch_array($checkquery);
-										$db->query("INSERT INTO `<PRE>user_packs` (userid,domain,pid,signup,status,additional) 
+										$db->query("INSERT INTO `<PRE>user_packs` (userid,domain,pid,signup,status,additional)
 																				 VALUES(
 																						'{$datanewuser['id']}',
 																						'{$data['domain']}',

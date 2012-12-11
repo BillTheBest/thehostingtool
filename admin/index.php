@@ -22,8 +22,8 @@ function acp() {
 	global $type;
 	global $email;
 	ob_start(); # Stop the output buffer
-	
-	if(!$main->getvar['page']) { 
+
+	if(!$main->getvar['page']) {
 		$main->getvar['page'] = "home";
 	}
 	$query = $db->query("SELECT * FROM `<PRE>acpnav` WHERE `link` = '{$main->getvar['page']}'");
@@ -33,7 +33,7 @@ function acp() {
 		case "credits":
 			$header = "Credits";
 			break;
-		
+
 		default:
 			if($page['visual'] == "Tickets" && $main->getvar['mode'] == 'ticketsall'){
 				$header = "All Tickets";
@@ -68,7 +68,7 @@ function acp() {
 			$content = new page;
 			// Main Side Bar HTML
 			$nav = "Sidebar Menu";
-		
+
 			$sub = $db->query("SELECT * FROM `<PRE>acpnav`");
 			while($row = $db->fetch_array($sub)) {
 				if($main->checkPerms($row['id'])) {
@@ -110,7 +110,7 @@ function acp() {
 			$array2['VISUAL'] = "Logout";
 			$array['LINKS'] .= $style->replaceVar("tpl/sidebarlink.tpl", $array2);
 			$sidebar = $style->replaceVar("tpl/sidebar.tpl", $array);
-			
+
 			//Page Sidebar
 			if($content->navtitle) {
 				$subnav = $content->navtitle;
@@ -123,7 +123,7 @@ function acp() {
 				}
 				$subsidebar = $style->replaceVar("tpl/sidebar.tpl", $array3);
 			}
-			
+
 			if($main->getvar['sub'] && $main->getvar['page'] != "type") {
 				foreach($content->navlist as $key => $value) {
 					if($value[2] == $main->getvar['sub']) {
@@ -172,12 +172,12 @@ function acp() {
 				}
 				elseif($content->navlist) {
 					$html .= $content->description(); # First, we gotta get the page description.
-                    $html .= "<br /><br />"; # Break it up
-                    // Now we should prepend some stuff here
-                    $subsidebar2 .= "<strong>Page Submenu</strong><div class='break'></div>";
-                    $subsidebar2 .= $subsidebar;
-                    // Done, now output it in a sub() table
-                    $html .= $main->sub($subsidebar2, NULL); # Initial implementation, add the SubSidebar(var) into the description, basically append it 
+					$html .= "<br /><br />"; # Break it up
+					// Now we should prepend some stuff here
+					$subsidebar2 .= "<strong>Page Submenu</strong><div class='break'></div>";
+					$subsidebar2 .= $subsidebar;
+					// Done, now output it in a sub() table
+					$html .= $main->sub($subsidebar2, NULL); # Initial implementation, add the SubSidebar(var) into the description, basically append it
 				}
 				else {
 					ob_start();
@@ -195,7 +195,7 @@ function acp() {
 	$staffuser = $db->staff($_SESSION['user']);
 	define("SUB", $header);
 	define("INFO", '<b>Welcome back, '. strip_tags($staffuser['name']) .'</b><br />'. SUB);
-	
+
 	echo '<div id="left">';
 	echo $main->table($nav, $sidebar);
 	if($content->navtitle) {
@@ -203,14 +203,14 @@ function acp() {
 		echo $main->table($subnav, $subsidebar);
 	}
 	echo '</div>';
-	
+
 	echo '<div id="right">';
 	echo $main->table($header, $html);
 	echo '</div>';
-	
+
 	$data = ob_get_contents(); # Retrieve the HTML
 	ob_clean(); # Flush the HTML
-	
+
 	return $data; # Return the HTML
 }
 
@@ -219,7 +219,7 @@ if(!$_SESSION['logged']) {
 		define("SUB", "Reset Password");
 		define("INFO", SUB);
 		echo $style->get("header.tpl");
-		
+
 		if($_POST) {
 			foreach($main->postvar as $key => $value) {
 				if($value == "" && !$n) {
@@ -248,7 +248,7 @@ if(!$_SESSION['logged']) {
 			}
 		}
 		echo '<div align="center">'.$main->table("Admin Area - Reset Password", $style->replaceVar("tpl/areset.tpl", $array), "300px").'</div>';
-		
+
 		echo $style->get("footer.tpl");
 	}
 	else{
@@ -266,7 +266,7 @@ if(!$_SESSION['logged']) {
 			$main->errors("Incorrect username or password!");
 		}
 	}
-	
+
 	echo $style->get("header.tpl");
 	$array[] = "";
 	echo '<div align="center">'.$main->table("Admin Area - Login", $style->replaceVar("tpl/alogin.tpl", $array), "300px").'</div>';

@@ -1,6 +1,6 @@
 <div class="subborder">
 	<div class="sub">
-	  <table width="100%" border="0" cellspacing="0" cellpadding="0">
+	  <table width="100%" border="0" cellspacing="0" cellpadding="0" class="text">
 	    <tr>
 	      <td width="50%">
           <strong>Username:</strong> <a href="?page=users&sub=search&do=%CLIENTID%">%USER%</a><br />

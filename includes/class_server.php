@@ -7,9 +7,9 @@
 //////////////////////////////
 
 class server {
-	
+
 	private $servers = array(); # All the servers in a array
-	
+
 	# Start the Functions #
 	public function createServer($package = "") { # Returns the server class for the desired package
 		global $type, $main, $db;
@@ -71,6 +71,7 @@ class server {
 		global $db;
 		global $type;
 		global $email;
+		global $navens_coupons, $sdk;
 
 		//NOTE: I moved all of the getvar stuff up to the top of this function so its easier to manage.  The naming convention I used for the new variables is simply $[NAME_OF_GETVAR]_url
 		//I also removed pointless variables that would always hold the same value as the unes up here.  ($UsrName and $newusername) I also entry condensed all the checks into checking
@@ -99,6 +100,7 @@ class server {
 		$country_url = addslashes(stripslashes(urldecode($main->getvar['country'])));
 		$phone_url = addslashes(stripslashes(urldecode($main->getvar['phone'])));
 		$tzones_url = addslashes(stripslashes(urldecode($main->getvar['tzones'])));
+		$coupon_url = addslashes(stripslashes(urldecode($main->getvar['coupon'])));
 
 		//For some reason the preg_match will not see an apostrophee if its been slashed.  So, these will only be used on checking if
 		//they hold legitimate values.
@@ -158,7 +160,7 @@ class server {
 			}
 			$main->getvar['fdom'] = $csub_url.".".$csub2_url;
 		}
-		
+
 		if(!$username_url) {
 			echo "Please enter a username!";
 			return;
@@ -231,7 +233,16 @@ class server {
 			echo "Please enter a valid phone number!";
 			return;
 		}
-		
+		if($coupon_url && $package_data['type'] != 'free') {
+			$coupon_response = $navens_coupons->validate_coupon($coupon_url, "orders", $username_url, $package_url);
+			if(!$coupon_response){
+				echo "Please enter a valid coupon!";
+				return;
+			}else{
+				$coupon_info = $navens_coupons->coupon_data($coupon_url);
+			}
+		}
+
 		$type2 = $type->createType($type->determineType($package_url));
 		if($type2->signup) {
 			$pass = $type2->signup();
@@ -285,8 +296,7 @@ class server {
 				'{$country_url}',
 				'{$phone_url}',
 				'{$status}',
-				'{$tzones_url}')"
-			);
+				'{$tzones_url}')");
 			$rdata = $db->query("SELECT * FROM `<PRE>users` WHERE `user` = '{$username_url}' LIMIT 1;");
 			$rdata_data = $db->fetch_array($rdata);
 			$db->query("INSERT INTO `<PRE>users_bak` (uid, user, email, password, salt, signup, ip, firstname, lastname, address, city, state, zip, country, phone, status) VALUES(
@@ -305,14 +315,12 @@ class server {
 				'{$zip_url}',
 				'{$country_url}',
 				'{$phone_url}',
-				'{$status}')"
-			);
+				'{$status}')");
 			$db->query("INSERT INTO `<PRE>logs` (uid, loguser, logtime, message) VALUES(
 				'{$rdata_data['id']}',
 				'{$username_url}',
 				'{$date}',
-				'Registered.')"
-			);
+				'Registered.')");
 			$newSQL = "SELECT * FROM `<PRE>users` WHERE `user` = '{$username_url}' LIMIT 1;";
 			$query = $db->query($newSQL);
 			if($db->num_rows($query) == 1) {
@@ -323,22 +331,44 @@ class server {
 					'{$main->getvar['fdom']}',
 					'{$status}',
 					'{$date}',
-					'{$additional}')"
-				);
+					'{$additional}')");
 				$db->query("INSERT INTO `<PRE>user_packs_bak` (userid, pid, domain, status, signup, additional) VALUES(
 					'{$data['id']}',
 					'{$package_url}',
 					'{$main->getvar['fdom']}',
 					'{$status}',
 					'{$date}',
-					'{$additional}')"
-				);
+					'{$additional}')");
 				$db->query("INSERT INTO `<PRE>logs` (uid, loguser, logtime, message) VALUES(
 					'{$data['id']}',
 					'{$username_url}',
 					'{$date}',
-					'Package created ({$main->getvar['fdom']})')"
-				);
+					'Package created ({$main->getvar['fdom']})')");
+
+				if(!empty($coupon_info)){
+					$sdk->thtlog("Coupon used (".$coupon_info['coupcode'].")", $data['id']);
+
+					$package_info = $type->additional($package_url);
+					$packmonthly = $package_info['monthly'];
+					if($pname2['type'] == "paid"){
+						$coupon_info['p2hmonthlydisc'] = "0";
+						$coupon_info['paiddisc'] = $navens_coupons->percent_to_value("paid", $coupon_info['paidtype'], $coupon_info['paiddisc'], $packmonthly);
+					}else{
+						$coupon_info['paiddisc'] = "0";
+						$coupon_info['p2hmonthlydisc'] = $navens_coupons->percent_to_value("p2h", $coupon_info['p2hmonthlytype'], $coupon_info['p2hmonthlydisc'], $packmonthly);
+					}
+
+					$insert_array = array("user" =>   $data['id'],
+							      "coupcode" =>       $coupon_info['coupcode'],
+							      "timeapplied" =>    time(),
+							      "packages" =>       $package_url,
+							      "goodfor" =>        $coupon_info['goodfor'],
+							      "monthsgoodfor" =>  $coupon_info['monthsgoodfor'],
+							      "paiddisc" =>       $coupon_info['paiddisc'],
+							      "p2hmonthlydisc" => $coupon_info['p2hmonthlydisc']);
+
+					$sdk->insert("mod_navens_coupons_used", $insert_array);
+				}
 
 				$query_server = $db->query("SELECT * FROM <PRE>servers WHERE id = '".$package_server."' LIMIT 1");
 				$query_server_data = $db->fetch_array($query_server);
@@ -413,7 +443,10 @@ class server {
 				global $invoice;
 				$amountinfo = $type->additional($package_url);
 				$amount = $amountinfo['monthly'];
-				$due = time()+intval($db->config("suspensiondays")*24*60*60);
+				if(!empty($coupon_info)){
+					$amount = max(0, $amount - $coupon_info['paiddisc']);
+				}
+				$due = time()+2592000;
 				$notes = "Your current hosting package monthly invoice. Package: ". $pname['name'];
 				$invoice->create($data['id'], $amount, $due, $notes);
 				$serverphp->suspend($username_url, $type->determineServer($package_url));
@@ -455,10 +488,10 @@ class server {
 					'{$db->strip($data['userid'])}',
 					'{$data2['user']}',
 					'{$date}',
-					'Terminated ($reason)')"
-				);
+					'Terminated ($reason)')");
 				$db->query("DELETE FROM `<PRE>user_packs` WHERE `id` = '{$data['id']}'");
 				$db->query("DELETE FROM `<PRE>users` WHERE `id` = '{$db->strip($data['userid'])}'");
+				$db->query("DELETE FROM `<PRE>mod_navens_upgrade` WHERE `uid` = '{$db->strip($data['userid'])}'");
 				return true;
 			}
 			else {
@@ -618,7 +651,7 @@ class server {
 			}
 		}
 	}
-	
+
 	public function unsuspend($id, $noemail = 0) { # Unsuspends a user account from the package ID
 		global $db, $main, $type, $email;
 		$query = $db->query("SELECT * FROM `<PRE>user_packs` WHERE `id` = '{$db->strip($id)}' AND (`status` = '2' OR `status` = '3' OR `status` = '4')");
@@ -656,7 +689,7 @@ class server {
 			}
 		}
 	}
-	
+
 	public function approve($id) { # Approves a user's account (Admin Validation).
 		global $db, $main, $type, $email;
 		$query = $db->query("SELECT * FROM `<PRE>user_packs` WHERE `id` = '{$db->strip($id)}' AND (`status` = '2' OR `status` = '3' OR `status` = '4')");
@@ -690,7 +723,7 @@ class server {
 			}
 		}
 	}
-	
+
 	public function confirm($username, $confirm) { # Set's user's account to Active when the unique link is visited.
 		global $db, $main, $type, $email;
 		$query = $db->query("SELECT * FROM `<PRE>users` WHERE `user` = '{$username}' AND `signup` = {$confirm} AND `status` = '3'");
@@ -711,7 +744,7 @@ class server {
 			return true;
 		}
 	}
-	
+
 	public function testConnection($serverId) {
 		global $db;
 		$query = $db->query("SELECT `type` FROM `<PRE>servers` WHERE `id` = {$serverId}");

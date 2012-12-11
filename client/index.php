@@ -20,11 +20,11 @@ function client() {
 	global $style;
 	global $type;
 	global $email;
-        global $server;
-        global $invoice;
+	global $server;
+	global $invoice;
 	ob_start(); # Stop the output buffer
-		
-	if(!$main->getvar['page']) { 
+
+	if(!$main->getvar['page']) {
 		$main->getvar['page'] = "home";
 	}
 	$query = $db->query("SELECT * FROM `<PRE>clientnav` WHERE `link` = '{$main->getvar['page']}'");
@@ -53,7 +53,7 @@ function client() {
 				$array2['VISUAL'] = $row['visual'];
 				$array['LINKS'] .= $style->replaceVar("tpl/sidebarlink.tpl", $array2);
 			}
-				# Types Navbar
+			# Types Navbar
 			$navquery = $db->query("SELECT * FROM `<PRE>user_packs` WHERE `userid` = '{$_SESSION['cuser']}'");
 			$navdata = $db->fetch_array($navquery);
 			$class = $type->createType($type->determineType($navdata['pid']));
@@ -71,13 +71,13 @@ function client() {
 				}
 			}
 			$type->classes[$type->determineType($navdata['pid'])] = $class;
-			
+
 			$array2['IMGURL'] = "delete.png";
 			$array2['LINK'] = "?page=logout";
 			$array2['VISUAL'] = "Logout";
 			$array['LINKS'] .= $style->replaceVar("tpl/sidebarlink.tpl", $array2);
 			$sidebar = $style->replaceVar("tpl/sidebar.tpl", $array);
-			
+
 			//Page Sidebar
 			if($content->navtitle) {
 				$subnav = $content->navtitle;
@@ -137,7 +137,7 @@ function client() {
 			}
 		}
 	}
-	
+
 	if($main->getvar['sub'] && $main->getvar['page'] != "type") {
 		foreach($content->navlist as $key => $value) {
 			if($value[2] == $main->getvar['sub']) {
@@ -149,7 +149,7 @@ function client() {
 	$staffuser = $db->client($_SESSION['cuser']);
 	define("SUB", $header);
 	define("INFO", '<b>Welcome back, '. $staffuser['user'] .'</b><br />'. SUB);
-	
+
 	echo '<div id="left">';
 	echo $main->table($nav, $sidebar);
 	if($content->navtitle) {
@@ -157,14 +157,14 @@ function client() {
 		echo $main->table($subnav, $subsidebar);
 	}
 	echo '</div>';
-	
+
 	echo '<div id="right">';
 	echo $main->table($header, $html);
 	echo '</div>';
-	
+
 	$data = ob_get_contents(); # Retrieve the HTML
 	ob_clean(); # Flush the HTML
-	
+
 	return $data; # Return the HTML
 }
 
@@ -173,7 +173,7 @@ if(!$_SESSION['clogged']) {
 		define("SUB", "Reset Password");
 		define("INFO", SUB);
 		echo $style->get("header.tpl");
-		
+
 		if($_POST) {
 			foreach($main->postvar as $key => $value) {
 				if($value == "" && !$n) {
@@ -201,7 +201,7 @@ if(!$_SESSION['clogged']) {
 			}
 		}
 		echo '<div align="center">'.$main->table("Client Area - Reset Password", $style->replaceVar("tpl/creset.tpl", $array), "300px").'</div>';
-		
+
 		echo $style->get("footer.tpl");
 	}
 	else {
@@ -215,7 +215,7 @@ if(!$_SESSION['clogged']) {
 				$main->errors("Incorrect username or password or account not active!");
 			}
 		}
-		
+
 		echo $style->get("header.tpl");
 		$array[] = "";
 		if(!$db->config("cenabled")) {
@@ -266,6 +266,11 @@ elseif($_SESSION['clogged']) {
 		$content = '<div align="center">'.$main->table("Client Area - Disabled", $db->config("cmessage"), "300px").'</div>';
 	}
 	else {
+		$usersdb = $db->query("SELECT * FROM `<PRE>users` WHERE `id` = '{$_SESSION['cuser']}'");
+		$usersdb_data = $db->fetch_array($usersdb);
+		if(empty($usersdb_data)){
+			$main->redirect("?page=logout");
+		}
 		$content = client();
 	}
 	echo $style->get("header.tpl");

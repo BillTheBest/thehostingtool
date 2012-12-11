@@ -12,12 +12,12 @@ if(THT != 1){die();}
 define("PAGE", "Logs");
 
 class page {
-	
-	public function content() { # Displays the page 
+
+	public function content() { # Displays the page
 		global $style;
 		global $db;
 		global $main;
-		
+
 		if(is_numeric($main->getvar['dellogid'])){
 			echo "<font color = '#FF0000'>Log entry deleted!</font>";
 			$db->query("DELETE FROM `<PRE>logs` WHERE `id` = '".$main->getvar['dellogid']."'");
@@ -70,43 +70,43 @@ class page {
 				$query = $db->query("SELECT * FROM `<PRE>logs`");
 			}
 			$pages = intval($db->num_rows($query)/$l);
-					if ($db->num_rows($query)%$l) {
-						$pages++;
-					}
-					$current = ($p/$l) + 1;
-					if (($pages < 1) || ($pages == 0)) {
-						$total = 1;
-					}
-					else {
-						$total = $pages;
-					}
-					$first = $p + 1;
-					if (!((($p + $l) / $l) >= $pages) && $pages != 1) {
-						$last = $p + $l;
-					}
-					else{
-						$last = $db->num_rows($query);
-					}
-					if ($db->num_rows($query) == 0) {
-						echo "No logs found.";
-					}
-					else {
-						if ($show != all) {
-							$query2 = $db->query("SELECT * FROM `<PRE>logs` WHERE `message` LIKE '".$paypal_wildcard."$show%' ORDER BY `id` DESC LIMIT $p, $l");
-						}
-						else {
-							$query2 = $db->query("SELECT * FROM `<PRE>logs` ORDER BY `id` DESC LIMIT $p, $l");
-						}
-						while($data = $db->fetch_array($query2)) {
-							$message_data = explode("<", substr($data['message'], 0, 100));
-							$array['USER'] = $data['loguser'];
-							$array['DATE'] = $main->convertdate("n/d/Y", $data['logtime']);
-							$array['TIME'] = $main->convertdate("g:i A", $data['logtime']);
-							$array['MESSAGE'] = $message_data[0];
-							$array['LOGID'] = $data['id'];
-						echo $style->replaceVar("tpl/adminlogs.tpl", $array);
-						}
-					}
+			if ($db->num_rows($query)%$l) {
+				$pages++;
+			}
+			$current = ($p/$l) + 1;
+			if (($pages < 1) || ($pages == 0)) {
+				$total = 1;
+			}
+			else {
+				$total = $pages;
+			}
+			$first = $p + 1;
+			if (!((($p + $l) / $l) >= $pages) && $pages != 1) {
+				$last = $p + $l;
+			}
+			else{
+				$last = $db->num_rows($query);
+			}
+			if ($db->num_rows($query) == 0) {
+				echo "No logs found.";
+			}
+			else {
+				if ($show != all) {
+					$query2 = $db->query("SELECT * FROM `<PRE>logs` WHERE `message` LIKE '".$paypal_wildcard."$show%' ORDER BY `id` DESC LIMIT $p, $l");
+				}
+				else {
+					$query2 = $db->query("SELECT * FROM `<PRE>logs` ORDER BY `id` DESC LIMIT $p, $l");
+				}
+				while($data = $db->fetch_array($query2)) {
+					$message_data = explode("<", substr($data['message'], 0, 100));
+					$array['USER'] = $data['loguser'];
+					$array['DATE'] = $main->convertdate("n/d/Y", $data['logtime']);
+					$array['TIME'] = $main->convertdate("g:i A", $data['logtime']);
+					$array['MESSAGE'] = $message_data[0];
+					$array['LOGID'] = $data['id'];
+					echo $style->replaceVar("tpl/adminlogs.tpl", $array);
+				}
+			}
 			echo "</table></div>";
 			echo "<center>";
 			if ($p != 0) {

@@ -12,9 +12,9 @@ if(THT != 1){die();}
 //Create the class
 class db {
 	private $sql = array(), $con, $prefix, $db; #Variables, only accesible in class
-	
+
 	# Start the functions #
-	
+
 	public function __construct() { # Connect SQL as class is called
 		include(LINK."conf.inc.php"); # Get the config
 		$this->sql = $sql; # Assign the settings to DB Class
@@ -32,15 +32,15 @@ class db {
 			}
 		}
 	}
-	
+
 	private function error($name, $mysqlerror, $func) { #Shows a SQL error from main class
+		global $main;
 		$error['Error'] = $name;
 		$error['Function'] = $func;
 		$error['mySQL Error'] = $mysqlerror;
-		global $main;
 		$main->error($error);
 	}
-	
+
 	public function query($sql) { # Run any query and return the results
 		$sql = preg_replace("/<PRE>/si", $this->prefix, $sql); #Replace prefix variable with right value
 		$sql = @mysql_query($sql, $this->con); # Run query
@@ -49,17 +49,17 @@ class db {
 		}
 		return $sql; # Return SQL
 	}
-	
+
 	public function num_rows($sql) { # Runs a query and returns the rows
 		$sql = mysql_num_rows($sql); # Run query
 		return $sql; # Return SQL
 	}
-	
+
 	public function fetch_array($sql) { # Gets a query and returns the rows/columns as array
 		$sql = @mysql_fetch_array($sql); # Fetch the SQL Array, all the data
 		return $sql; # Return SQL
 	}
-	
+
 	public function strip($value) { # Gets a string and returns a value without SQL Injection
 		if(is_array($value)) {
 			$array = array();
@@ -70,11 +70,11 @@ class db {
 				else {
 					$v = str_replace("\r\n", "", $v);
 					if(get_magic_quotes_gpc()) { # Check if Magic Quotes are on
-						  $v = stripslashes($v); 
+						  $v = stripslashes($v);
 					}
 					if(function_exists("mysql_real_escape_string")) { # Does mysql real escape string exist?
 						  $v = mysql_real_escape_string($v);
-					} 
+					}
 					else { # If all else fails..
 						  $v = addslashes($v);
 					}
@@ -86,11 +86,11 @@ class db {
 		else {
 			$value = str_replace("\r\n", "", $value);
 			if(get_magic_quotes_gpc()) { # Check if Magic Quotes are on
-				  $value = stripslashes($value); 
+				  $value = stripslashes($value);
 			}
 			if(function_exists("mysql_real_escape_string")) { # Does mysql real escape string exist?
 				  $value = mysql_real_escape_string($value);
-			} 
+			}
 			else { # If all else fails..
 				  $value = addslashes($value);
 			}
@@ -98,7 +98,7 @@ class db {
 		}
 
 	}
-	
+
 	public function config($name) { # Returns a value of a config variable
 		$query = $this->query("SELECT * FROM `<PRE>config` WHERE `name` = '{$name}'");
 		if($this->num_rows($query) == 0) {
@@ -112,7 +112,7 @@ class db {
 			return $value['value'];
 		}
 	}
-	
+
 	public function resources($name) { # Returns a value of a resource variable
 		$query = $this->query("SELECT * FROM `<PRE>resources` WHERE `resource_name` = '{$name}'");
 		if($this->num_rows($query) == 0) {
@@ -126,7 +126,7 @@ class db {
 			return $value['resource_value'];
 		}
 	}
-	
+
 	public function staff($id) { # Returns values of a id
 		$id = $this->strip($id);
 		$query = $this->query("SELECT * FROM `<PRE>staff` WHERE `id` = '{$id}'");
@@ -141,7 +141,7 @@ class db {
 			return $value;
 		}
 	}
-	
+
 	public function client($id) { # Returns values of a id
 		$id = $this->strip($id);
 		$query = $this->query("SELECT * FROM `<PRE>users` WHERE `id` = '{$id}'");
@@ -160,21 +160,21 @@ class db {
 			return $value;
 		}
 	}
-	
+
 	public function updateConfig($name, $value) { # Updates a config value
 		// Who actually wrote this?!
 		$name = $this->strip($name);
 		$value = $this->strip($value);
 		$query = $this->query("UPDATE `<PRE>config` SET `value` = '{$value}' WHERE `name` = '{$name}'");
 	}
-	
+
 	public function updateResource($name, $value) { # Updates a config value
 		// Does not expect input to be safe so we sanitize it.
 		$name = $this->strip($name);
 		$value = $this->strip($value);
 		$query = $this->query("UPDATE `<PRE>resources` SET `resource_value` = '{$value}' WHERE `resource_name` = '{$name}'");
 	}
-	
+
 	public function emailTemplate($name = 0, $id = 0) { # Retrieves a email template with name or id
 		global $main, $db;
 		if($name) {

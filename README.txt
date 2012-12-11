@@ -84,5 +84,5 @@ channel on irc.expertec.co.uk
 COPYRIGHT INFORMATION
 -----------------------------------
 
-Copyright Â© 2008-2011 TheHostingTool Development Team and Contributors
+Copyright © 2008-2011 TheHostingTool Development Team and Contributors
 TheHostingTool is licensed under the GNU-GPLv3. See COPYING.txt for license details.

@@ -7,20 +7,21 @@
 //////////////////////////////
 
 class whm {
-	
+
 	# START THE MO TRUCKIN FUNCTIONS #
-	
+
 	public $name = "cPanel/WHM"; # THT Values
 	public $hash = true; # Password or Access Hash?
-	
+	public $canupgrade = true;
+
 	private $server;
-	
+
 	public function __construct($serverId = null) {
 		if(!is_null($serverId)) {
 			$this->server = (int)$serverId;
 		}
 	}
-	
+
 	private function serverDetails($server) {
 		global $db;
 		global $main;
@@ -35,9 +36,9 @@ class whm {
 			return $db->fetch_array($query);
 		}
 	}
-	
+
 	private function remote($url, $xml = 0, $term = false, $returnErrors = false) {
-        global $db;
+		global $db;
 		$data = $this->serverDetails($this->server);
 		$cleanaccesshash = preg_replace("'(\r|\n)'","",$data['accesshash']);
 		$authstr = $data['user'] . ":" . $cleanaccesshash;
@@ -55,7 +56,7 @@ class whm {
 		curl_setopt($ch, CURLOPT_HEADER, 0);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
 		$curlheaders[0] = "Authorization: WHM $authstr";
-		curl_setopt($ch,CURLOPT_HTTPHEADER,$curlheaders);
+		curl_setopt($ch, CURLOPT_HTTPHEADER,$curlheaders);
 		$data = curl_exec($ch);
 		if($data === false) {
 			if($returnErrors) {
@@ -67,9 +68,8 @@ class whm {
 		}
 		curl_close($ch);
 		//END
-        if($term == true) {
+		if($term == true) {
 			return true;
-		
 		}
 		elseif(strstr($data, "SSL encryption is required")) {
 			if($returnErrors) {
@@ -97,7 +97,7 @@ class whm {
 		}
 		return $user;
 	}
-	
+
 	public function GenPassword() {
 		for ($digit = 0; $digit < 5; $digit++) {
 			$r = rand(0,1);
@@ -106,7 +106,7 @@ class whm {
 		}
 		return $passwd;
 	}
-	
+
 	public function signup($server, $reseller, $user = '', $email = '', $pass = '') {
 		global $main;
 		global $db;
@@ -125,7 +125,7 @@ class whm {
 		}
 		//echo $action."<br />". $reseller."<br>";
 		$command = $this->remote($action);
-		
+
 		if($command->result->status == 1) {
 			return true;
 		}
@@ -133,17 +133,17 @@ class whm {
 			echo "WHM Error: ". $command->result->statusmsg;
 		}
 	}
-	
+
 	public function suspend($user, $server, $reason = false) {
 		$this->server = $server;
 		$action = "/xml-api/suspendacct?user=" . strtolower($user);
 		$command = $this->remote($action);
-                if($reason == false) {
-                    $command = $this->remote($action);
-                }
-                else {
-                    $command = $this->remote($action . "&reason=" . str_replace(" ", "%20", $reason));
-                }
+		if($reason == false) {
+			$command = $this->remote($action);
+		}
+		else {
+			$command = $this->remote($action . "&reason=" . str_replace(" ", "%20", $reason));
+		}
 		if($command->result->status == 1) {
 			return true;
 		}
@@ -151,7 +151,7 @@ class whm {
 			return false;
 		}
 	}
-	
+
 	public function unsuspend($user, $server) {
 		$this->server = $server;
 		$action = "/xml-api/unsuspendacct?user=" . strtolower($user);
@@ -224,7 +224,7 @@ class whm {
 				$i++;
 			}
 		}
-		
+
 		$list = $xml->getElementsByTagName('email');
 		$i=0;
 		foreach ($list AS $element)
@@ -255,12 +255,12 @@ class whm {
 			}
 		}
 	}
-	
+
 	public function testConnection($serverId = null) {
 		if(!is_null($serverId)) {
 			$this->server = (int)$serverId;
 		}
-		
+
 		$command = $this->remote("/xml-api/version", 0, false, true);
 		if((is_object($command)) and (get_class($command) == "SimpleXMLElement")) {
 			if(isset($command->version)) {
@@ -279,6 +279,79 @@ class whm {
 			return $command;
 		}
 	}
-}
 
+	public function upgrade($server, $pkg, $user){
+		global $main;
+		global $db;
+
+		$this->server = $server;
+		$action = "/xml-api/changepackage".
+					"?user=". $user . "".
+					"&pkg=". $pkg ."";
+
+		$command = $this->remote($action);
+
+		if($command->result->status == 1) {
+			return true;
+		}
+		else {
+			echo "WHM Error: ". $command->result->statusmsg;
+		}
+	}
+
+	public function simpleXMLToArray(SimpleXMLElement $xml,$attributesKey=null,$childrenKey=null,$valueKey=null){
+
+		if($childrenKey && !is_string($childrenKey)){$childrenKey = '@children';}
+		if($attributesKey && !is_string($attributesKey)){$attributesKey = '@attributes';}
+		if($valueKey && !is_string($valueKey)){$valueKey = '@values';}
+
+		$return = array();
+		$name = $xml->getName();
+		$_value = trim((string)$xml);
+		if(!strlen($_value)){$_value = null;};
+
+		if($_value!==null){
+			if($valueKey){$return[$valueKey] = $_value;}
+			else{$return = $_value;}
+		}
+
+		$children = array();
+		$first = true;
+		foreach($xml->children() as $elementName => $child){
+			$value = simpleXMLToArray($child,$attributesKey, $childrenKey,$valueKey);
+			if(isset($children[$elementName])){
+				if(is_array($children[$elementName])){
+					if($first){
+						$temp = $children[$elementName];
+						unset($children[$elementName]);
+						$children[$elementName][] = $temp;
+						$first=false;
+					}
+					$children[$elementName][] = $value;
+				}else{
+					$children[$elementName] = array($children[$elementName],$value);
+				}
+			}
+			else{
+				$children[$elementName] = $value;
+			}
+		}
+		if($children){
+			if($childrenKey){$return[$childrenKey] = $children;}
+			else{$return = array_merge($return,$children);}
+		}
+
+		$attributes = array();
+		foreach($xml->attributes() as $name=>$value){
+			$attributes[$name] = trim($value);
+		}
+		if($attributes){
+			if($attributesKey){$return[$attributesKey] = $attributes;}
+			else{$return = array_merge($return, $attributes);}
+		}
+
+		return $return;
+	}
+
+}
 ?>

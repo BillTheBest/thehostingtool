@@ -36,6 +36,7 @@ $starttime = $starttime[1] + $starttime[0];
 #Start us up
 if(CRON != 1) {
 	session_start();
+	header("Cache-control: private");
 }
 
 #Stop the output
@@ -173,15 +174,15 @@ if(!is_dir("../includes") && !is_dir("../themes") && !is_dir("../".ADMINDIR)) {
 	}
 }
 
-if(FOLDER != "install" && FOLDER != "includes" && INSTALL != 1) { # Are we installing?  
-                // Old Method - Uncomment if having trouble installing
-        //$error['Error'] = "THT isn't Installed!";
-        //$error['What to do'] = "Please run the install script @ <a href='".LINK."../install'>here</a>";
-        //die($main->error($error));
-        
-                // Lets just redirect to the installer, shall we?
-        $installURL = LINK . "../install";
-        header("Location: $installURL");
+if(FOLDER != "install" && FOLDER != "includes" && INSTALL != 1) { # Are we installing?
+		// Old Method - Uncomment if having trouble installing
+	//$error['Error'] = "THT isn't Installed!";
+	//$error['What to do'] = "Please run the install script @ <a href='".LINK."../install'>here</a>";
+	//die($main->error($error));
+
+		// Lets just redirect to the installer, shall we?
+	$installURL = LINK . "../install";
+	header("Location: $installURL");
 }
 
 

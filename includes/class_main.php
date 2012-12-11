@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 //////////////////////////////
 // TheHostingTool
 // Main functions class
@@ -10,10 +10,10 @@
 if(THT != 1){die();}
 
 class main {
-	
+
 	public $postvar = array(), $getvar = array(), $requestvar = array(); # All post/get/request strings
-	
-	public function convertdate($dtformat, $time){
+
+	public function convertdate($dtformat, $time, $user = ""){
 		global $db;
 		if($_SESSION['logged']){
 			$table = "staff";
@@ -22,7 +22,12 @@ class main {
 			$table = "users";
 			$userid = $_SESSION['cuser'];
 		}
-        
+
+		if($user){
+			$userid = $user;
+			$table = "users";
+		}
+
 		if($table){
 			$query = $db->query("SELECT tzadjust,id FROM <PRE>".$table." WHERE id = '".$userid."' LIMIT 1");
 			$data = $db->fetch_array($query);
@@ -42,7 +47,7 @@ class main {
 			return date($dtformat, $time);        //Using GMT
 		}
 	}
-        
+
 	//Used by tzlist()
 	function array_flatten($array) {
 		$result = array();
@@ -119,23 +124,23 @@ class main {
 	}
 
 	public function cleaninteger($var){ # Transforms an Integer Value (1/0) to a Friendly version (Yes/No)
-	     $patterns[0] = '/0/';
-         $patterns[1] = '/1/';
-         $replacements[0] = 'No';
-         $replacements[1] = 'Yes';
-         return preg_replace($patterns, $replacements, $var);
+		$patterns[0] = '/0/';
+		$patterns[1] = '/1/';
+		$replacements[0] = 'No';
+		$replacements[1] = 'Yes';
+		return preg_replace($patterns, $replacements, $var);
 	}
-	
+
 	public function cleanwip($var){ # Cleans v* from the version Number so we can work
-	     if(preg_match('/v/', $var)){
-	     $wip[0] = '/v/';
-	     $wipr[0] = '';
-	     $cleaned = preg_replace($wip, $wipr, $var);
-	     return $cleaned;
-	     }
-	     else{
-	 	     return $var; #Untouched
-	     }
+		if(preg_match('/v/', $var)){
+			$wip[0] = '/v/';
+			$wipr[0] = '';
+			$cleaned = preg_replace($wip, $wipr, $var);
+			return $cleaned;
+		}
+		else{
+			return $var; #Untouched
+		}
 	}
 	public function error($array) { # The main THT Error show
 		global $style;
@@ -151,7 +156,7 @@ class main {
 			echo $style->replaceVar("../includes/tpl/error.tpl", $errors);
 		}
 	}
-	
+
 	public function redirect($url, $headers = 0, $long = 0) { # Redirects user, default headers
 		if(!$headers) {
 			header("Location: ". $url);	# Redirect with headers
@@ -160,7 +165,7 @@ class main {
 			echo '<meta http-equiv="REFRESH" content="'.$long.';url='.$url.'">'; # HTML Headers
 		}
 	}
-	
+
 	public function errors($error = 0) { # Shows error default, sets error if $error set
 		if(!$error) {
 			if($_SESSION['errors']) {
@@ -171,7 +176,7 @@ class main {
 			$_SESSION['errors'] = $error;
 		}
 	}
-	
+
 	public function table($header, $content = 0, $width = 0, $height = 0) { # Returns the HTML for a THT table
 		global $style;
 		if($width) {
@@ -206,7 +211,7 @@ class main {
 		}
 		return $tbl;
 	}
-	
+
 	public function evalreturn($code) { # Evals code and then returns it without showing
 		ob_start();
 		eval("?> " . $code . "<?php ");
@@ -214,7 +219,7 @@ class main {
 		ob_clean();
 		return $data;
 	}
-	
+
 	public function done() { # Redirects the user to the right part
 		global $main;
 		foreach($main->getvar as $key => $value) {
@@ -230,7 +235,7 @@ class main {
 		}
 		$main->redirect($url);
 	}
-	
+
 	public function check_email($email) {
 		if($this->validEmail($email)) {
 			return true;
@@ -239,7 +244,7 @@ class main {
 			return false;
 		}
 	}
-	
+
 	public function dropDown($name, $values, $default = 0, $top = 1, $class = "", $custom = "") { # Returns HTML for a drop down menu with all values and selected
 		if($top) {
 			$html .= '<select name="'.$name.'" id="'.$name.'" class="'.$class.'" '.$custom.'>';
@@ -258,7 +263,7 @@ class main {
 		}
 		return $html;
 	}
-	
+
 	public function userDetails($id) { # Returns the details of a user in an array
 		global $db;
 		global $main;
@@ -274,7 +279,7 @@ class main {
 			return $data;
 		}
 	}
-	
+
 	public function folderFiles($link, $ignored = array(".", "..", ".svn", "index.html")) { // Returns the filenames of a content in a folder
 		$folder = $link;
 		if ($handle = opendir($folder)) { // Open the folder
@@ -287,7 +292,7 @@ class main {
 		closedir($handle); // Close the folder
 		return $values;
 	}
-	
+
 	public function checkIP($ip) { # Returns boolean for ip. Checks if exists
 		global $db;
 		global $main;
@@ -299,7 +304,7 @@ class main {
 			return true;
 		}
 	}
-	
+
 	public function checkPerms($id, $user = 0) { # Checks the staff permissions for a nav item
 		global $main, $db;
 		if(!$user) {
@@ -322,7 +327,7 @@ class main {
 			return true;
 		}
 	}
-	
+
 	public function clientLogin($user, $pass) { # Checks the credentails of the client and logs in, returns true or false
 		global $db, $main;
 		if($user && $pass) {
@@ -360,7 +365,7 @@ class main {
 			return false;
 		}
 	}
-	
+
 	public function staffLogin($user, $pass) { # Checks the credentials of a staff member and returns true or false
 		global $db, $main;
 		if($user && $pass) {
@@ -398,14 +403,14 @@ class main {
 			return false;
 		}
 	}
-	
+
 	public function laterMonth($num) { # Makes the date with num of months after current
 		$day = date('d');
 		$month = date('m');
 		$year = date('Y');
-		
+
 		$endMonth = $month + $num;
-		
+
 		switch($endMonth) {
 		case 1:
 		$year++;
@@ -420,17 +425,17 @@ class main {
 		}
 		break;
 		default:
-		// nothing to do 
+		// nothing to do
 		break;
 		}
-		
+
 		return mktime(0,0,0,$endMonth,$day,$year);
 	}
-	
+
 	/**
 	* Validate an email address.
 	* Provide email address (raw input)
-	* Returns true if the email address has the email 
+	* Returns true if the email address has the email
 	* address format and the domain exists.
 	* Thank you, Linux Journal!
 	* http://www.linuxjournal.com/article/9585
@@ -483,7 +488,7 @@ class main {
 	(!preg_match('/^(\\\\.|[A-Za-z0-9!#%&`_=\\/$\'*+?^{}|~.-])+$/',
 					 str_replace("\\\\","",$local)))
 		  {
-			 // character not valid in local part unless 
+			 // character not valid in local part unless
 			 // local part is quoted
 			 if (!preg_match('/^"(\\\\"|[^"])+"$/',
 				 str_replace("\\\\","",$local)))
@@ -491,8 +496,7 @@ class main {
 				$isValid = false;
 			 }
 		  }
-		  if ($isValid && !(checkdnsrr($domain,"MX") || 
-	 checkdnsrr($domain,"A")))
+		  if ($isValid && !(checkdnsrr($domain,"MX") || checkdnsrr($domain,"A")))
 		  {
 			 // domain not found in DNS
 			 $isValid = false;
@@ -500,7 +504,7 @@ class main {
 	   }
 	   return $isValid;
 	}
-	
+
 	/*
 	 * A more or less centralized function for changing a client's
 	 * password. This updates both the cPanel/WHM and THT password.
@@ -515,17 +519,17 @@ class main {
 		if($db->num_rows($query) == 0) {
 			return "That client does not exist.";
 		}
-		
+
 		/*
 		 * We're going to set the password in cPanel/WHM first. That way
-		 * if the password is rejected for some reason, THT will not 
+		 * if the password is rejected for some reason, THT will not
 		 * desync.
 		 */
 		$command = $server->changePwd($clientid, $newpass);
 		if($command !== true) {
 			return $command;
 		}
-		
+
 		/*
 		 * Let's change THT's copy of the password. Might as well make a
 		 * new salt while we're at it.
@@ -535,18 +539,18 @@ class main {
 		$password = md5(md5($newpass) . md5($salt));
 		$db->query("UPDATE `<PRE>users` SET `password` = '{$password}' WHERE `id` = '{$db->strip($clientid)}'");
 		$db->query("UPDATE `<PRE>users` SET `salt` = '{$salt}' WHERE `id` = '{$db->strip($clientid)}'");
-		
+
 		//Let's wrap it all up.
 		return true;
 	}
-	
-        /*
-         * Converts two-letter country codes to their full names.
-         * This will probably come in handy considering we use the two-letter
-         * country code format to store countries in the database.
-         * I had to compress this code a bit so it wouldn't be too lengthy.
-         * Original Snippet: http://snipplr.com/view/36868/php-country-code--to-country-name-list/
-         */
+
+	/*
+	 * Converts two-letter country codes to their full names.
+	 * This will probably come in handy considering we use the two-letter
+	 * country code format to store countries in the database.
+	 * I had to compress this code a bit so it wouldn't be too lengthy.
+	 * Original Snippet: http://snipplr.com/view/36868/php-country-code--to-country-name-list/
+	 */
 	public function country_code_to_country($code) {
 		$country = '';
 		if($code=='AF')$country='Afghanistan';if($code=='AX')$country='Aland Islands';if($code=='AL')$country='Albania';if($code=='DZ')$country='Algeria';if($code=='AS')$country='American Samoa';if($code=='AD')$country='Andorra';if($code=='AO')$country='Angola';if($code=='AI')$country='Anguilla';if($code=='AQ')$country='Antarctica';if($code=='AG')$country='Antigua and Barbuda';if($code=='AR')$country='Argentina';if($code=='AM')$country='Armenia';if($code=='AW')$country='Aruba';if($code=='AU')$country='Australia';if($code=='AT')$country='Austria';if($code=='AZ')$country='Azerbaijan';if($code=='BS')$country='Bahamas the';if($code=='BH')$country='Bahrain';if($code=='BD')$country='Bangladesh';if($code=='BB')$country='Barbados';if($code=='BY')$country='Belarus';if($code=='BE')$country='Belgium';if($code=='BZ')$country='Belize';if($code=='BJ')$country='Benin';if($code=='BM')$country='Bermuda';if($code=='BT')$country='Bhutan';if($code=='BO')$country='Bolivia';if($code=='BA')$country='Bosnia and Herzegovina';if($code=='BW')$country='Botswana';if($code=='BV')$country='Bouvet Island (Bouvetoya)';if($code=='BR')$country='Brazil';if($code=='IO')$country='British Indian Ocean Territory (Chagos Archipelago)';if($code=='VG')$country='British Virgin Islands';if($code=='BN')$country='Brunei Darussalam';if($code=='BG')$country='Bulgaria';if($code=='BF')$country='Burkina Faso';if($code=='BI')$country='Burundi';if($code=='KH')$country='Cambodia';if($code=='CM')$country='Cameroon';if($code=='CA')$country='Canada';
@@ -558,9 +562,9 @@ class main {
 		if($code=='VU')$country='Vanuatu';if($code=='VE')$country='Venezuela';if($code=='VN')$country='Vietnam';if($code=='WF')$country='Wallis and Futuna';if($code=='EH')$country='Western Sahara';if($code=='YE')$country='Yemen';if($code=='ZM')$country='Zambia';if($code=='ZW')$country='Zimbabwe';if( $country == '') $country = $code;
 		return $country;
 	}
-	
+
 	/*
-	 * Returns the IP address of this server the way external devices will see it. If $detailed == true then 
+	 * Returns the IP address of this server the way external devices will see it. If $detailed == true then
 	 * it'll return a SimpleXMLElement with much more information. Returns false on failure.
 	 */
 	public function getWanIp($detailed = false) {
@@ -587,7 +591,7 @@ class main {
 		}
 		return $xml->ip_address;
 	}
-	
+
 	/*
 	 * Returns true if it's safe to run a function, false otherwise.
 	 */

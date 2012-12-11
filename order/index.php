@@ -32,7 +32,18 @@ elseif(!$main->checkIP($ip) && !$db->config("multiple")) {
 	$maincontent = $main->table("IP Already Exists!", "Your IP already exists in the database!");
 }
 elseif($_SESSION['clogged']) {
-	$maincontent = $main->table("Unable to sign-up!", "One package per account!");
+	$usersdb = $db->query("SELECT * FROM `<PRE>users` WHERE `id` = '{$_SESSION['cuser']}'");
+	$usersdb_data = $db->fetch_array($usersdb);
+	if(empty($usersdb_data)){
+		session_destroy();
+		$main->redirect("./");
+	}
+	if(!$main->checkIP($ip) && !$db->config("multiple")){
+		$maincontent = $main->table("Unable to sign-up!", "One package per account!");
+	}else{
+		session_destroy();
+		$main->redirect("./");
+	}
 }
 else {
 	$_SESSION['orderform'] = true;
@@ -65,7 +76,7 @@ else {
 		}
 		if($n == 2) {
 			$array['PACKAGES'] .= "</tr>";
-			$n = 0;	
+			$n = 0;
 		}
 	}
 	$array['TOS'] = $db->config("tos");

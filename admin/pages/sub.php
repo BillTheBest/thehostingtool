@@ -10,10 +10,10 @@
 if(THT != 1){die();}
 
 class page {
-	
+
 	public $navtitle;
 	public $navlist = array();
-							
+
 	public function __construct() {
 		$this->navtitle = "Subdomain Sub Menu";
 		$this->navlist[] = array("Add Subdomain", "add.png", "add");
@@ -25,7 +25,7 @@ class page {
 		This is where you add domains so users can make subdomains with them.<br />
 		To get started, choose a link from the sidebar's SubMenu.";
 	}
-	public function content() { # Displays the page 
+	public function content() { # Displays the page
 		global $main;
 		global $style;
 		global $db;
@@ -54,7 +54,7 @@ class page {
 				$array['SERVER'] = $main->dropDown("server", $values);
 				echo $style->replaceVar("tpl/addsubdomain.tpl", $array);
 			break;
-			
+
 			case "edit":
 				if(isset($main->getvar['do'])) {
 					$query = $db->query("SELECT * FROM `<PRE>subdomains` WHERE `id` = '{$main->getvar['do']}'");
@@ -70,7 +70,7 @@ class page {
 								}
 							}
 							if(!$n) {
-								$db->query("UPDATE `<PRE>subdomains` SET `subdomain` = '{$main->postvar['subdomain']}', 
+								$db->query("UPDATE `<PRE>subdomains` SET `subdomain` = '{$main->postvar['subdomain']}',
 																	  `server` = '{$main->postvar['server']}'
 																	   WHERE `id` = '{$main->getvar['do']}'");
 								$main->errors("Subdomain edited!");
@@ -100,7 +100,7 @@ class page {
 					}
 				}
 				break;
-			
+
 			case "delete":
 				if(isset($main->getvar['do'])) {
 					$db->query("DELETE FROM `<PRE>subdomains` WHERE `id` = '{$main->getvar['do']}'");

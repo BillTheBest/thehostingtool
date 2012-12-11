@@ -10,10 +10,10 @@
 if(THT != 1){die();}
 
 class page {
-	
+
 	public $navtitle;
 	public $navlist = array();
-	
+
 	private function lastUpdated($id) { # Returns a the date of last updated on ticket id
 		global $db, $main;
 		$query = $db->query("SELECT * FROM `<PRE>tickets` WHERE `ticketid` = '{$db->strip($id)}' AND `reply` = '1' ORDER BY `time` DESC");
@@ -26,27 +26,27 @@ class page {
 			return $main->convertdate("n/d/Y - g:i A", $data['time'])." by ". $username;
 		}
 	}
-	
+
 	private function status($status) { # Returns the text of the status
 		switch($status) {
 			default:
 				return "Other";
 				break;
-			
+
 			case 1:
 				return "Open";
 				break;
-				
+
 			case 2:
 				return "On Hold";
 				break;
-				
+
 			case 3:
 				return "Closed";
 				break;
 		}
 	}
-	
+
 	private function determineAuthor($id, $staff) { # Returns the text of the author of a reply
 		global $db;
 		switch($staff) {
@@ -54,7 +54,7 @@ class page {
 				$client = $db->client($id);
 				$username = $client['user'];
 				break;
-				
+
 			case 1:
 				$client = $db->staff($id);
 				$username = $client['name'];
@@ -62,7 +62,7 @@ class page {
 		}
 		return $username;
 	}
-	
+
 	private function showReply($id) { # Returns the HTML for a ticket box
 		global $db, $main, $style;
 		$query = $db->query("SELECT * FROM `<PRE>tickets` WHERE `id` = '{$id}'");
@@ -77,15 +77,15 @@ class page {
 			$array['DETAILS'] = "Original Poster";
 		}
 		elseif($data['staff'] == 1) {
-			$array['DETAILS'] = "Staff Member";
+			$array['DETAILS'] = "<font color = '#FF0000'>Staff Member</font>";
 		}
 		else {
 			$array['DETAILS'] = "";
 		}
 		return $style->replaceVar("tpl/support/replybox.tpl", $array);
 	}
-	
-	public function content() { # Displays the page 
+
+	public function content() { # Displays the page
 		global $main;
 		global $style;
 		global $db;
@@ -162,7 +162,7 @@ class page {
 						$db->query("INSERT INTO `<PRE>tickets` (title, content, time, userid, reply, ticketid, staff) VALUES('{$main->postvar['title']}', '{$main->postvar['content']}', '{$time}', '{$_SESSION['user']}', '1', '{$main->getvar['do']}', '1')");
 						$main->errors("Reply has been added!");
 						$last_ticket = $db->query("SELECT * FROM <PRE>tickets WHERE time = '".$time."' LIMIT 1");
-						$last_ticket_data = $db->fetch_array($last_ticket);        
+						$last_ticket_data = $db->fetch_array($last_ticket);
 						$data = $db->fetch_array($query);
 						$client = $db->staff($_SESSION['user']);
 						$user = $db->client($data['userid']);
@@ -203,7 +203,7 @@ class page {
 					$array['REPLIES'] .= $this->showReply($reply['id']);
 					$n++;
 				}
-				
+
 				$array['ADDREPLY'] .= "<br /><b>Change Ticket Status</b>";
 				$values[] = array("Open", 1);
 				$values[] = array("On Hold", 2);
@@ -211,11 +211,11 @@ class page {
 				$array3['DROPDOWN'] = $main->dropdown("status", $values, $data['status'], 0);
 				$array3['ID'] = $data['id'];
 				$array['ADDREPLY'] .= $style->replaceVar("tpl/support/changestatus.tpl", $array3);
-				
+
 				$array['ADDREPLY'] .= "<br /><b>Add Reply</b>";
 				$array2['TITLE'] = "RE: ". $data['title'];
 				$array['ADDREPLY'] .= $style->replaceVar("tpl/support/addreply.tpl", $array2);
-				
+
 				echo $style->replaceVar("tpl/support/viewticket.tpl", $array);
 			}
 		}

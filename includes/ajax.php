@@ -24,12 +24,12 @@ class Ajax {
 		global $main;
 		echo $type->acpPadd($main->getvar['type']);
 	}
-	
+
 	public function pdescription() {
 		global $main;
 		global $db;
 		if(!$main->getvar['id']) {
-		   echo "Select a package to see the description!";
+			echo "Select a package to see the description!";
 		}
 		else {
 			$query = $db->query("SELECT * FROM `<PRE>packages` WHERE `id` = '{$main->getvar['id']}'");
@@ -37,11 +37,11 @@ class Ajax {
 			echo $data['description'];
 		}
 	}
-	
+
 	public function usercheck() {
 		global $main;
 		global $db;
-		
+
 		//If it's over 8 characters then complain.
 		if(strlen($main->getvar['user']) > 8) {
 			echo 0;
@@ -84,8 +84,8 @@ class Ajax {
 		global $main;
 		if($main->getvar['pass'] == ":") {
 			$_SESSION['check']['pass'] = false;
-		   echo 0;
-		   return;
+			echo 0;
+			return;
 		}
 		else {
 			$pass = explode(":", $main->getvar['pass']);
@@ -99,18 +99,40 @@ class Ajax {
 			}
 		}
 	}
+	public function couponcheck() {
+		global $main, $navens_coupons, $type;
+		if(empty($main->getvar['coupon'])) {
+			echo 1;
+			return;
+		}else{
+			$package_type = $type->determineType($main->getvar['package']);
+			if($package_type == "free"){  //lol =)
+				echo 1;
+				return;
+			}
+
+			$coupon_text = $navens_coupons->validate_coupon($main->getvar['coupon'], "orders", $main->getvar['username'], $main->getvar['package']);
+			if($coupon_text){
+				echo $coupon_text;
+				return;
+			}else{
+				echo 0;
+				return;
+			}
+		}
+	}
 	public function emailcheck() {
 		global $main, $db;
 		if(!$main->getvar['email']) {
-		   $_SESSION['check']['email'] = false;
-		   echo 0;
-		   return;
+			$_SESSION['check']['email'] = false;
+			echo 0;
+			return;
 		}
 		$query = $db->query("SELECT * FROM `<PRE>users` WHERE `email` = '{$main->getvar['email']}'");
 		if($db->num_rows($query) != 0) {
-		   $_SESSION['check']['email'] = false;
-		   echo 0;
-		   return;
+			$_SESSION['check']['email'] = false;
+			echo 0;
+			return;
 		}
 		else {
 			if($main->check_email($main->getvar['email'])) {
@@ -135,7 +157,7 @@ class Ajax {
 			echo 1;
 		}
 	}
-	
+
 	public function lastnamecheck() {
 		global $main;
 		if(!preg_match("/^([a-zA-Z\.\'\ \-])+$/",stripslashes($main->getvar['lastname']))) {
@@ -147,7 +169,7 @@ class Ajax {
 			echo 1;
 		}
 	}
-	
+
 	public function addresscheck() {
 		global $main;
 		if(!preg_match("/^([0-9a-zA-Z\.\ \-])+$/",$main->getvar['address'])) {
@@ -159,7 +181,7 @@ class Ajax {
 			echo 1;
 		}
 	}
-	
+
 	public function citycheck() {
 		global $main;
 		if (!preg_match("/^([a-zA-Z ])+$/",$main->getvar['city'])) {
@@ -171,7 +193,7 @@ class Ajax {
 			echo 1;
 		}
 	}
-	
+
 	public function statecheck() {
 		global $main;
 		if (!preg_match("/^([a-zA-Z\.\ -])+$/",$main->getvar['state'])) {
@@ -183,7 +205,7 @@ class Ajax {
 			echo 1;
 		}
 	}
-	
+
 	public function zipcheck() {
 		global $main;
 		if(strlen($main->getvar['zip']) > 7) {
@@ -201,7 +223,7 @@ class Ajax {
 				}
 			}
 	}
-	
+
 	public function phonecheck() {
 		global $main;
 		if(strlen($main->getvar['phone']) > 15) {
@@ -231,7 +253,7 @@ class Ajax {
 			echo 1;
 		}
 	}
-	
+
 	public function clientcheck() {
 		if($_SESSION['check']['email'] == true && $_SESSION['check']['user'] == true && $_SESSION['check']['pass'] == true && $_SESSION['check']['human'] == true && $_SESSION['check']['address'] == true && $_SESSION['check']['state'] == true && $_SESSION['check']['zip'] == true && $_SESSION['check']['phone'] == true) {
 			echo 1;
@@ -240,7 +262,7 @@ class Ajax {
 			echo 0;
 		}
 	}
-	
+
 	public function domaincheck() {
 		global $main;
 		if(!$main->getvar['domain']) {
@@ -256,20 +278,20 @@ class Ajax {
 			}
 		}
 	}
-	
-	public function create() { 
+
+	public function create() {
 		global $main;
 		global $server;
 		$server->signup();
 	}
-	
+
 	public function orderForm() {
 		global $type;
 		global $main;
 		$ptype = $type->determineType($main->getvar['package']);
 		echo $type->orderForm($ptype);
 	}
-	
+
 	public function cancelacc() {
 		global $db, $main, $type, $server, $email;
 		$user = $main->getvar['user'];
@@ -296,7 +318,7 @@ class Ajax {
 			}
 		}
 	}
-	
+
 	public function template() {
 		global $main, $db, $style;
 		if($_SESSION['logged']) {
@@ -322,7 +344,7 @@ class Ajax {
 			}
 		}
 	}
-	
+
 	public function cat() {
 		global $main, $db, $style;
 		if($_SESSION['logged']) {
@@ -353,7 +375,7 @@ class Ajax {
 			}
 		}
 	}
-	
+
 	public function search() {
 		global $main, $db, $style;
 		if($_SESSION['logged']) {
@@ -444,13 +466,13 @@ class Ajax {
 		}
 		echo $main->dropdown("csub2", $values, $values[0]['subdomain']);
 	}
-	
+
 	public function phpinfo() {
 		if($_SESSION['logged']) {
 			phpinfo();
 		}
 	}
-	
+
 	public function status() {
 		global $db;
 		global $main;
@@ -466,7 +488,7 @@ class Ajax {
 			}
 		}
 	}
-	
+
 	public function ticketstatus() {
 		global $db;
 		global $main;
@@ -483,7 +505,7 @@ class Ajax {
 			}
 		}
 	}
-        
+
 	public function serverhash() {
 		global $main;
 		$type = $main->getvar['type'];
@@ -496,7 +518,40 @@ class Ajax {
 			echo 1;
 		}
 	}
-	
+
+	public function servernstmp() {
+		if($_SESSION['logged']) {
+			global $main, $db;
+			$type = $main->getvar['type'];
+			include(LINK ."servers/". $type .".php");
+			$server = new $type;
+			if($server->ns_tmpl) {
+				echo 1;
+			}
+			else {
+				echo 0;
+			}
+
+			echo ";:;". $server->dnstemplate;
+		}
+	}
+
+	public function serverwelcome() {
+		if($_SESSION['logged']) {
+			global $main, $db;
+			$type = $main->getvar['type'];
+			$id = $main->getvar['server'];
+			include(LINK ."servers/". $type .".php");
+			$server = new $type;
+			if($server->has_welcome) {
+				echo 1;
+			}
+			else {
+				echo 0;
+			}
+		}
+	}
+
 	public function editserverhash() {
 		if($_SESSION['logged']) {
 			global $main, $db;
@@ -515,7 +570,46 @@ class Ajax {
 			echo ";:;". $data['accesshash'];
 		}
 	}
-	
+
+	public function editservernstmp() {
+		if($_SESSION['logged']) {
+			global $main, $db;
+			$type = $main->getvar['type'];
+			$id = $main->getvar['server'];
+			include(LINK ."servers/". $type .".php");
+			$server = new $type;
+			if($server->ns_tmpl) {
+				echo 1;
+			}
+			else {
+				echo 0;
+			}
+			$query = $db->query("SELECT * FROM `<PRE>servers` WHERE `id` = '{$id}'");
+			$data = $db->fetch_array($query);
+			if(!$data['dnstemplate']){
+			    $tmpl = $server->dnstemplate;
+			}else{
+			    $tmpl = $data['dnstemplate'];
+			}
+			echo ";:;". $tmpl;
+		}
+	}
+
+	public function editserverwelcome() {
+		if($_SESSION['logged']) {
+			global $main, $db;
+			$type = $main->getvar['type'];
+			$id = $main->getvar['server'];
+			include(LINK ."servers/". $type .".php");
+			$server = new $type;
+			if($server->has_welcome) {
+				echo 1;
+			}
+			else {
+				echo 0;
+			}
+		}
+	}
 	public function sqlcheck() {
 		global $main, $style;
 		if(INSTALL != 1) {
@@ -527,25 +621,25 @@ class Ajax {
 			//die($_SERVER['REQUEST_URI']);
 			$con = @mysql_connect($host, $user, $pass);
 			if(!$con) {
-				echo 0;	
+				echo 0;
 			}
 			else {
 				$seldb = mysql_select_db($db, $con);
 				if(!$seldb) {
-					echo 1;	
+					echo 1;
 				}
 				else {
 					if($this->writeconfig($host, $user, $pass, $db, $pre, "false")) {
-						echo 2;	
+						echo 2;
 					}
 					else {
-						echo 3;	
+						echo 3;
 					}
 				}
 			}
 		}
 		else {
-			echo 4;	
+			echo 4;
 		}
 	}
 	private function writeconfig($host, $user, $pass, $db, $pre, $true) {
@@ -576,7 +670,7 @@ class Ajax {
 				$errors = $this->installsql("sql/install.sql", $sql['pre'], $dbCon);
 			}
 			elseif($main->getvar['type'] == "upgrade") {
-				$errors = $this->installsql("sql/upgrade.sql", $sql['pre'], $dbCon); 
+				$errors = $this->installsql("sql/upgrade.sql", $sql['pre'], $dbCon);
 				$porders = mysql_query("SELECT * FROM `{$sql['pre']}packages`", $dbCon);
 				$n = 1;
 				while($data = mysql_fetch_array($porders)) {
@@ -605,13 +699,13 @@ class Ajax {
 			}
 			echo "Complete!<br /><strong>There were ".$errors['n']." errors while executing the SQL!</strong><br />";
 			if(!$this->writeconfig($sql['host'], $sql['user'], $sql['pass'], $sql['db'], $sql['pre'], "true")) {
-				echo '<div class="errors">There was a problem re-writing to the config!</div>';	
+				echo '<div class="errors">There was a problem re-writing to the config!</div>';
 			}
 			if($main->getvar['type'] == "install") {
 				echo '<div align="center"><input type="button" name="button4" id="button4" value="Next Step" onclick="change()" /></div>';
 			}
 			elseif($main->getvar['type'] == "upgrade") {
-				echo '<div class="errors">Your upgrade is now complete! You can use the script as normal.</div>';	
+				echo '<div class="errors">Your upgrade is now complete! You can use the script as normal.</div>';
 			}
 			if($errors['n']) {
 				echo "<strong>SQL Queries (Broke):</strong><br /><pre>";
@@ -632,14 +726,14 @@ class Ajax {
 		$sDoubleSlash   = '~~DOUBLE_SLASH~~';
 		$sSlashQuote    = '~~SLASH_QUOTE~~';
 		$sSlashSQuote   = '~~SLASH_SQUOTE~~';
-		
+
 		$sContents = str_replace('\\\\', $sDoubleSlash,  $sContents);
 		$sContents = str_replace('\"', $sSlashQuote,  $sContents);
 		$sContents = str_replace("\'", $sSlashSQuote, $sContents);
-		
+
 		$iContents = strlen($sContents);
 		$sDefaultDelimiter = ';';
-		
+
 		$aSql = array();
 		$sSql = '';
 		$bInQuote   = false;
@@ -657,7 +751,7 @@ class Ajax {
 						continue;
 				}
 			}
-		
+
 			if (in_array($sContents[$i], $aQuote)) {
 				$bInQuote = !$bInQuote;
 				if ($bInQuote) {
@@ -666,7 +760,7 @@ class Ajax {
 						$aQuote = array("'", '"');
 				}
 			}
-		
+
 			if ($bInQuote) {
 				$sSql .= $sContents[$i];
 			} else {
@@ -675,18 +769,18 @@ class Ajax {
 						// Clear Comments
 						$sSql = preg_replace("/^(-{2,}.+)/", '', $sSql);
 						$sSql = preg_replace("/(?:\r|\n)(-{2,}.+)/", '', $sSql);
-		
+
 						// Put quotes back where you found them
 						$sSql = str_replace($sDoubleSlash, '\\\\',  $sSql);
 						$sSql = str_replace($sSlashQuote,  '\\"',   $sSql);
 						$sSql = str_replace($sSlashSQuote, "\\'",   $sSql);
-		
+
 						// FIXME: odd replacement issue, just fix it for now and move on
 						$sSql = str_replace('IFEXISTS`', 'IF EXISTS `', $sSql);
-		
+
 						$aSql[] = $sSql;
 						$sSql = '';
-		
+
 						// pass delimiter
 						$i += $iDelimiter;
 				} else {
@@ -694,17 +788,17 @@ class Ajax {
 				}
 			}
 		}
-		
+
 		$aSql = array_map('trim', $aSql);
 		$aSql = array_filter($aSql);
-		
+
 		$n = 0;
 		foreach($aSql as $sSql) {
 			if($con) {
 				$query = mysql_query($sSql, $con);
 			}
 			else {
-				$query = $db->query($sSql);	
+				$query = $db->query($sSql);
 			}
 			if(!$query) {
 				$n++;
@@ -712,7 +806,7 @@ class Ajax {
 			}
 		}
 		if(!$n) {
-			$n = 0;	
+			$n = 0;
 		}
 		$stuff['n'] = $n;
 		$stuff['errors'] = $errors;
@@ -724,7 +818,7 @@ class Ajax {
 		if(!$db->num_rows($query)) {
 			foreach($main->getvar as $key => $value) {
 				if(!$value) {
-					$n++;	
+					$n++;
 				}
 			}
 			if(!$n) {
@@ -740,7 +834,7 @@ class Ajax {
 				echo 1;
 			}
 			else {
-				echo 0;	
+				echo 0;
 			}
 		}
 	}
@@ -812,290 +906,290 @@ class Ajax {
 		}
 	}
 
-        function acpPedit(){
-                global $type;
-                global $main;
-                echo $type->acpPedit($main->getvar['type'], $main->getvar['values'], $main->getvar['origtype']);
-        }
+	function acpPedit(){
+		global $type;
+		global $main;
+		echo $type->acpPedit($main->getvar['type'], $main->getvar['values'], $main->getvar['origtype']);
+	}
 
-        function editbackupservers(){
-                global $type;
-                global $main;
-                echo $type->editbackupservers($main->getvar['switchto']);
-        }
+	function editbackupservers(){
+		global $type;
+		global $main;
+		echo $type->editbackupservers($main->getvar['switchto']);
+	}
 
-        function nedit() {
-            if($_SESSION['logged']) {
-                global $db, $style, $main;
-                $query = $db->query("SELECT * FROM `<PRE>navbar` WHERE `id` = '{$main->getvar['do']}'");
-                $data = $db->fetch_array($query);
-                $array['ID'] = $data['id'];
-                $array['NAME'] = $data['name'];
-                $array['VISUAL']= $data['visual'];
-                $array['LINK'] = $data['link'];
-                $array['ICON'] = $data['icon'];
-                //echo $style->replaceVar("tpl/navedit/pbox.tpl", $array);
-                //echo "\n<!-- O NOEZ IT R H4XX -->\n"; // <-- Don't remove this.
-                echo $style->replaceVar("tpl/navedit/editbox.tpl", $array);
-                return true;
-            }
-        }
+	function nedit() {
+		if($_SESSION['logged']) {
+			global $db, $style, $main;
+			$query = $db->query("SELECT * FROM `<PRE>navbar` WHERE `id` = '{$main->getvar['do']}'");
+			$data = $db->fetch_array($query);
+			$array['ID'] = $data['id'];
+			$array['NAME'] = $data['name'];
+			$array['VISUAL']= $data['visual'];
+			$array['LINK'] = $data['link'];
+			$array['ICON'] = $data['icon'];
+			//echo $style->replaceVar("tpl/navedit/pbox.tpl", $array);
+			//echo "\n<!-- O NOEZ IT R H4XX -->\n"; // <-- Don't remove this.
+			echo $style->replaceVar("tpl/navedit/editbox.tpl", $array);
+			return true;
+		}
+	}
 
-        private function randomString($length = 8, $possible = '0123456789bcdfghjkmnpqrstvwxyz') {
-                $string = "";
-                $i = 0;
-                while($i < $length) {
-                    $char = substr($possible, mt_rand(0, strlen($possible)-1), 1);
-                    if(!strstr($salt, $char)) {
-                        $string .= $char;
-                        $i++;
-                    }
-                }
-                return $string;
-        }
+	private function randomString($length = 8, $possible = '0123456789bcdfghjkmnpqrstvwxyz') {
+		$string = "";
+		$i = 0;
+		while($i < $length) {
+			$char = substr($possible, mt_rand(0, strlen($possible)-1), 1);
+			if(!strstr($salt, $char)) {
+			$string .= $char;
+			$i++;
+			}
+		}
+		return $string;
+	}
 
-        function editcss() {
-            global $main, $db, $style;
-            if($_SESSION['logged']) {
-                if(isset($_POST['css'])) {
-                    $url = $db->config('url')."themes/".$db->config('theme')."/images/";
-                    $slash = stripslashes(str_replace("&lt;IMG&gt;", "<IMG>", $_POST['css'])); #Strip it back
-                    $filetochange = LINK."../themes/".$db->config('theme')."/style.css";
-                    file_put_contents($filetochange, $slash);
-                    echo "CSS File Modified! Refresh for changes.";
-                }
-                else {
-                    return;
-                }
-            }
-            return true;
-        }
+	function editcss() {
+		global $main, $db, $style;
+		if($_SESSION['logged']) {
+			if(isset($_POST['css'])) {
+				$url = $db->config('url')."themes/".$db->config('theme')."/images/";
+				$slash = stripslashes(str_replace("&lt;IMG&gt;", "<IMG>", $_POST['css'])); #Strip it back
+				$filetochange = LINK."../themes/".$db->config('theme')."/style.css";
+				file_put_contents($filetochange, $slash);
+				echo "CSS File Modified! Refresh for changes.";
+			}
+			else {
+				return;
+			}
+		}
+		return true;
+	}
 
-        function edittpl() {
-            global $main, $db, $style;
-            if($_SESSION['logged']) {
-                if(isset($_POST['file']) and isset($_POST['contents'])) {
-                    $file = $_POST['file'];
-                    $contents = $_POST['contents'];
-                    $slash = $contents;
-                    //We have to do some special stuff for the footer.
-                    //This gets complex. But it works. I might simplify it sometime.
-                    if($file == "footer") {
-						$slash = str_replace("&lt;COPYRIGHT&gt;", "<COPYRIGHT>", $slash);
-						$slash = stripslashes(str_replace("&lt;PAGEGEN&gt;", "<PAGEGEN>", $slash));
-                    }
-                    $slash = stripslashes(str_replace("&lt;THT TITLE&gt;", "<THT TITLE>", $slash)); # Yay, strip it
-                    $slash = str_replace("&lt;JAVASCRIPT&gt;", "<JAVASCRIPT>", $slash); #jav
-                    $slash = str_replace("&lt;CSS&gt;", "<CSS>", $slash); #css
-                    $slash = str_replace("&lt;ICONDIR&gt;", "<ICONDIR>", $slash); #icondir
-                    $slash = str_replace("&lt;IMG&gt;", "<IMG>", $slash);
-                    $slash = str_replace("&lt;MENU&gt;", "<MENU>", $slash);
-                    $slash = str_replace("&#37;INFO%", "%INFO%", $slash);
-                    #Alrighty, what to do nexty?
-                    $filetochange = LINK."../themes/".$db->config('theme')."/".$file.".tpl";
-                    $filetochangeOpen = fopen($filetochange,"w");
-                    fputs($filetochangeOpen,$slash);
-                    fclose($filetochangeOpen) or die ("Error Closing File!");
-                    echo $file . '.tpl Modified! Refresh for changes.';
-                    die();
-                }
-            }
-            return true;
-        }
+	function edittpl() {
+		global $main, $db, $style;
+		if($_SESSION['logged']) {
+			if(isset($_POST['file']) and isset($_POST['contents'])) {
+				$file = $_POST['file'];
+				$contents = $_POST['contents'];
+				$slash = $contents;
+				//We have to do some special stuff for the footer.
+				//This gets complex. But it works. I might simplify it sometime.
+				if($file == "footer") {
+					$slash = str_replace("&lt;COPYRIGHT&gt;", "<COPYRIGHT>", $slash);
+					$slash = stripslashes(str_replace("&lt;PAGEGEN&gt;", "<PAGEGEN>", $slash));
+				}
+				$slash = stripslashes(str_replace("&lt;THT TITLE&gt;", "<THT TITLE>", $slash)); # Yay, strip it
+				$slash = str_replace("&lt;JAVASCRIPT&gt;", "<JAVASCRIPT>", $slash); #jav
+				$slash = str_replace("&lt;CSS&gt;", "<CSS>", $slash); #css
+				$slash = str_replace("&lt;ICONDIR&gt;", "<ICONDIR>", $slash); #icondir
+				$slash = str_replace("&lt;IMG&gt;", "<IMG>", $slash);
+				$slash = str_replace("&lt;MENU&gt;", "<MENU>", $slash);
+				$slash = str_replace("&#37;INFO%", "%INFO%", $slash);
+				#Alrighty, what to do nexty?
+				$filetochange = LINK."../themes/".$db->config('theme')."/".$file.".tpl";
+				$filetochangeOpen = fopen($filetochange,"w");
+				fputs($filetochangeOpen,$slash);
+				fclose($filetochangeOpen) or die ("Error Closing File!");
+				echo $file . '.tpl Modified! Refresh for changes.';
+				die();
+			}
+		}
+		return true;
+	}
 
-        function notice() {
-            global $style;
-            if(isset($_REQUEST['status']) and isset ($_REQUEST['message'])) {
-                if($_REQUEST['status'] == "good") {
-                    $status = true;
-                }
-                else {
-                    $status = false;
-                }
-                echo $style->notice($status, $_REQUEST['message']);
-            }
-            return true;
-        }
+	function notice() {
+		global $style;
+		if(isset($_REQUEST['status']) and isset ($_REQUEST['message'])) {
+			if($_REQUEST['status'] == "good") {
+				$status = true;
+			}
+			else {
+				$status = false;
+			}
+			echo $style->notice($status, $_REQUEST['message']);
+		}
+		return true;
+	}
 
-       function upload() {
-           global $main;
-           if($_SESSION['logged']) {
-               
-           }
-       }
+	function upload() {
+		global $main;
+		if($_SESSION['logged']) {
 
-       function navbar() {
-           global $main, $db;
-           if($_SESSION['logged']) {
-               //Cause I'm fairly lazy
-               $P = $_POST;
-               if(isset($P['action']) or $_GET['action']) {
-                   //Even lazier?
-                   $action = $_REQUEST['action'];
-                   $id = $main->postvar['id'];
-                   $name = $main->postvar['name'];
-                   $icon = $main->postvar['icon'];
-                   $link = $main->postvar['link'];
-                   switch($action) {
-                       case "add":
-                           if(
-							isset($P['name']) && isset($P['icon']) && isset($P['link']) &&
-							$P['name'] && $P['icon'] && $P['link']
-                           ) {
-                                $db->query("INSERT INTO `<pre>navbar` (visual, icon, link) VALUES('{$name}', '{$icon}','{$link}')");
-                           }
-                           break;
-                       case "edit":
-                           if(
-							isset($P['id']) && isset($P['name']) && isset($P['icon']) && isset($P['link']) &&
-							$P['id'] && $P['name'] && $P['icon'] && $P['link']
-                           ) {
-                                $db->query("UPDATE `<pre>navbar` SET
-                                `visual` = '{$name}',
-                                `icon` = '{$icon}',
-                                `link` = '{$link}'
-                                WHERE `id` = '{$id}'");
-                           }
-                           break;
-                       case "delete":
-                           if(isset($_GET['id']) && $_GET['id']) {
-                               $db->query("DELETE FROM `<PRE>navbar` WHERE `id` = '{$main->getvar['id']}'");
-                           }
-                           break;
-                       case "order":
-                           if(isset($P['order'])) {
-                               $ids = explode("-", $main->postvar['order']);
-                               $i = 0;
-                               foreach($ids as $id) {
-                                   $db->query("UPDATE `<PRE>navbar` SET `order` = {$i} WHERE `id` = {$id}");
-                                   $i++;
-                               }
-                           }
-                           break;
-                   }
-               }
-           }
-       }
+		}
+	}
 
-       function acpPackages() {
-           global $main, $db, $type;
-           if($_SESSION['logged']) {
-                $P = $_POST;
-               $G = $_GET;
-               $R = $_REQUEST;
-               $action = $R['action'];
-               $id = $main->postvar['id'];
-               $name = $main->postvar['name'];
-               $backend = $main->postvar['backend'];
-               $description = $main->postvar['description'];
-               $type2 = $main->postvar['type'];
-               $val = $main->postvar['val'];
-               $reseller = $main->postvar['reseller'];
-               $order = $main->postvar['order'];
-               $additional = $main->postvar['additional'];
-               $server = $main->postvar['server'];
+	function navbar() {
+		global $main, $db;
+		if($_SESSION['logged']) {
+			//Cause I'm fairly lazy
+			$P = $_POST;
+			if(isset($P['action']) or $_GET['action']) {
+				//Even lazier?
+				$action = $_REQUEST['action'];
+				$id = $main->postvar['id'];
+				$name = $main->postvar['name'];
+				$icon = $main->postvar['icon'];
+				$link = $main->postvar['link'];
+				switch($action) {
+				case "add":
+					if(
+						isset($P['name']) && isset($P['icon']) && isset($P['link']) &&
+						$P['name'] && $P['icon'] && $P['link']
+					){
+						$db->query("INSERT INTO `<pre>navbar` (visual, icon, link) VALUES('{$name}', '{$icon}','{$link}')");
+					}
+					break;
+				case "edit":
+					if(
+						isset($P['id']) && isset($P['name']) && isset($P['icon']) && isset($P['link']) &&
+						$P['id'] && $P['name'] && $P['icon'] && $P['link']
+					){
+						$db->query("UPDATE `<pre>navbar` SET
+							`visual` = '{$name}',
+							`icon` = '{$icon}',
+							`link` = '{$link}'
+							WHERE `id` = '{$id}'");
+					}
+					break;
+				case "delete":
+					if(isset($_GET['id']) && $_GET['id']) {
+						$db->query("DELETE FROM `<PRE>navbar` WHERE `id` = '{$main->getvar['id']}'");
+					}
+					break;
+				case "order":
+					if(isset($P['order'])) {
+						$ids = explode("-", $main->postvar['order']);
+						$i = 0;
+						foreach($ids as $id) {
+							$db->query("UPDATE `<PRE>navbar` SET `order` = {$i} WHERE `id` = {$id}");
+							$i++;
+						}
+					}
+					break;
+				}
+			}
+		}
+	}
 
-               if(isset($P['action']) or $G['action']) {
-                   switch($action) {
-                       case "edit":
-                           if(empty($P['additional']) or $P['additional'] == "undefined") {
-                               $db->query("UPDATE `<PRE>packages` SET
-                            `name` = '{$name}',
-                            `backend` = '{$backend}',
-                            `description` = '{$description}',
-                            `admin` = '{$val}',
-                            `reseller` = '{$reseller}'
-                            WHERE `id` = '{$id}'");
-                           }
-                           else {
-                            $db->query("UPDATE `<PRE>packages` SET
-                            `name` = '{$name}',
-                            `backend` = '{$backend}',
-                            `description` = '{$description}',
-                            `admin` = '{$val}',
-                            `reseller` = '{$reseller}',
-                            `additional` = '{$additional}'
-                            WHERE `id` = '{$id}'");
-                           }
-                           break;
+	function acpPackages() {
+		global $main, $db, $type;
+		if($_SESSION['logged']) {
+			$P = $_POST;
+			$G = $_GET;
+			$R = $_REQUEST;
+			$action = $R['action'];
+			$id = $main->postvar['id'];
+			$name = $main->postvar['name'];
+			$backend = $main->postvar['backend'];
+			$description = $main->postvar['description'];
+			$type2 = $main->postvar['type'];
+			$val = $main->postvar['val'];
+			$reseller = $main->postvar['reseller'];
+			$order = $main->postvar['order'];
+			$additional = $main->postvar['additional'];
+			$server = $main->postvar['server'];
 
-                       case "add":
-                           if(empty($P['additional']) or $P['additional'] == "undefined") {
-                               $db->query("INSERT INTO <PRE>packages
-                               (
-                               `name`,
-                               `backend`,
-                               `description`,
-                               `type`,
-                               `server`,
-                               `admin`,
-                               `reseller`
-                               )
-                               VALUES
-                               (
-                               '{$name}',
-                               '{$backend}',
-                               '{$description}',
-                               '{$type2}',
-                               '{$server}',
-                               '{$val}',
-                               '{$reseller}'
-                               );
-                                ");
-                           }
-                           else {
-                               $db->query("INSERT INTO <PRE>packages
-                               (
-                               `name`,
-                               `backend`,
-                               `description`,
-                               `type`,
-                               `server`,
-                               `admin`,
-                               `reseller`,
-                               `additional`
-                               )
-                               VALUES
-                               (
-                               '{$name}',
-                               '{$backend}',
-                               '{$description}',
-                               '{$type2}',
-                               '{$server}',
-                               '{$val}',
-                               '{$reseller}',
-                               '{$additional}'
-                               );
-                                ");
-                           }
-                           break;
+			if(isset($P['action']) or $G['action']) {
+			switch($action) {
+				case "edit":
+					if(empty($P['additional']) or $P['additional'] == "undefined") {
+						$db->query("UPDATE `<PRE>packages` SET
+							`name` = '{$name}',
+							`backend` = '{$backend}',
+							`description` = '{$description}',
+							`admin` = '{$val}',
+							`reseller` = '{$reseller}'
+							WHERE `id` = '{$id}'");
+					}
+					else {
+						$db->query("UPDATE `<PRE>packages` SET
+							`name` = '{$name}',
+							`backend` = '{$backend}',
+							`description` = '{$description}',
+							`admin` = '{$val}',
+							`reseller` = '{$reseller}',
+							`additional` = '{$additional}'
+							WHERE `id` = '{$id}'");
+					}
+					break;
 
-                       case "delete":
-                           if(isset($G['id'])) {
-                               $db->query("DELETE FROM `<PRE>packages` WHERE `id` = '{$main->getvar['id']}'");
-                           }
-                           break;
+				case "add":
+					if(empty($P['additional']) or $P['additional'] == "undefined") {
+						$db->query("INSERT INTO <PRE>packages
+							(
+							`name`,
+							`backend`,
+							`description`,
+							`type`,
+							`server`,
+							`admin`,
+							`reseller`
+							)
+							VALUES
+							(
+							'{$name}',
+							'{$backend}',
+							'{$description}',
+							'{$type2}',
+							'{$server}',
+							'{$val}',
+							'{$reseller}'
+							);
+						");
+					}
+					else {
+						$db->query("INSERT INTO <PRE>packages
+							(
+							`name`,
+							`backend`,
+							`description`,
+							`type`,
+							`server`,
+							`admin`,
+							`reseller`,
+							`additional`
+							)
+							VALUES
+							(
+							'{$name}',
+							'{$backend}',
+							'{$description}',
+							'{$type2}',
+							'{$server}',
+							'{$val}',
+							'{$reseller}',
+							'{$additional}'
+							);
+						");
+					}
+					break;
+
+				case "delete":
+					if(isset($G['id'])) {
+						$db->query("DELETE FROM `<PRE>packages` WHERE `id` = '{$main->getvar['id']}'");
+					}
+					break;
 
 
-                       case "order":
-                            if(isset($P['order'])) {
-                                $ids = explode("-", $order);
-                                $i = 0;
-                                foreach($ids as $id) {
-                                    $db->query("UPDATE `<PRE>packages` SET `order` = '{$i}' WHERE `id` = '{$id}'");
-                                    $i++;
-                                }
-                            }
-                       break;
+				case "order":
+					if(isset($P['order'])) {
+						$ids = explode("-", $order);
+						$i = 0;
+						foreach($ids as $id) {
+							$db->query("UPDATE `<PRE>packages` SET `order` = '{$i}' WHERE `id` = '{$id}'");
+							$i++;
+						}
+					}
+					break;
 
-                       case "typeInfo":
-                           if(isset($G['type'])) {
-                            echo $type->acpPadd($G['type']);
-                           }
-                           break;
-                   }
-               }
-           }
+				case "typeInfo":
+					if(isset($G['type'])) {
+						echo $type->acpPadd($G['type']);
+					}
+					break;
+				}
+			}
+		}
 
        }
 
@@ -1108,7 +1202,7 @@ class Ajax {
                }
            }
        }
-	   
+
 		function ispaid() {
 			//Used in the order form.  This will now return an id if the plan isn't set to be approved by an admin.
 			global $db, $main;
@@ -1120,7 +1214,7 @@ class Ajax {
 				echo $invoice['id'];
 			}
 	   }
-	   
+
 	   function deleteTicket() {
 		   if($_SESSION['logged']) {
 			   global $main, $db;
@@ -1133,7 +1227,7 @@ class Ajax {
 			   }
 		   }
 	   }
-	   
+
 	   // Sets the order of the rows in a table.
 	   // $_POST["order"] should be a comma seperated list of IDs for $_POST["table"]
 	   // $_POST["table"] should NOT include the table prefix.
@@ -1171,7 +1265,7 @@ class Ajax {
 			echo "1";
 		}
 	}
-	   
+
 }
 if(isset($_REQUEST['function']) and $_REQUEST['function'] != "") {
 	$Ajax = new Ajax();

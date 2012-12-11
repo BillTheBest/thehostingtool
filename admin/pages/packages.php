@@ -10,24 +10,24 @@
 if(THT != 1){die();}
 
 class page {
-	
+
 	public $navtitle;
 	public $navlist = array();
-							
+
 	public function __construct() {
 		$this->navtitle = "Packages Sub Menu";
 		$this->navlist[] = array("Add Packages", "package_add.png", "add");
 		$this->navlist[] = array("Edit Packages", "package_go.png", "edit");
 		$this->navlist[] = array("Delete Packages", "package_delete.png", "delete");
 	}
-	
+
 	public function description() {
 		return "<strong>Managing Packages</strong><br />
 		Welcome to the Package Management Area. Here you can add, edit and delete web hosting packages. Have fun :)<br />
 		To get started, choose a link from the sidebar's SubMenu.";
 	}
-	
-	public function content() { # Displays the page 
+
+	public function content() { # Displays the page
 		global $main;
 		global $style;
 		global $db;
@@ -76,7 +76,7 @@ class page {
 				echo "This will only add the package to THT, not create the package on the backend for you.<br><br>";
 				echo $style->replaceVar("tpl/addpackage.tpl", $array);
 				break;
-				
+
 			case "edit":
 				if(isset($main->getvar['do'])) {
 					$query = $db->query("SELECT * FROM `<PRE>packages` WHERE `id` = '{$main->getvar['do']}'");
@@ -175,11 +175,11 @@ class page {
 						}
 
 						$array['ORIGTYPE'] = $data['type'];
-						$query = $db->query("SELECT * FROM `<PRE>servers`");
-						while($data = $db->fetch_array($query)) {
-							$values[] = array($data['name'], $data['id']);
+						$query_serv = $db->query("SELECT * FROM `<PRE>servers`");
+						while($data_serv = $db->fetch_array($query_serv)) {
+							$values[] = array($data_serv['name'], $data_serv['id']);
 						}
-						$array['SERVER'] = $array['THEME'] = $main->dropDown("server", $values, $data['server']);
+						$array['SERVER'] = $main->dropDown("server", $values, $data['server']);
 						echo "This will only edit the package on THT, not edit the package on the backend for you.<br><br>";
 						echo $style->replaceVar("tpl/editpackage.tpl", $array);
 					}
@@ -198,7 +198,7 @@ class page {
 					}
 				}
 				break;
-				
+
 			case "delete":
 				if($main->getvar['do']) {
 					$db->query("DELETE FROM `<PRE>packages` WHERE `id` = '{$main->getvar['do']}'");

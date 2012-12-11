@@ -901,7 +901,7 @@ padding-left: 4px;
 
 
 /* THT integration - made by herolien */
-/* http://www.myheberg.com	      */
+/* http://www.myheberg.com            */
 
 
 #tooltip {
@@ -1015,19 +1015,19 @@ input, textarea, select {
 			color: #FFF;
 			text-decoration: none;
 		}
-         #tht_navigation  .active{
-              background: #ccc; color: #FFF;
-              margin-right: 7px;
-              font-size: 1.05em;
-              text-decoration:none;
-         }
-		.active a{
-            display:block;
+	#tht_navigation  .active{
+		background: #ccc; color: #FFF;
+		margin-right: 7px;
+		font-size: 1.05em;
+		text-decoration:none;
+	}
+	.active a{
+		display:block;
 
-            color: #FFF;
-            background: #CCC;
-            font-weight: bold;
-		}
+		color: #FFF;
+		background: #CCC;
+		font-weight: bold;
+	}
 
 	#tht_navigation ul li a {
 		color: #333;

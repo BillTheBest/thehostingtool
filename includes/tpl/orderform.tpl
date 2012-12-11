@@ -15,11 +15,11 @@ $(document).ready(function(){
    });
 });
 
-function stopRKey(evt) { 
-  var evt = (evt) ? evt : ((event) ? event : null); 
-  var node = (evt.target) ? evt.target : ((evt.srcElement) ? evt.srcElement : null); 
-  if ((evt.keyCode == 13) && (node.type=="text"))  {return false;} 
-} 
+function stopRKey(evt) {
+  var evt = (evt) ? evt : ((event) ? event : null);
+  var node = (evt.target) ? evt.target : ((evt.srcElement) ? evt.srcElement : null);
+  if ((evt.keyCode == 13) && (node.type=="text"))  {return false;}
+}
 
 document.onkeypress = stopRKey;
 
@@ -27,12 +27,18 @@ function check(name, value) {
 	$("#"+name+"check").html(loading);
 	document.getElementById("next").disabled = true;
 	window.setTimeout(function() {
-		$.get("<AJAX>?function="+name+"check&THT=1&"+name+"="+value, function(data) {
+		if(name == "coupon"){
+			var extrasend = "&username="+document.getElementById("username").value+"&package="+document.getElementById("package").value;
+		}else{
+			var extrasend = "";
+		}
+		$.get("<AJAX>?function="+name+"check&THT=1&"+name+"="+value+extrasend, function(data) {
 			if(data == "1") {
 				$("#"+name+"check").html(right);
-			}
-			else {
+			}else if(data == "0") {
 				$("#"+name+"check").html(wrong);
+			}else{
+				$("#"+name+"check").html(data);
 			}
 			document.getElementById("next").disabled = false;
 		});
@@ -54,7 +60,7 @@ function orderstepme(id) {
 		document.getElementById("sub").style.display = 'none';
 		document.getElementById("dom").style.display = '';
 	}
-	$.get('<AJAX>?function=orderForm&package='+ document.getElementById("package").value, function(stuff) {
+	$.get('<AJAX>?function=orderForm&package='+ document.getElementById("package").value+"&coupon="+document.getElementById("coupon").value, function(stuff) {
 		$("#custom").html('<table width="100%" border="0" cellspacing="2" cellpadding="0" id="custom">'+stuff+'</table>');
 																								   });
 	showhide(step, step + 1)
@@ -80,7 +86,7 @@ function nextstep() {
 				document.getElementById("verify").innerHTML = wrong
 			}
 			break;
-			
+
 		case 3:
 			//I don't know JS very well, so I said screw it with the loops after 6 hours.  This works, so I'm using it.  - Na'ven
 
@@ -109,6 +115,7 @@ function nextstep() {
 			var zipver = document.getElementById("zipcheck").innerHTML
 			var phonever = document.getElementById("phonecheck").innerHTML
 			var humanver = document.getElementById("humancheck").innerHTML
+			var couponver = document.getElementById("couponcheck").innerHTML
 
 			$.get("<AJAX>?function=akismetcheck&checkthisname="+document.getElementById("firstname").value+" "+document.getElementById("lastname").value+"&checkthisemail="+document.getElementById("email").value, function(data){
 			if(data == "0"){
@@ -138,7 +145,8 @@ function nextstep() {
 					statever == wrong ||
 					zipver == wrong ||
 					phonever == wrong ||
-					humanver == wrong)
+					humanver == wrong ||
+					couponver == wrong)
 				{
 					document.getElementById("verify").innerHTML = wrong;
 				}else{
@@ -147,9 +155,9 @@ function nextstep() {
 					step = step + 1
 				}
 			}
-																		});
+			});
 			break;
-			
+
 		case 4:
 			  final(step, step + 1)
 			  step = step + 1
@@ -214,7 +222,7 @@ function previousstep() {
 		document.getElementById("next").disabled = true;
 		document.getElementById("back").disabled = true;
 		document.getElementById("verify").innerHTML = ""
-		
+
 		var newstep = step - 1;
 		if (newstep == 3) {
 			$.get("<AJAX>?function=orderIsUser", function(data) {
@@ -234,16 +242,15 @@ function previousstep() {
 				document.getElementById("next").disabled = true;
 				document.getElementById("order"+pid).disabled = false;
 			}
-										  });
-		
-     });
+		});
+		});
 	}
 }
 </script>
 <form action="" method="post" name="order" id="order">
 <div>
 	<div id="1">
-    	<input name="package" id="package" type="hidden" value="" />
+        <input name="package" id="package" type="hidden" value="" />
         <div class="table">
             <div class="cat">Step One - Choose Type/Package</div>
             <div class="text">
@@ -366,6 +373,12 @@ function previousstep() {
                 <td><input type="text" name="human" id="human" onchange="check('human', this.value)" size = "47" /></td>
                 <td align="left"><a title="Answer the question to prove you are not a bot." class="tooltip"><img src="<URL>themes/icons/information.png" /></a></td>
                 <td id="humancheck" align="left">&nbsp;</td>
+              </tr>
+              <tr>
+                <td>Coupon:</td>
+                <td><input type="text" name="coupon" id="coupon" onchange="check('coupon', this.value)" size = "47" /></td>
+                <td align="left"><a title="If you have a coupon code, please enter it here." class="tooltip"><img src="<URL>themes/icons/information.png" /></a></td>
+                <td id="couponcheck" align="left">&nbsp;</td>
               </tr>
             </table>
             </table>

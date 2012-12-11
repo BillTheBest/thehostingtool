@@ -60,7 +60,7 @@ document.write(messageDate);
 <div id="panel">
 <!-- start: header_welcomeblock_member -->
 <br/>%INFO%<br/>
-<a href="<URL>order"><strong>Order Form</strong></a> | <a href="<URL>client"><strong>Client Area</strong></a> | <a href="<URL>support"><strong>Support</strong></a>
+<a href="<URL>order"><strong>Order Form</strong></a> | <a href="<URL>client"><strong>Client Area</strong></a> | <a href="<URL>support"><strong>Knowledgebase</strong></a>
 </div>
 
 <div class="logo"><a href="<URL>"><img src="<IMG>logo.png"/></a></div>
@@ -79,7 +79,7 @@ document.write(messageDate);
 
 <div id="container">
 		<a name="top" id="top"></a>
-			<hr class="hidden" />
+		<hr class="hidden" />
 		<hr class="hidden" />
 		<br class="clear" />
 		<div id="content">

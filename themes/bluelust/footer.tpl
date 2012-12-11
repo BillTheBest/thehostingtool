@@ -1,5 +1,5 @@
-	<br clear='all'/><!-- start: footer -->
-
+<!-- start: footer -->
+<br clear='all'/>
 <br />
 			<div class="bottommenu" style="height:15px;">
 				<div class="float_left"><!-- start: footer_languageselect -->
@@ -7,7 +7,7 @@
 <!-- end: footer_languageselect --></div>
 				<div class="float_right"><span class="smalltext"><COPYRIGHT></span></div>
 				<div>
-					<span class="smalltext"><a href="../../"><NAME></a> | <a href="<URL>forums">Forums</a> | <a href="<URL>client/index.php?page=invoices">Billing</a> | <a href="../../Contact">Contact Us</a> | <a href="#">Return to Top</a></span>
+					<span class="smalltext"><a href="../../"><NAME></a> | <a href="<URL>forums">Forums</a> | <a href="<URL>client/index.php?page=invoices">Billing</a> | <a href="../Contact">Contact Us</a> | <a href="#">Return to Top</a></span>
 
 				</div>
 			</div>

@@ -7,20 +7,20 @@
 //////////////////////////////
 
 class da {
-	
+
 	# START THE MO TRUCKIN FUNCTIONS #
-	
+
 	public $name = "Direct Admin"; # THT Values
 	public $hash = false; # Password or Access Hash?
-	
+
 	private $server;
-	
+
 	public function __construct($serverId = null) {
 		if(!is_null($serverId)) {
 			$this->server = (int)$serverId;
 		}
 	}
-	
+
 	private function serverDetails($server) {
 		global $db;
 		global $main;
@@ -35,7 +35,7 @@ class da {
 			return $db->fetch_array($query);
 		}
 	}
-	
+
 	private function remote($action, $url, $get = false, $returnErrors = false) {
 		$data = $this->serverDetails($this->server);
 		$ch = curl_init();
@@ -51,6 +51,9 @@ class da {
 		}
 		curl_setopt($ch, CURLOPT_HEADER, 0);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 		$data = curl_exec($ch);
 		if($data === false) {
 			if($returnErrors) {
@@ -79,7 +82,7 @@ class da {
 		}
 		return $user;
 	}
-	
+
 	public function GenPassword() {
 		for ($digit = 0; $digit < 5; $digit++) {
 			$r = rand(0,1);
@@ -88,7 +91,7 @@ class da {
 		}
 		return $passwd;
 	}
-	
+
 	public function signup($server, $reseller, $user = '', $email = '', $pass = '') {
 		global $main;
 		global $db;
@@ -122,7 +125,7 @@ class da {
 			return true;
 		}
 	}
-	
+
 	public function suspend($user, $server, $reason = false) {
 		$this->server = $server;
 		$define = "CMD_API_SELECT_USERS";
@@ -135,7 +138,7 @@ class da {
 			return false;
 		}
 	}
-	
+
 	public function unsuspend($user, $server) {
 		$this->server = $server;
 		$define = "CMD_API_SELECT_USERS";
@@ -160,12 +163,12 @@ class da {
 			return false;
 		}
 	}
-	
+
 	public function testConnection($serverId = null) {
 		if(!is_null($serverId)) {
 			$this->server = (int)$serverId;
 		}
-		
+
 		// No idea if this will work. Still need a DA testing server.
 		$command = $this->remote("CMD_API_ADMIN_STATS", "", true, true);
 		if($command["error"] == "1") {

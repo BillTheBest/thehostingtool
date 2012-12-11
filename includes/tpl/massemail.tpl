@@ -19,7 +19,7 @@ function sendemail() {
 	}
 	else {
 		document.getElementById("ajaxemail").innerHTML = "Houston, we have a problem.<hr>" + mydata;
-	}});	
+	}});
 }
 </script>
 <div id="ajaxemail">

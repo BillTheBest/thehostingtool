@@ -10,15 +10,15 @@
 if(THT != 1){die();}
 
 class whmimport {
-	
+
 	public $name = "Web Host Manager (WHM)";
-	
+
 	public function import() { # Imports or displays. Whatever really..
 		global $style;
 		global $db;
 		global $main;
 		global $type;
-		
+
 		if(!$_POST) {
 			$query = $db->query("SELECT * FROM `<PRE>servers` WHERE `type` = 'whm'");
 			while($data = $db->fetch_array($query)) {
@@ -43,7 +43,7 @@ class whmimport {
 					$usercheck = $db->query("SELECT * FROM `<PRE>users` WHERE `user` = '{$data['user']}'");
 					if($db->num_rows($usercheck) == 0) {
 						if($db->num_rows($pselect) == 0) {
-							$db->query("INSERT INTO `<PRE>packages` (name,backend,description,type,server,admin) 
+							$db->query("INSERT INTO `<PRE>packages` (name,backend,description,type,server,admin)
 																	   VALUES('{$data['package']}',
 																			  '{$data['package']}',
 																			  'Description Here',
@@ -63,11 +63,10 @@ class whmimport {
 								'saltme',
 								'{$data['start_date']}',
 								'',
-								'1')"
-							);
+								'1')");
 							$checkquery = $db->query("SELECT * FROM `<PRE>users` WHERE `user` = '{$data['user']}'");
 							$datanewuser = $db->fetch_array($checkquery);
-							$db->query("INSERT INTO `<PRE>user_packs` (userid,domain,pid,signup,status,additional) 
+							$db->query("INSERT INTO `<PRE>user_packs` (userid,domain,pid,signup,status,additional)
 																	 VALUES(
 																			'{$datanewuser['id']}',
 																			'{$data['domain']}',

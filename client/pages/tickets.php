@@ -10,21 +10,21 @@
 if(THT != 1){die();}
 
 class page {
-	
+
 	public $navtitle;
 	public $navlist = array();
-							
+
 	public function __construct() {
 		$this->navtitle = "Tickets Menu";
 		$this->navlist[] = array("New Ticket", "page_white_add.png", "add");
 		$this->navlist[] = array("View Tickets", "page_white_go.png", "view");
 	}
-	
+
 	public function description() {
 		return "<strong>Tickets Area</strong><br />
 		This is the area where you can add/view tickets that you've created or just created. Any tickets, responses will be sent via email.";
 	}
-	
+
 	private function lastUpdated($id) { # Returns a the date of last updated on ticket id
 		global $db, $main;
 		$query = $db->query("SELECT * FROM `<PRE>tickets` WHERE `ticketid` = '{$db->strip($id)}' AND `reply` = '1' ORDER BY `time` DESC");
@@ -37,27 +37,27 @@ class page {
 			return $main->convertdate("n/d/Y - g:i A", $data['time'])." by ". $username;
 		}
 	}
-	
+
 	private function status($status) { # Returns the text of the status
 		switch($status) {
 			default:
 				return "Other";
 				break;
-			
+
 			case 1:
 				return "Open";
 				break;
-				
+
 			case 2:
 				return "On Hold";
 				break;
-				
+
 			case 3:
 				return "Closed";
 				break;
 		}
 	}
-	
+
 	private function determineAuthor($id, $staff) { # Returns the text of the author of a reply
 		global $db;
 		switch($staff) {
@@ -65,7 +65,7 @@ class page {
 				$client = $db->client($id);
 				$username = $client['user'];
 				break;
-				
+
 			case 1:
 				$client = $db->staff($id);
 				$username = $client['name'];
@@ -73,7 +73,7 @@ class page {
 		}
 		return $username;
 	}
-	
+
 	private function showReply($id) { # Returns the HTML for a ticket box
 		global $db, $main, $style;
 		$query = $db->query("SELECT * FROM `<PRE>tickets` WHERE `id` = '{$id}'");
@@ -88,14 +88,14 @@ class page {
 			$array['DETAILS'] = "Original Poster";
 		}
 		elseif($data['staff'] == 1) {
-			$array['DETAILS'] = "Staff Member";
+			$array['DETAILS'] = "<font color = '#FF0000'>Staff Member</font>";
 		}
 		else {
 			$array['DETAILS'] = "";
 		}
 		return $style->replaceVar("tpl/support/replybox.tpl", $array);
 	}
-	
+
 	public function content() { # Displays the page
 	global $main;
 	global $style;
@@ -126,7 +126,7 @@ class page {
 				}
 				echo $style->replaceVar("tpl/support/addticket.tpl", $array);
 				break;
-			
+
 			case "view":
 				if(is_numeric($_GET['deltid'])){
 					$userid = $_SESSION['cuser'];
@@ -204,7 +204,7 @@ class page {
 						}else{
 							$array['STATUSCOLOR'] = "000000";
 						}
-						
+
 						$n = 0;
 						$array['REPLIES'] = "";
 						while($reply = $db->fetch_array($query)) {
@@ -233,7 +233,7 @@ class page {
 						//else {
 						//	$array['ADDREPLY'] = "";
 						//}
-						
+
 						echo $style->replaceVar("tpl/support/viewticket.tpl", $array);
 					}
 				}
